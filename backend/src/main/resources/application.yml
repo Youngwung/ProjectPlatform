@@ -1,5 +1,6 @@
 server:
     port: 8080
+
 spring:
     servlet:
         multipart:
@@ -14,11 +15,17 @@ spring:
         show-sql: true
         properties:
             hibernate:
-            format_sql: true
-            dialect: org.hibernate.dialect.MySQLDialect
+                format_sql: true
         defer-datasource-initialization: true
     datasource:
-        url: jdbc:mysql://localhost:3306/ezbook?allowPublicKeyRetrieval=true&useSSL=false
-        username: root
-        password: 1234
+        url: jdbc:mysql://mysql-container:3306/ppproject
+        username: ppproject
+        password: ppproject
         driver-class-name: com.mysql.cj.jdbc.Driver
+        hikari:
+            auto-commit: true
+            minimum-idle: 5
+            maximum-pool-size: 10
+            idle-timeout: 30000
+            max-lifetime: 1800000
+            connection-timeout: 30000

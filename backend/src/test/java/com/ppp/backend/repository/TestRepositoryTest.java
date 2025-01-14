@@ -15,7 +15,7 @@ public class TestRepositoryTest {
 
     @org.junit.jupiter.api.Test
     public void testInsert() {
-        testRepository.save(Test.builder().id(1L).name("이정인").build());
+       String lee= String.valueOf(testRepository.findById(1L));
+       System.out.println(lee);
     }
-
 }

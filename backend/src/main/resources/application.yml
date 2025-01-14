@@ -18,7 +18,7 @@ spring:
                 format_sql: true
         defer-datasource-initialization: true
     datasource:
-        url: jdbc:mysql://mysql-container:3306/ppproject
+        url: jdbc:mysql://localhost:3308/ppproject?allowPublicKeyRetrieval=true&useSSL=false
         username: ppproject
         password: ppproject
         driver-class-name: com.mysql.cj.jdbc.Driver

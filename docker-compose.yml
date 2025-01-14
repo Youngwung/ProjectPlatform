@@ -9,7 +9,7 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/ppproject
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3308/ppproject?allowPublicKeyRetrieval=true&useSSL=false
       SPRING_DATASOURCE_USERNAME: ppproject
       SPRING_DATASOURCE_PASSWORD: ppproject
     volumes:

@@ -1,21 +1,23 @@
 package com.ppp.backend.repository;
 
-import com.ppp.backend.entity.Test;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
 @SpringBootTest
+@Slf4j
+@ActiveProfiles("local")
 public class TestRepositoryTest {
     @Autowired
     private TestRepository testRepository;
 
-    @org.junit.jupiter.api.Test
-    public void testInsert() {
-       String lee= String.valueOf(testRepository.findById(1L));
-       System.out.println(lee);
+    @Test
+    public void testAll() {
     }
 }

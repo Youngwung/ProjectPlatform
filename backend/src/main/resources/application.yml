@@ -2,6 +2,9 @@ server:
     port: 8080
 
 spring:
+    config:
+        activate:
+            on-profile: docker
     servlet:
         multipart:
             max-file-size: 10MB
@@ -18,6 +21,43 @@ spring:
         properties:
             hibernate:
                 format_sql: true
+                dialect: org.hibernate.dialect.MySQLDialect
+        defer-datasource-initialization: true
+    datasource:
+        url: jdbc:mysql://mysql-container:3306/ppproject?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+        username: ppproject
+        password: ppproject
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        hikari:
+            auto-commit: true
+            minimum-idle: 5
+            maximum-pool-size: 10
+            idle-timeout: 30000
+            max-lifetime: 1800000
+            connection-timeout: 30000
+---
+
+spring:
+    config:
+        activate:
+            on-profile: local
+    servlet:
+        multipart:
+            max-file-size: 10MB
+            max-request-size: 10MB
+    web:
+        resources:
+            mime:
+                types:
+                    map: application/json
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: true
+        properties:
+            hibernate:
+                format_sql: true
+                dialect: org.hibernate.dialect.MySQLDialect
         defer-datasource-initialization: true
     datasource:
         url: jdbc:mysql://localhost:3308/ppproject?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
@@ -31,3 +71,4 @@ spring:
             idle-timeout: 30000
             max-lifetime: 1800000
             connection-timeout: 30000
+

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Nav, Navbar, Container, NavDropdown} from 'react-bootstrap';
+import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 const Top = () => {
@@ -20,14 +20,14 @@ const Top = () => {
               navbarScroll
             >
               <NavDropdown title="구인" id="navbarScrollingDropdown">
-                <NavDropdown.Item as={Link} to="/findProject">전체보기</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/findProject/frontend">frontend</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/findProject/backend">backend</NavDropdown.Item>
-              </NavDropdown>
-              <NavDropdown title="구직" id="navbarScrollingDropdown">
                 <NavDropdown.Item as={Link} to="/joinProject">전체보기</NavDropdown.Item>
                 <NavDropdown.Item as={Link} to="/joinProject/frontend">frontend</NavDropdown.Item>
                 <NavDropdown.Item as={Link} to="/joinProject/backend">backend</NavDropdown.Item>
+              </NavDropdown>
+              <NavDropdown title="구직" id="navbarScrollingDropdown">
+                <NavDropdown.Item as={Link} to="/findProject">전체보기</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/findProject/frontend">frontend</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/findProject/backend">backend</NavDropdown.Item>
               </NavDropdown>
             </Nav>
           </Navbar.Collapse>

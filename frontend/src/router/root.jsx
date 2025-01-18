@@ -1,36 +1,62 @@
-import React from 'react'
-import { createBrowserRouter as Router} from 'react-router-dom'
-import FindProject from '../pages/FindProject'
-import JoinProject from '../pages/JoinProject'
-import Main from '../pages/Main'
-import MyPage from '../pages/MyPage'
-import ErrorPage from '../pages/ErrorPage'
-import Layout from '../Layout/Layout'
+import React, { lazy, Suspense } from "react";
+import { createBrowserRouter as Router } from "react-router-dom";
+
+const Loading = <div>Loading....</div>; // 로딩 중에 보여줄 요소
+const Layout = lazy(() => import("../Layout/Layout"));
+const ErrorPage = lazy(() => import("../pages/ErrorPage"));
+const Main = lazy(() => import("../pages/Main"));
+const FindProject = lazy(() => import("../pages/FindProject"));
+const JoinProject = lazy(() => import("../pages/JoinProject"));
+const MyPage = lazy(() => import("../pages/MyPage"));
 
 const root = Router([
-    {
-        path: '/',
-        element: <Layout />,
-        errorElement: <ErrorPage />, // 에러 페이지 처리
-        children: [
-            {
-                path: '/',
-                element: <Main/>
-            },
-            {
-                path: '/findProject',
-                element: <FindProject />
-            },
-            {
-                path: '/joinProject',
-                element: <JoinProject />
-            },
-            {
-                path: '/mypage',
-                element: <MyPage />
-            }
-        ],
-    },
-])
+	{
+		path: "/",
+		element: (
+			<Suspense fallback={Loading}>
+				<Layout />
+			</Suspense>
+		),
+		errorElement: (
+			<Suspense fallback={Loading}>
+				<ErrorPage />
+			</Suspense>
+		), // 에러 페이지 처리
+		children: [
+			{
+				path: "/",
+				element: (
+					<Suspense fallback={Loading}>
+						<Main />
+					</Suspense>
+				),
+			},
+			{
+				path: "/findProject",
+				element: (
+					<Suspense fallback={Loading}>
+						<FindProject />
+					</Suspense>
+				),
+			},
+			{
+				path: "/joinProject",
+				element: (
+					<Suspense fallback={Loading}>
+						<JoinProject />
+					</Suspense>
+				),
+			},
+			{
+				path: "/mypage",
+				element: (
+					<Suspense fallback={Loading}>
+						<MyPage />
+					</Suspense>
+				),
+			},
+		],
+	},
+]);
 
-export default root
+export default root;

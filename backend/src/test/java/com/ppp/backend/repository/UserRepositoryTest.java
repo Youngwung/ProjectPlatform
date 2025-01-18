@@ -32,11 +32,11 @@ public class UserRepositoryTest {
 	public void insertTest() {
 		Provider provider = provRepo.findById(1L).orElseThrow();
 		User user = User.builder()
-			.name("Test")
-			.password("1234")
-			.email("123@123")
-			.provider(provider)
-		.build();
+				.name("Test")
+				.password("1234")
+				.email("123@123")
+				.provider(provider)
+				.build();
 
 		userRepo.save(user);
 	}
@@ -50,15 +50,14 @@ public class UserRepositoryTest {
 	// @Test
 	public void testUpdate() {
 		Provider provider = provRepo.findById(1L).orElseThrow();
-		Long userId = 1L;
-			User user = userRepo.findById(userId).orElseThrow();
-			user = User.builder()
-				.id(userId)
+
+		User user = User.builder()
+				.id(1L)
 				.name("Test")
 				.password("1234")
 				.provider(provider)
 				.email("Test1")
-			.build();
+				.build();
 		userRepo.save(user);
 		log.info("user = {}", user);
 	}

@@ -4,7 +4,7 @@ import joinProjectRouter from "./joinProjectRouter";
 import findProjectRouter from "./findProjectRouter";
 
 const Loading = <div>Loading....</div>; // 로딩 중에 보여줄 요소
-const Layout = lazy(() => import("../Layout/Layout"));
+const Layout = lazy(() => import("../layout/Layout"));
 const ErrorPage = lazy(() => import("../pages/ErrorPage"));
 const Main = lazy(() => import("../pages/Main"));
 const FindProject = lazy(() => import("../pages/FindProject"));

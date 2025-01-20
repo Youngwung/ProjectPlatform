@@ -1,6 +1,7 @@
 import React, { lazy, Suspense } from "react";
 import { createBrowserRouter as Router } from "react-router-dom";
 import joinProjectRouter from "./joinProjectRouter";
+import findProjectRouter from "./findProjectRouter";
 
 const Loading = <div>Loading....</div>; // 로딩 중에 보여줄 요소
 const Layout = lazy(() => import("../Layout/Layout"));
@@ -31,6 +32,7 @@ const root = Router([
 				element: (
 					<Suspense fallback={Loading}><FindProject /></Suspense>
 				),
+				children: findProjectRouter(),
 			},
 			{
 				path: "/joinProject",

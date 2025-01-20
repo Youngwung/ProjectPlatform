@@ -1,6 +1,9 @@
 package com.ppp.backend.domain;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,8 +52,10 @@ public class User {
 	private Provider provider;
 
 	@ToString.Exclude
-	private LocalDate createdAt;
+	@CreationTimestamp
+	private LocalDateTime createdAt;
 
 	@ToString.Exclude
-	private LocalDate updatedAt;
+	@UpdateTimestamp
+	private LocalDateTime updatedAt;
 }

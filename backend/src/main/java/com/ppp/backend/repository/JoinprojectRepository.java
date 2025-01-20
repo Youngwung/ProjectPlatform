@@ -3,10 +3,10 @@ package com.ppp.backend.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.ppp.backend.domain.Joinproject;
+import com.ppp.backend.domain.JoinProject;
 
 
 
-public interface JoinprojectRepository extends JpaRepository<Joinproject, Long> {
+public interface JoinProjectRepository extends JpaRepository<JoinProject, Long> {
 	
 }

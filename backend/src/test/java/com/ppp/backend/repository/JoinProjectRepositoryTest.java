@@ -11,7 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ppp.backend.domain.Joinproject;
+import com.ppp.backend.domain.JoinProject;
 import com.ppp.backend.domain.User;
 
 import lombok.extern.slf4j.Slf4j;
@@ -21,36 +21,37 @@ import lombok.extern.slf4j.Slf4j;
 @ActiveProfiles("local")
 public class JoinProjectRepositoryTest {
 	@Autowired
-	private JoinprojectRepository jpRepo;
+	private JoinProjectRepository jPRepo;
 	@Autowired
 	private UserRepository userRepo;
 
 	@Test
 	public void testDi() {
-		Assertions.assertNotNull(jpRepo);
-		log.info("jpRepo = {}", jpRepo);
+		Assertions.assertNotNull(jPRepo);
+		log.info("jPRepo = {}", jPRepo);
 	}
 
 	// @Test
 	public void testInsert() {
 		User user = userRepo.findById(1L).orElseThrow();
-		Joinproject joinProject = Joinproject.builder()
+		JoinProject joinProject = JoinProject.builder()
 				.title("TestTitle")
 				.user(user).build();
-		jpRepo.save(joinProject);
+		jPRepo.save(joinProject);
 	}
 
 	@Test
+	@Transactional
 	public void readTest() {
-		Joinproject joinproject = jpRepo.findById(1L).orElseThrow(null);
-		log.info("joinproject = {} ", joinproject);
+		JoinProject joinProject = jPRepo.findById(1L).orElseThrow(null);
+		log.info("joinProject = {} ", joinProject);
 	}
 
 	// @Test
 	public void updateTest() {
 		User user = userRepo.findById(1L).orElseThrow(null);
-		Joinproject jp = Joinproject.builder().id(1L).title("updatetest").user(user).build();
-		jpRepo.save(jp);
+		JoinProject jp = JoinProject.builder().id(1L).title("updatetest").user(user).build();
+		jPRepo.save(jp);
 	}
 
 	@Test
@@ -58,7 +59,7 @@ public class JoinProjectRepositoryTest {
 	public void pagingTest() {
 		Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
 
-		Page<Joinproject> result = jpRepo.findAll(pageable);
+		Page<JoinProject> result = jPRepo.findAll(pageable);
 
 		// 전체 원소 개수
 		log.info("resultTotalElements = {}", result.getTotalElements());

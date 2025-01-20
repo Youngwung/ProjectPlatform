@@ -53,6 +53,8 @@ public class User {
 
 	@ToString.Exclude
 	@CreationTimestamp
+	// 최초 생성 시 디폴트값, 그 이후에 수정 불가
+	@Column(updatable = false)
 	private LocalDateTime createdAt;
 
 	@ToString.Exclude

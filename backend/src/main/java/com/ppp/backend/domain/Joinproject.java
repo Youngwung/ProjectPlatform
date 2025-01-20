@@ -60,6 +60,8 @@ public class JoinProject {
 	@ToString.Exclude
 	@CreationTimestamp
 	// LocalDateTime, TimeStamp 등에서 사용 가능한 편의 애너테이션
+	@Column(updatable = false)
+	// 최초 생성 시 default값, 그 이후에 수정 불가
 	private LocalDateTime createdAt;
 
 	@ToString.Exclude

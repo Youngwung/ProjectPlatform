@@ -72,7 +72,7 @@ CREATE TABLE joinproject (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     max_people INT,
-    status ENUM('모집 중', '진행 중', '완료') DEFAULT '모집 중',
+    status ENUM('모집_중', '진행_중', '완료') DEFAULT '모집_중',
     is_public BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

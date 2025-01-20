@@ -2,7 +2,7 @@ package com.ppp.backend.domain;
 
 import java.time.LocalDate;
 
-import com.ppp.backend.status.JoinprojectStatus;
+import com.ppp.backend.status.JoinProjectStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,7 +47,7 @@ public class JoinProject {
 
 	// enum 타입 컬럼 저장
 	@Enumerated(EnumType.STRING)
-	private JoinprojectStatus status;
+	private JoinProjectStatus status;
 
 	private boolean isPublic;
 

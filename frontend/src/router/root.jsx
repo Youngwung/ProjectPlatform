@@ -5,9 +5,9 @@ import findProjectRouter from "./findProjectRouter";
 
 const Loading = <div>Loading....</div>; // 로딩 중에 보여줄 요소
 const Layout = lazy(() => import("../layout/Layout"));
-const ErrorPage = lazy(() => import("../pages/ErrorPage"));
+// const ErrorPage = lazy(() => import("../pages/ErrorPage"));
 const Main = lazy(() => import("../pages/Main"));
-const FindProject = lazy(() => import("../pages/FindProject"));
+const FindProject = lazy(() => import("../pages/findProject/IndexPage"));
 const JoinProjectIndex = lazy(() => import("../pages/joinProject/IndexPage"));
 const MyPage = lazy(() => import("../pages/MyPage"));
 
@@ -17,9 +17,9 @@ const root = Router([
 		element: (
 			<Suspense fallback={Loading}><Layout /></Suspense>
 		),
-		errorElement: (
-			<Suspense fallback={Loading}><ErrorPage /></Suspense>
-		), // 에러 페이지 처리
+		// errorElement: (
+		// 	<Suspense fallback={Loading}><ErrorPage /></Suspense>
+		// ), // 에러 페이지 처리
 		children: [
 			{
 				path: "/",

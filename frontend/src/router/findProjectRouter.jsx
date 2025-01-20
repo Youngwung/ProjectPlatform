@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { Navigate } from "react-router-dom";
 
 const Loading = <div>Loading...</div>;
-const FindProjectListPage = lazy(() => import("../pages/FindProject"));
+const FindProjectListPage = lazy(() => import("../pages/findProject/ListPage"));
 const FindProjectPortfolioDetail = lazy(() => import("../pages/findProject/PortfolioDetail"));
 const FindProjectAddPage = lazy(() => import("../pages/findProject/CreactPortfolio"));
 const FindProjectModifyPage = lazy(() => import("../pages/findProject/ModifyPortfolio"));

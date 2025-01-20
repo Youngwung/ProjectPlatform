@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom"; // navigate 가져오기
 import { Container, Card, Button } from "react-bootstrap";
 
 const PortfolioDetail = () => {
   const { projectId } = useParams();
-  console.log("Current Project ID:", projectId);
+  const navigate = useNavigate(); // navigate 함수 초기화
   const [portfolio, setPortfolio] = useState(null);
 
   useEffect(() => {
@@ -40,6 +40,15 @@ const PortfolioDetail = () => {
           <Card.Link href={portfolio.github_url} target="_blank">
             GitHub 링크
           </Card.Link>
+          {/* 수정 버튼 */}
+          <Button
+            variant="primary"
+            onClick={() =>
+              navigate(`/findProject/modify/${projectId}`, { state: { portfolio } })
+            }
+          >
+            수정
+          </Button>
         </Card.Body>
       </Card>
       <Link to="/findProject/list">
@@ -52,4 +61,3 @@ const PortfolioDetail = () => {
 };
 
 export default PortfolioDetail;
-

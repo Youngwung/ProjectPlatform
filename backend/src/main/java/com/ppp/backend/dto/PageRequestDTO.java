@@ -1,15 +1,19 @@
 package com.ppp.backend.dto;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @Data
+@AllArgsConstructor
 public class PageRequestDTO {
-	@Builder.Default
-	private int page = 1;
+	private int page;
 
-	@Builder.Default
-	private int size = 10;
+	private int size;
+
+	public PageRequestDTO() {
+		this.page = 1;
+		this.size = 10;
+	}
 }

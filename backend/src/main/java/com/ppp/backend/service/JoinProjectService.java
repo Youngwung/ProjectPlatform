@@ -3,6 +3,8 @@ package com.ppp.backend.service;
 import com.ppp.backend.domain.JoinProject;
 import com.ppp.backend.domain.User;
 import com.ppp.backend.dto.JoinProjectDTO;
+import com.ppp.backend.dto.PageRequestDTO;
+import com.ppp.backend.dto.PageResponseDTO;
 import com.ppp.backend.repository.UserRepository;
 import com.ppp.backend.status.JoinProjectStatus;
 
@@ -18,6 +20,8 @@ public interface JoinProjectService {
 	void modify(JoinProjectDTO dto);
 
 	void remove(Long jpNo);
+
+	PageResponseDTO<JoinProjectDTO> getList(PageRequestDTO PageRequestDTO);
 
 	// Entity → DTO 변환
 	default JoinProjectDTO fromEntity(JoinProject entity) {

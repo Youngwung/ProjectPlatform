@@ -3,6 +3,7 @@ package com.ppp.backend.repository;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 
 import com.ppp.backend.domain.JoinProject;
 import com.ppp.backend.domain.QJoinProject;
+import com.ppp.backend.dto.PageRequestDTO;
 import com.querydsl.jpa.JPQLQuery;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,31 +28,27 @@ public class JoinProjectSearchImpl extends QuerydslRepositorySupport implements 
 	}
 
 	@Override
-	public Page<JoinProject> search1() {
-		log.info("search1............");
+	public Page<JoinProject> search1(PageRequestDTO pageRequestDTO) {
 
 		QJoinProject jProject = QJoinProject.joinProject;
 
 		// JoinProject 테이블에서
 		JPQLQuery<JoinProject> query = from(jProject);
 
-		// title 컬럼에 1이 포함된 조건으로 select 문 작성
-		query.where(jProject.title.toLowerCase().contains("t"));
-
 		// pageable 객체 생성
-		Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
+		// DTO의 값으로 수정
+		Pageable pageable = PageRequest.of(pageRequestDTO.getPage() - 1, pageRequestDTO.getSize(), Sort.by("id").descending());
 
 		// QueryDSL에서 페이징 처리 하는 방법
 		this.getQuerydsl().applyPagination(pageable, query);
 		// query에 페이징 처리가 적용됨.
 
-		List<JoinProject> fetch = query.fetch(); // 페이징 처리된 목록 데이터
-		System.out.println(fetch);
+		List<JoinProject> list = query.fetch(); // 페이징 처리된 목록 데이터
 
-		long fetchCount = query.fetchCount(); // 검색된 전체 데이터 양
-		System.out.println(fetchCount);
+		long total = query.fetchCount(); // 검색된 전체 데이터 양
 		
-		return null;
+		// Collect와 Pageable객체, 전체 데이터 개수로 Page<E>를 리턴해주는 생성자: PageImpl
+		return new PageImpl<>(list, pageable, total);
 	}
 
 }

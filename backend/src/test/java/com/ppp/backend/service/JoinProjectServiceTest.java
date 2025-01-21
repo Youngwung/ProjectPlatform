@@ -6,6 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.ppp.backend.dto.JoinProjectDTO;
+import com.ppp.backend.dto.PageRequestDTO;
+import com.ppp.backend.dto.PageResponseDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,4 +51,26 @@ public class JoinProjectServiceTest {
 	public void removeTest() {
 		jPService.remove(3L);
 	}
+
+	// @Test
+	public void insertDummyData() {
+		for(int i = 0; i < 20; i++) {
+			JoinProjectDTO dto =JoinProjectDTO.builder()
+			.title("title: " + i)
+			.description("testDescription" + i)
+			.userId(1L)
+			.build();
+			Long id = jPService.register(dto);
+			log.info("id = {}", id);
+		}
+	}
+
+	@Test
+	public void getListTest() {
+		// 값을 지정하지 않으면 page = 1, size = 10
+		PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(1).build();
+		PageResponseDTO<JoinProjectDTO> result = jPService.getList(pageRequestDTO);
+		System.out.println(result);
+	}
+
 }

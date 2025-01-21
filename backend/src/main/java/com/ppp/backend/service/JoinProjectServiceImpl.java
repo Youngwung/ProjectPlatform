@@ -1,9 +1,15 @@
 package com.ppp.backend.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.ppp.backend.domain.JoinProject;
 import com.ppp.backend.dto.JoinProjectDTO;
+import com.ppp.backend.dto.PageRequestDTO;
+import com.ppp.backend.dto.PageResponseDTO;
 import com.ppp.backend.repository.JoinProjectRepository;
 import com.ppp.backend.repository.UserRepository;
 
@@ -46,5 +52,18 @@ public class JoinProjectServiceImpl implements JoinProjectService{
 	@Override
 	public void remove(Long jpNo) {
 		jPRepo.deleteById(jpNo);
+	}
+
+	@Override
+	public PageResponseDTO<JoinProjectDTO> getList(PageRequestDTO PageRequestDTO) {
+		// JPA
+		Page<JoinProject> result = jPRepo.search1(PageRequestDTO);
+		
+		//! JoinProject List => JoinProjectDTO List
+		List<JoinProjectDTO> dtoList = result.get().map(joinProject -> fromEntity(joinProject)).collect(Collectors.toList());
+
+		PageResponseDTO<JoinProjectDTO> pageResponseDTO = new PageResponseDTO<>(dtoList, PageRequestDTO, result.getTotalElements());
+		
+		return pageResponseDTO;
 	}
 }

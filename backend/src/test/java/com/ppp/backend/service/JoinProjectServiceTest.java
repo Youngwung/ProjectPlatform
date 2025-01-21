@@ -33,4 +33,20 @@ public class JoinProjectServiceTest {
 		Long id = jPService.register(dto);
 		log.info("id = {}", id);
 	}
+
+	@Test
+	public void modifyTest() {
+		JoinProjectDTO dto =JoinProjectDTO.builder()
+		.id(4L)
+		.title("modifyTest2")
+		.description("testDescription")
+		.userId(1L)
+		.build();
+		jPService.modify(dto);
+	}
+
+	@Test
+	public void removeTest() {
+		jPService.remove(3L);
+	}
 }

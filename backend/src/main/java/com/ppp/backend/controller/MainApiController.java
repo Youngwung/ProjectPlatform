@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController("/")
 @RequiredArgsConstructor
-public class ApiController {
+public class MainApiController {
 
     @GetMapping("/")
     public String main(){
@@ -19,8 +19,8 @@ public class ApiController {
         return "Hello World";
     }
 
-    @GetMapping("/joinproject")
-    public String joinProject(){
-        return "Hello World";
-    }
+//    @GetMapping("/joinproject")
+//    public String joinProject() {
+//        return "Hello World";
+//    }
 }

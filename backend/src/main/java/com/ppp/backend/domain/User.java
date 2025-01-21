@@ -25,7 +25,7 @@ import lombok.ToString;
 @Table
 @Getter
 @ToString
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
 public class User {

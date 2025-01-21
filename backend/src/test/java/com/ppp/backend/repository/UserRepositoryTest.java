@@ -46,10 +46,15 @@ public class UserRepositoryTest {
 			.name("kakao")
 			.description("카카오 프로바이더")
 		.build();
+		Provider local = Provider.builder()
+					.name("local")
+					.description("로컬")
+					.build();
 
 		provRepo.save(google);
 		provRepo.save(naver);
 		provRepo.save(kakao);
+		provRepo.save(local);
 
 	}
 

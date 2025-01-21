@@ -86,11 +86,6 @@ public class JoinProjectController {
 	@DeleteMapping("/{jpNo}")
 	public Map<String, String> remove(@PathVariable("jpNo") Long jpNo) {
 		joinProjectService.remove(jpNo);
-
 		return Map.of("RESULT", "SUCCESS");
 	}
-	
-	
-	
-	
 }

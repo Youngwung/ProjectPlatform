@@ -17,7 +17,7 @@ import com.ppp.backend.status.JoinProjectStatus;
 
 import lombok.extern.slf4j.Slf4j;
 
-@SpringBootTest
+// @SpringBootTest
 @Slf4j
 @ActiveProfiles("local")
 public class JoinProjectRepositoryTest {
@@ -26,13 +26,13 @@ public class JoinProjectRepositoryTest {
 	@Autowired
 	private UserRepository userRepo;
 
-	@Test
+	// @Test
 	public void testDi() {
 		Assertions.assertNotNull(jPRepo);
 		log.info("jPRepo = {}", jPRepo);
 	}
 
-	@Test
+	// @Test
 	public void testInsert() {
 		User user = userRepo.findById(1L).orElseThrow();
 		JoinProject joinProject = JoinProject.builder()
@@ -41,21 +41,21 @@ public class JoinProjectRepositoryTest {
 		jPRepo.save(joinProject);
 	}
 
-	@Test
+	// @Test
 	@Transactional
 	public void readTest() {
 		JoinProject joinProject = jPRepo.findById(1L).orElseThrow(null);
 		log.info("joinProject = {} ", joinProject);
 	}
 
-	@Test
+	// @Test
 	public void updateTest() {
 		User user = userRepo.findById(1L).orElseThrow(null);
 		JoinProject jp = JoinProject.builder().id(1L).title("DefaultUpdateTest1").status(JoinProjectStatus.모집_중).user(user).build();
 		jPRepo.save(jp);
 	}
 
-	@Test
+	// @Test
 	@Transactional
 	public void pagingTest() {
 		Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());

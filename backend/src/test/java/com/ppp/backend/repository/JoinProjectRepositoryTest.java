@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ppp.backend.domain.JoinProject;
 import com.ppp.backend.domain.User;
+import com.ppp.backend.status.JoinProjectStatus;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,11 +32,11 @@ public class JoinProjectRepositoryTest {
 		log.info("jPRepo = {}", jPRepo);
 	}
 
-	// @Test
+	@Test
 	public void testInsert() {
 		User user = userRepo.findById(1L).orElseThrow();
 		JoinProject joinProject = JoinProject.builder()
-				.title("TestTitle")
+				.title("DefaultTest2")
 				.user(user).build();
 		jPRepo.save(joinProject);
 	}
@@ -47,10 +48,10 @@ public class JoinProjectRepositoryTest {
 		log.info("joinProject = {} ", joinProject);
 	}
 
-	// @Test
+	@Test
 	public void updateTest() {
 		User user = userRepo.findById(1L).orElseThrow(null);
-		JoinProject jp = JoinProject.builder().id(1L).title("updatetest").user(user).build();
+		JoinProject jp = JoinProject.builder().id(1L).title("DefaultUpdateTest1").status(JoinProjectStatus.모집_중).user(user).build();
 		jPRepo.save(jp);
 	}
 

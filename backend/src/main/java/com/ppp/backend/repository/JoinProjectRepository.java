@@ -7,6 +7,6 @@ import com.ppp.backend.domain.JoinProject;
 
 
 
-public interface JoinProjectRepository extends JpaRepository<JoinProject, Long> {
+public interface JoinProjectRepository extends JpaRepository<JoinProject, Long>, JoinProjectSearch {
 	
 }

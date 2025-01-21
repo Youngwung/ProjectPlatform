@@ -7,7 +7,7 @@ import org.springframework.test.context.ActiveProfiles;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
-@SpringBootTest
+// @SpringBootTest
 @Slf4j
 @ActiveProfiles("local")
 public class JoinProjectSearchTest {

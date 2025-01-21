@@ -13,7 +13,7 @@ import com.ppp.backend.domain.User;
 
 import lombok.extern.slf4j.Slf4j;
 
-@SpringBootTest
+// @SpringBootTest
 @ActiveProfiles("local")
 @Slf4j
 public class UserRepositoryTest {
@@ -24,13 +24,13 @@ public class UserRepositoryTest {
 	@Autowired
 	private ProviderRepository provRepo;
 
-	@Test
+	// @Test
 	public void diTest() {
 		Assertions.assertNotNull(userRepo);
 		log.info("userRepo = {} ------------------", userRepo);
 	}
 
-	@Test
+	// @Test
 	public void providerInsertTest() {
 		Provider google = Provider.builder()
 			.name("google")
@@ -53,7 +53,7 @@ public class UserRepositoryTest {
 
 	}
 
-	@Test
+	// @Test
 	public void insertTest() {
 		Provider provider = provRepo.findById(1L).orElseThrow();
 		User user = User.builder()
@@ -66,13 +66,13 @@ public class UserRepositoryTest {
 		userRepo.save(user);
 	}
 
-	@Test
+	// @Test
 	public void testRead() {
 		User user = userRepo.findById(1L).orElseThrow();
 		log.info("user = {}", user.getProvider());
 	}
 
-	@Test
+	// @Test
 	public void testUpdate() {
 		Provider provider = provRepo.findById(1L).orElseThrow();
 

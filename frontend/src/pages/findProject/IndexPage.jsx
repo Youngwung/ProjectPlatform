@@ -9,8 +9,8 @@ const FindProject = () => {
 
   // 특정 경로에서 헤더와 검색창/버튼 숨기기
   const isListOrDetail = 
-                            location.pathname.includes("/findProject/list") || 
-                            location.pathname.includes("/findProject/detail");
+                        location.pathname.includes("/findProject/list") || 
+                        location.pathname.includes("/findProject/detail");
 
   return (
     <Container className="mt-4">

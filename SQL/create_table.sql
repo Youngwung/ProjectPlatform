@@ -97,7 +97,7 @@ CREATE TABLE findproject (
 );
 
 -- notice 테이블 생성
-CREATE TABLE notice (
+CREATE TABLE alert (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     joinproject_id BIGINT,
     user_id BIGINT NOT NULL,

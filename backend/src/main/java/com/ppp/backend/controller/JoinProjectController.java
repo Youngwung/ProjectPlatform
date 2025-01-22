@@ -19,10 +19,6 @@ import com.ppp.backend.service.JoinProjectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-
-
-
-
 @RestController
 @Slf4j
 @RequiredArgsConstructor

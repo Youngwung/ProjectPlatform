@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom"; // navigate 가져오기
 import { Container, Card, Button } from "react-bootstrap";
+import ReadComponent from "../../components/findProject/ReadComponent";
 
 const PortfolioDetail = () => {
   const { projectId } = useParams();
@@ -35,7 +36,7 @@ const PortfolioDetail = () => {
           <Card.Title>{portfolio.title}</Card.Title>
           <Card.Text>{portfolio.description}</Card.Text>
           <Card.Text>
-            <strong>기술:</strong> {portfolio.skills.join(", ")}
+            <strong>기술:</strong> {portfolio.skills}
           </Card.Text>
           <Card.Link href={portfolio.github_url} target="_blank">
             GitHub 링크
@@ -56,6 +57,7 @@ const PortfolioDetail = () => {
           목록으로 돌아가기
         </Button>
       </Link>
+      <ReadComponent fpNo={projectId} />
     </Container>
   );
 };

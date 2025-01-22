@@ -5,7 +5,7 @@ export const API_URL = 'http://localhost:8080';
 const prefix = `${API_URL}/api/findProject`;
 
 // FindProject API 함수 모듈
-const FindProjectApi = {
+const findProjectApi = {
   // 전체 프로젝트 조회
   getAllProjects: async () => {
     try {
@@ -75,4 +75,4 @@ const FindProjectApi = {
   },
 };
 
-export default FindProjectApi;
+export default findProjectApi;

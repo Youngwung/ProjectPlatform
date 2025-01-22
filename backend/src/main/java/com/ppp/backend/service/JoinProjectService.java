@@ -1,5 +1,7 @@
 package com.ppp.backend.service;
 
+import java.sql.Timestamp;
+
 import com.ppp.backend.domain.JoinProject;
 import com.ppp.backend.domain.User;
 import com.ppp.backend.dto.JoinProjectDTO;
@@ -36,8 +38,8 @@ public interface JoinProjectService {
 				.description(entity.getDescription())
 				.maxPeople(entity.getMaxPeople())
 				.isPublic(entity.isPublic())
-				.createdAt(entity.getCreatedAt())
-				.updatedAt(entity.getUpdatedAt())
+				.createdAt(entity.getCreatedAt().toLocalDateTime())
+				.updatedAt(entity.getUpdatedAt().toLocalDateTime())
 				.build();
 
 		// 만약에 스테이터스가 null이면 default값
@@ -72,8 +74,8 @@ public interface JoinProjectService {
 				.maxPeople(dto.getMaxPeople())
 				.status(dto.getStatus())
 				.isPublic(dto.isPublic())
-				.createdAt(dto.getCreatedAt())
-				.updatedAt(dto.getUpdatedAt())
+				.createdAt(Timestamp.valueOf(dto.getCreatedAt()))
+				.updatedAt(Timestamp.valueOf(dto.getUpdatedAt()))
 				.build();
 
 		return entity;

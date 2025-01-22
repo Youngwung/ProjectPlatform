@@ -38,7 +38,7 @@ public class PageResponseDTO<E> {
 
 		// 끝 페이지 end가 몇 인 지 구하기.
 		// 나누는 숫자가 실수여야 원하는 결과가 나옴.
-		int end = (int) (Math.ceil(pageRequestDTO.getPage() / (pageRequestDTO.getSize() + 0.0))) * pageRequestDTO.getSize();
+		int end = (int) (Math.ceil(pageRequestDTO.getPage() / (pageRequestDTO.getSize() + 0.0))) * pageRequestDTO.getSize(); 
 		// ceil: 올림 함수
 
 		// 시작 페이지가 몇 인 지 구하기

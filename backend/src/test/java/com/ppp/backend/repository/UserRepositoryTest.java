@@ -1,5 +1,6 @@
 package com.ppp.backend.repository;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Assertions;
@@ -13,7 +14,7 @@ import com.ppp.backend.domain.User;
 
 import lombok.extern.slf4j.Slf4j;
 
-// @SpringBootTest
+@SpringBootTest
 @ActiveProfiles("local")
 @Slf4j
 public class UserRepositoryTest {
@@ -77,19 +78,21 @@ public class UserRepositoryTest {
 		log.info("user = {}", user.getProvider());
 	}
 
-	// @Test
+	@Test
 	public void testUpdate() {
 		Provider provider = provRepo.findById(1L).orElseThrow();
 
 		log.info("now() = {}", LocalDateTime.now());
+		log.info("now() = {}", Timestamp.valueOf(LocalDateTime.now()));
 		User user = User.builder()
 				.id(1L)
 				.name("TestUpdate")
 				.password("1234")
 				.provider(provider)
 				.email("Test1")
+				.createdAt(Timestamp.valueOf(LocalDateTime.now()))
 				// 영국 표준시 저장됨.
-				.updatedAt(LocalDateTime.now())
+				.updatedAt(Timestamp.valueOf(LocalDateTime.now()))
 				.build();
 		userRepo.save(user);
 		log.info("user = {}", user);

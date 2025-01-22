@@ -1,6 +1,6 @@
 package com.ppp.backend.domain;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -55,9 +55,9 @@ public class User {
 	@CreationTimestamp
 	// 최초 생성 시 디폴트값, 그 이후에 수정 불가
 	@Column(updatable = false)
-	private LocalDateTime createdAt;
+	private Timestamp createdAt;
 
 	@ToString.Exclude
 	@UpdateTimestamp
-	private LocalDateTime updatedAt;
+	private Timestamp updatedAt;
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { Pagination } from "react-bootstrap";
+import FindProjectApi from "../../api/FindProjectApi";  
 
 const ListPage = () => {
   const [portfolios, setPortfolios] = useState([]); // 전체 포트폴리오 데이터
@@ -27,18 +28,15 @@ const ListPage = () => {
 
   // 더미 데이터 생성
   useEffect(() => {
-    const fetchData = async () => {
-      const dummyData = Array.from({ length: 50 }, (_, index) => ({
-        id: index + 1,
-        title: `포트폴리오 ${index + 1}`,
-        description: `포트폴리오 설명 ${index + 1}`,
-        skills: ["React", "Bootstrap", "MySQL"],
-        github_url: `https://github.com/project-${index + 1}`,
-        image_url: "https://via.placeholder.com/150",
-      }));
-      setPortfolios(dummyData);
+    const fetchGetAllFindProjects = async () => {
+      try {
+        const response = await FindProjectApi.getAllProjects();
+        setPortfolios(response);
+      } catch (error) {
+        console.error("전체 프로젝트 조회 실패:", error);
+      }
     };
-    fetchData();
+    fetchGetAllFindProjects();
   }, []);
 
   return (

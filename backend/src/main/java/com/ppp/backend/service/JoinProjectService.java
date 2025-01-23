@@ -1,6 +1,7 @@
 package com.ppp.backend.service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import com.ppp.backend.domain.JoinProject;
 import com.ppp.backend.domain.User;
@@ -38,6 +39,7 @@ public interface JoinProjectService {
 				.description(entity.getDescription())
 				.maxPeople(entity.getMaxPeople())
 				.isPublic(entity.isPublic())
+				.status(entity.getStatus().toString())
 				.createdAt(entity.getCreatedAt().toLocalDateTime())
 				.updatedAt(entity.getUpdatedAt().toLocalDateTime())
 				.build();
@@ -45,7 +47,7 @@ public interface JoinProjectService {
 		// 만약에 스테이터스가 null이면 default값
 		// update 시 status가 항상 null로 초기화 되는 문제 해결을 위한 코드
 		if (dto.getStatus() == null) {
-			dto.setStatus(JoinProjectStatus.모집_중);
+			dto.setStatus("모집_중");
 		}
 
 		return dto;
@@ -63,7 +65,7 @@ public interface JoinProjectService {
 		// 만약에 스테이터스가 null이면 default값
 		// update 시 status가 항상 null로 초기화 되는 문제 해결을 위한 코드
 		if (dto.getStatus() == null) {
-			dto.setStatus(JoinProjectStatus.모집_중);
+			dto.setStatus("모집_중");
 		}
 
 		JoinProject entity = JoinProject.builder()
@@ -72,10 +74,10 @@ public interface JoinProjectService {
 				.title(dto.getTitle())
 				.description(dto.getDescription())
 				.maxPeople(dto.getMaxPeople())
-				.status(dto.getStatus())
+				.status(JoinProjectStatus.valueOf(dto.getStatus()))
 				.isPublic(dto.isPublic())
-				.createdAt(Timestamp.valueOf(dto.getCreatedAt()))
-				.updatedAt(Timestamp.valueOf(dto.getUpdatedAt()))
+				.createdAt(dto.getCreatedAt() == null ? Timestamp.valueOf(LocalDateTime.now()) : Timestamp.valueOf(dto.getCreatedAt()))
+				.updatedAt(dto.getUpdatedAt() == null ? Timestamp.valueOf(LocalDateTime.now()) : Timestamp.valueOf(dto.getUpdatedAt()))
 				.build();
 
 		return entity;

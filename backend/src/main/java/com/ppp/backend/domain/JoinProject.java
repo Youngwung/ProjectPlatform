@@ -50,8 +50,6 @@ public class JoinProject {
 
 	// enum 타입 컬럼 저장
 	@Enumerated(EnumType.STRING)
-	// JPA가 insert문 생성 시 컬럼에서 제외하여 default값이 들어가도록 설정하는 애너테이션
-	@Column(insertable = false)
 	private JoinProjectStatus status;
 
 	@Column(insertable = false)

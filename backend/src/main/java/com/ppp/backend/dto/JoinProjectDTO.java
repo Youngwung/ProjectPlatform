@@ -2,8 +2,6 @@ package com.ppp.backend.dto;
 
 import java.time.LocalDateTime;
 
-import com.ppp.backend.status.JoinProjectStatus;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,7 +24,7 @@ public class JoinProjectDTO {
 	private int maxPeople;
 
 	// enum 타입 컬럼 저장
-	private JoinProjectStatus status;
+	private String status;
 
 	private boolean isPublic;
 

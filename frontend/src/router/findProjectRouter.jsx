@@ -22,7 +22,7 @@ const findProjectRouter = () => {
       element: <Navigate replace to="list" />,
     },
     {
-      path: "detail/:projectId",
+      path: "list/:projectId",
       element: (
         <Suspense fallback={Loading}>
           <FindProjectPortfolioDetail />

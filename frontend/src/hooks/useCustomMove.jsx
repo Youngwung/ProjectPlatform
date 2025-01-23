@@ -1,4 +1,5 @@
 // 페이지 이동 관련 useNavigate 들을 한 곳에서 관리하기 위한 커스텀 훅
+import { useState } from "react";
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom";
 
 const getNum = (param, defaultValue) => {
@@ -22,6 +23,9 @@ export default function useCustomMove() {
 	// ? page=1&size=10
 	const queryDefault = createSearchParams({page, size}).toString()
 
+	// 같은 페이지를 클릭했을 때 새로고침이 되어 데이터를 가져올 수 있도록 구현
+	const [refresh, setRefresh] = useState(false);
+
 
 	/**
 	 *
@@ -41,6 +45,8 @@ export default function useCustomMove() {
 		} else {
 			queryStr = queryDefault;
 		}
+		// 함수를 호출할 때 마다 값이 변경됨
+		setRefresh(!refresh);
 		navigate({pathname: '../list', search: queryStr})
 	}
 
@@ -52,6 +58,14 @@ export default function useCustomMove() {
 		})
 	}
 
-	return {moveToList, moveToModify, page, size}
+	const moveToRead = (jpNo) => {
+		navigate({
+			pathname: `../read/${jpNo}`,
+			search: queryDefault
+		})
+	}
+
+	// refresh 값 반환
+	return {moveToList, moveToModify, moveToRead, page, size, refresh}
 	// 커스텀 훅과 쿼리스트링에서 받아온 page 변수와 size 변수를 다른 페이지에서도 사용할 수 있게 반환
 }

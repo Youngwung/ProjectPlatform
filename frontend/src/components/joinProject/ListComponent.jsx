@@ -20,7 +20,7 @@ const initState = {
 };
 
 export default function ListComponent() {
-	const { page, size, moveToList } = useCustomMove();
+	const { page, size, moveToList,moveToRead, refresh } = useCustomMove();
 
 	const [serverData, setServerData] = useState(initState);
 
@@ -30,7 +30,8 @@ export default function ListComponent() {
 			setServerData(data);
 		});
 		return () => {};
-	}, [page, size]);
+		// refresh 값이 변경되면 데이터를 새로 받아옴.
+	}, [page, size, refresh]);
 
 	return (
 		<div>
@@ -41,7 +42,7 @@ export default function ListComponent() {
 							{serverData.dtoList.map((project, index) => (
 								<Col key={index}>
 									{project.public && (
-										<Card>
+										<Card onClick={() => moveToRead(project.id)}>
 											<Card.Body>
 												<Card.Title>{project.title}</Card.Title>
 												<Card.Text>{project.description}</Card.Text>

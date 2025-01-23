@@ -1,37 +1,21 @@
 import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import ReadComponent from "../../components/joinProject/ReadComponent";
+import useCustomMove from "../../hooks/useCustomMove";
 
 export default function ReadPage() {
 	// 경로 변수 추출 방법
-	const { jPno } = useParams();
-	// console.log(jPno);
-	const navigate = useNavigate();
+	const { jpNo } = useParams();
+	const{moveToList, moveToModify} = useCustomMove();
 
-	const moveToModify = (jPno) => {
-		navigate(
-			{
-				pathname: `/joinProject/modify/${jPno}`,
-				// todo: 페이징 변수 쿼리스트링에 저장
-			},
-			[jPno]
-		);
-	};
-
-	const moveToList = () => {
-		navigate({
-			pathname: `/joinProject/list`,
-			// todo: 페이징 변수 쿼리스트링에 저장
-		})
-	}
 
 	return (
 		<div>
-			Join Project Read Page 글 번호: {jPno}
-			<button onClick={() => moveToModify(jPno)}>Test Modify</button>
+			Join Project Read Page 글 번호: {jpNo}
+			<button onClick={() => moveToModify(jpNo)}>Test Modify</button>
 			<button onClick={moveToList}>Test List</button>
 			{/* props 전달 */}
-			<ReadComponent jPno = {jPno}></ReadComponent>
+			<ReadComponent jpNo = {jpNo}></ReadComponent>
 		</div>
 	);
 }

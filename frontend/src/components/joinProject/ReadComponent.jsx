@@ -32,22 +32,22 @@ const getStatusVariant = (status) => {
 	}
 };
 
-export default function ReadComponent({ jPno }) {
+export default function ReadComponent({ jpNo }) {
 	const [joinProject, setJoinProject] = useState(initState);
 
 	// 커스텀 훅에서 리스트 페이지로 이동하는 함수 가져옴
 	const {moveToList, moveToModify} = useCustomMove();
 
 	useEffect(() => {
-		getOne(jPno).then((data) => {
+		getOne(jpNo).then((data) => {
 			setJoinProject(data);
 
-			console.log(joinProject);
 		});
-
+		
 		return () => {};
-	}, [jPno]);
-
+	}, [jpNo]);
+	
+	console.log(joinProject);
 	return (
 		<div>
 			<Container className="mt-4">
@@ -85,7 +85,7 @@ export default function ReadComponent({ jPno }) {
 								<Button variant="primary" onClick={() => moveToList()}>리스트</Button>
 							</Col>
 							<Col>
-								<Button variant="primary" onClick={() => moveToModify(joinProject.jpNo)}>수정</Button>
+								<Button variant="primary" onClick={() => moveToModify(joinProject.id)}>수정</Button>
 							</Col>
 						</Row>
 						<Row className="mt-2 text-muted">

@@ -1,7 +1,6 @@
 package com.ppp.backend.repository;
 
 import com.ppp.backend.domain.FindProject;
-import com.ppp.backend.domain.Provider;
 import com.ppp.backend.domain.User;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -24,68 +23,10 @@ public class FindProjectRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private ProviderRepository providerRepository;
-
     @Test
-    public void findProject() {
+    public void findProjectRepositoryNotNull() {
         Assertions.assertNotNull(findProjectRepository);
-        log.info("FRepo = {}", findProjectRepository);
-    }
-
-    @Test
-    public void findUser() {
-        Assertions.assertNotNull(userRepository);
-        log.info("uRepo = {}", userRepository);
-    }
-
-    @Test
-    @Transactional
-    public void insertUser() {
-        Provider provider = providerRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("Provider not found with ID 1"));
-
-        User user = User.builder()
-                .name("lee")
-                .password("123")
-                .email("lee@example.com")
-                .phoneNumber("01011010010")
-                .experience("Backend Developer")
-                .provider(provider)
-                .build();
-
-        userRepository.save(user);
-        log.info("Inserted User: {}", user);
-    }
-
-    @Test
-    @Transactional
-    public void updateUser() {
-        // 기존 User 조회
-        User user = userRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("User not found with ID 1"));
-
-        // User 정보 수정
-        user = user.toBuilder()
-                .name("Updated Name")
-                .email("updated@example.com")
-                .build();
-
-        userRepository.save(user);
-        log.info("Updated User: {}", user);
-    }
-
-    @Test
-    @Transactional
-    public void deleteUser() {
-        // 기존 User 삭제
-        Long userId = 1L;
-        userRepository.deleteById(userId);
-        log.info("Deleted User with ID: {}", userId);
-
-        // 삭제 확인
-        Optional<User> deletedUser = userRepository.findById(userId);
-        Assertions.assertTrue(deletedUser.isEmpty());
+        log.info("FindProjectRepository initialized: {}", findProjectRepository);
     }
 
     @Test

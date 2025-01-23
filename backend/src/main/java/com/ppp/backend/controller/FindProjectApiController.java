@@ -20,11 +20,11 @@ public class FindProjectApiController {
 
     // **1. 전체 프로젝트 조회 (GET)**
     @GetMapping("/list")
-    public List<FindProjectDto> getAllProjects() {
-        log.info("모든 프로젝트 조회 요청");
-        return findProjectService.getAllFindProjects();
+    public ResponseEntity<List<FindProjectDto>> getAllFindProjects() {
+        List<FindProjectDto> projectList = findProjectService.getAllFindProjects();
+        log.info("프로젝트 전체조회 요청: {}", projectList);
+        return ResponseEntity.ok(projectList);
     }
-
     // **2. 검색어 기반 프로젝트 조회 (GET)**
     @GetMapping("/search")
     public List<FindProjectDto> searchFindProjects(@RequestParam String searchTerm) {
@@ -33,7 +33,7 @@ public class FindProjectApiController {
     }
 
     // **3. 프로젝트 상세 조회 (GET)**
-    @GetMapping("/{id}")
+    @GetMapping("/list/{id}")
     public FindProjectDto getFindProjectById(@PathVariable Long id) {
         log.info("프로젝트 상세 조회 요청: {}", id);
         return findProjectService.getFindProjectById(id);

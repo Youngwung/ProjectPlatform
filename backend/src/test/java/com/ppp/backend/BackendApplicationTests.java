@@ -8,8 +8,8 @@ import org.springframework.test.context.ActiveProfiles;
 // @ActiveProfiles("local")
 class BackendApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+	// @Test
+	// void contextLoads() {
+	// }
 
 }

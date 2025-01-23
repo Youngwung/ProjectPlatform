@@ -1,8 +1,12 @@
 package com.ppp.backend.service;
 
+import com.ppp.backend.domain.User;
 import com.ppp.backend.dto.FindProjectDto;
 import com.ppp.backend.domain.FindProject;
 import com.ppp.backend.repository.FindProjectRepository;
+import com.ppp.backend.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,9 +15,11 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class FindProjectService {
 
     private final FindProjectRepository findProjectRepository;
+    private final UserRepository userRepository;
 
     // **1. 전체 프로젝트 조회**
     public List<FindProjectDto> getAllFindProjects() {
@@ -65,6 +71,7 @@ public class FindProjectService {
     private FindProjectDto convertToDto(FindProject project) {
         return FindProjectDto.builder()
                 .id(project.getId())
+                .userId(project.getUser().getId())
                 .title(project.getTitle())
                 .description(project.getDescription())
                 .createdAt(project.getCreatedAt())
@@ -74,9 +81,13 @@ public class FindProjectService {
 
     // **DTO -> Entity 변환**
     private FindProject convertToEntity(FindProjectDto dto) {
+        User user = userRepository.findById(dto.getUserId()) // userId로 User 조회
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 유저를 찾을 수 없습니다."));
+
         return FindProject.builder()
                 .id(dto.getId())
                 .title(dto.getTitle())
+                .user(user)
                 .description(dto.getDescription())
                 .createdAt(dto.getCreatedAt())
                 .updatedAt(dto.getUpdatedAt())

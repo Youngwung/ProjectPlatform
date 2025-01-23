@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom"; // navigate 가져오기
 import { Container, Card, Button } from "react-bootstrap";
-import ReadComponent from "../../components/findProject/ReadComponent";
 
 const PortfolioDetail = () => {
   const { projectId } = useParams();
@@ -57,7 +56,6 @@ const PortfolioDetail = () => {
           목록으로 돌아가기
         </Button>
       </Link>
-      <ReadComponent fpNo={projectId} />
     </Container>
   );
 };

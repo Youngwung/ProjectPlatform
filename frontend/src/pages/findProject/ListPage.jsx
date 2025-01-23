@@ -34,7 +34,7 @@ const ListPage = () => {
     title: "",
     description: "",
     skills: "",
-    image_url: "",
+    imageUrl: "",
     createAt: "",
     updateAt: "",
   }

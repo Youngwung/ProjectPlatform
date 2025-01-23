@@ -39,18 +39,6 @@ const findProjectApi = {
       throw error;
     }
   },
-
-  // 특정 프로젝트 상세 조회
-  getProjectById: async (id) => {
-    try {
-      const response = await axios.get(`${prefix}/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error("프로젝트 상세 조회 실패:", error);
-      throw error;
-    }
-  },
-
   // 새 프로젝트 생성
   createProject: async (projectData) => {
     try {

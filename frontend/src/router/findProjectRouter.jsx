@@ -4,8 +4,8 @@ import { Navigate } from "react-router-dom";
 const Loading = <div>Loading...</div>;
 const FindProjectListPage = lazy(() => import("../pages/findProject/ListPage"));
 const FindProjectPortfolioDetail = lazy(() => import("../pages/findProject/PortfolioDetail"));
-const FindProjectAddPage = lazy(() => import("../pages/findProject/CreactPortfolio"));
-const FindProjectModifyPage = lazy(() => import("../pages/findProject/ModifyPortfolio"));
+const CreateFindProject = lazy(() => import("../pages/findProject/CreactPortfolio"));
+const ModifyFindProject = lazy(() => import("../pages/findProject/ModifyPortfolio"));
 
 const findProjectRouter = () => {
   return [
@@ -33,7 +33,7 @@ const findProjectRouter = () => {
       path: "add",
       element: (
         <Suspense fallback={Loading}>
-          <FindProjectAddPage />
+          <CreateFindProject />
         </Suspense>
       ),
     },
@@ -41,7 +41,7 @@ const findProjectRouter = () => {
       path: "modify/:projectId",
       element: (
         <Suspense fallback={Loading}>
-          <FindProjectModifyPage />
+          <ModifyFindProject/>
         </Suspense>
       ),
     },

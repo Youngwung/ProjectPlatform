@@ -36,7 +36,6 @@ const CreatePortfolio = () => {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     console.log({
       title,
       imageUrl,

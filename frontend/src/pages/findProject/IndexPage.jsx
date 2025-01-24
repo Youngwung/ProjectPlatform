@@ -26,7 +26,7 @@ const FindProject = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ maxWidth: "300px" }}
             />
-            <Button variant="primary" onClick={() => navigate("/findProject/add")}>
+            <Button variant="primary" onClick={() => navigate("/findProject/create")}>
               글 작성
             </Button>
           </div>

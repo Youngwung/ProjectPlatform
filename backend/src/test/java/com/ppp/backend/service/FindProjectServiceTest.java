@@ -26,4 +26,9 @@ public class FindProjectServiceTest {
     public void getAllTest() {
         log.info("all={}",fPService.getAllFindProjects());
     }
+
+    @Test
+    public void createTest() {
+        log.info("create={}",fPService.createFindProject(fPService.getFindProjectById(1L)));
+    }
 }

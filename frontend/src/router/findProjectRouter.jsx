@@ -30,7 +30,7 @@ const findProjectRouter = () => {
       ),
     },
     {
-      path: "add",
+      path: "create",
       element: (
         <Suspense fallback={Loading}>
           <CreateFindProject />

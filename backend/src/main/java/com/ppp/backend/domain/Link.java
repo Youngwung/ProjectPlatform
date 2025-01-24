@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class Link {
 
     @Id
@@ -29,8 +29,8 @@ public class Link {
     @Column(length = 1000)
     private String description;
 
-    @Column(name = "create_at")
+    @Column(name = "created_at")
     private Timestamp createdAt;
-    @Column(name = "update_at")
+    @Column(name = "updated_at")
     private Timestamp updatedAt;
 }

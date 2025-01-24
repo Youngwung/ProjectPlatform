@@ -1,51 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Form, Button, Container } from "react-bootstrap";
 import findProjectApi from "../../api/findProjectApi";
 
 const CreatePortfolio = () => {
-  const [id, setId] = useState(0);
-  const [userId, setUserId] = useState(5);
+  const [userId, setUserId] = useState(6); // 사용자 ID 상태  
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
   const [skills, setSkills] = useState("");
-  const [githubUrl, setGithubUrl] = useState("");
-  const [createAt, setCreateAt] = useState("");
-  const [updateAt, setUpdateAt] = useState("");
-  
-  useEffect(() => {
-    const fetchNewProject = async () => {
-      try {
-        const response = await findProjectApi.createProject();
-        console.log("새 프로젝트 생성 성공:", response);
-        setId(response.id);
-        setUserId(response.userId);
-        setTitle(response.title);
-        setDescription(response.description);
-        setImageUrl(response.imageUrl);
-        setSkills(response.skills);
-        setGithubUrl(response.githubUrl);
-        setCreateAt(response.createAt);
-        setUpdateAt(response.updateAt);
-      } catch (error) {
-        console.error("새 프로젝트 생성 실패:", error);
-      }
-    };
-    fetchNewProject();
-  }, []);
-  
+  const [links, setlinks] = useState(""); // 링크 ID 상태
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({
-      title,
-      imageUrl,
-      description,
-      skills: skills.split(",").map((skill) => skill.trim()),
-      githubUrl,
-      createAt,
-      updateAt,
-    });
-    alert("포트폴리오가 저장되었습니다.");
+
+    const portfolioData = {
+      userId: userId,
+      title: title,
+      description: description,
+      skills: skills,
+      links: links, // 링크 String
+    };
+
+    console.log("포트폴리오 데이터:", portfolioData);
+
+    try {
+      const response = await findProjectApi.createProject(portfolioData);
+      console.log("포트폴리오 저장 성공:", response);
+      alert("포트폴리오가 성공적으로 저장되었습니다!");
+    } catch (error) {
+      console.error("포트폴리오 저장 실패:", error);
+      alert("포트폴리오 저장 중 문제가 발생했습니다. 다시 시도해주세요.");
+    }
   };
 
   return (
@@ -61,6 +45,7 @@ const CreatePortfolio = () => {
             onChange={(e) => setTitle(e.target.value)}
           />
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>설명</Form.Label>
           <Form.Control
@@ -71,6 +56,7 @@ const CreatePortfolio = () => {
             onChange={(e) => setDescription(e.target.value)}
           />
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>기술</Form.Label>
           <Form.Control
@@ -80,16 +66,18 @@ const CreatePortfolio = () => {
             onChange={(e) => setSkills(e.target.value)}
           />
         </Form.Group>
+
         <Form.Group className="mb-3">
-          <Form.Label>GitHub 링크</Form.Label>
+          <Form.Label>링크 ID</Form.Label>
           <Form.Control
-            type="url"
-            placeholder="GitHub 리포지토리 URL"
-            value={githubUrl}
-            onChange={(e) => setGithubUrl(e.target.value)}
+            type="text"
+            placeholder="링크 ID 입력 (선택)"
+            value={links}
+            onChange={(e) => setlinks(e.target.value)}
           />
         </Form.Group>
-        <Button variant="primary" type="submit" onClick={handleSubmit}>
+
+        <Button variant="primary" type="submit">
           저장
         </Button>
       </Form>

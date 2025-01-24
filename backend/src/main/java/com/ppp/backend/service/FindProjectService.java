@@ -1,9 +1,13 @@
 package com.ppp.backend.service;
 
+import com.ppp.backend.domain.Link;
+import com.ppp.backend.domain.LinkType;
 import com.ppp.backend.domain.User;
 import com.ppp.backend.dto.FindProjectDto;
 import com.ppp.backend.domain.FindProject;
 import com.ppp.backend.repository.FindProjectRepository;
+import com.ppp.backend.repository.LinkRepository;
+import com.ppp.backend.repository.SkillRepository;
 import com.ppp.backend.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
@@ -20,6 +24,8 @@ public class FindProjectService {
 
     private final FindProjectRepository findProjectRepository;
     private final UserRepository userRepository;
+    private final SkillRepository skillRepository;
+    private final LinkRepository linkRepository;
 
     // **1. 전체 프로젝트 조회**
     public List<FindProjectDto> getAllFindProjects() {
@@ -44,6 +50,14 @@ public class FindProjectService {
 
     // **4. 새 프로젝트 생성**
     public FindProjectDto createFindProject(FindProjectDto findProjectDto) {
+
+        Link link = Link.builder()
+                .user(userRepository.findById(findProjectDto.getUserId()).orElseThrow())
+                .linkType(linkTypeRepository.findById(1L).getName())
+                .url(findProjectDto.getLinks())
+                .description("123")
+                .build();
+        linkRepository.save(link);
         FindProject project = convertToEntity(findProjectDto);
         FindProject savedProject = findProjectRepository.save(project);
         return convertToDto(savedProject);
@@ -78,6 +92,7 @@ public class FindProjectService {
                 .updatedAt(project.getUpdatedAt())
                 .build();
     }
+
 
     // **DTO -> Entity 변환**
     private FindProject convertToEntity(FindProjectDto dto) {

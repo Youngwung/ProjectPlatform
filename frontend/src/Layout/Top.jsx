@@ -29,6 +29,8 @@ const Top = () => {
                 <NavDropdown.Item as={Link} to="/findProject/frontend">frontend</NavDropdown.Item>
                 <NavDropdown.Item as={Link} to="/findProject/backend">backend</NavDropdown.Item>
               </NavDropdown>
+              <Nav.Link as={Link} to="/link">링크</Nav.Link>
+              <Nav.Link as={Link} to="/mypage">마이페이지 기능작동x</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>

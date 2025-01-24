@@ -10,4 +10,5 @@ import java.util.List;
 public interface LinkRepository extends JpaRepository<Link, Long> {
     // 특정 사용자의 Link 리스트 조회
     List<Link> findByUserId(Long userId);
+    List<Link> findByLinkTypeId(Long linkTypeId);
 }

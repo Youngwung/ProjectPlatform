@@ -5,10 +5,7 @@ import com.ppp.backend.domain.LinkType;
 import com.ppp.backend.domain.User;
 import com.ppp.backend.dto.FindProjectDto;
 import com.ppp.backend.domain.FindProject;
-import com.ppp.backend.repository.FindProjectRepository;
-import com.ppp.backend.repository.LinkRepository;
-import com.ppp.backend.repository.SkillRepository;
-import com.ppp.backend.repository.UserRepository;
+import com.ppp.backend.repository.*;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +23,7 @@ public class FindProjectService {
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
     private final LinkRepository linkRepository;
+    private final LinkTypeRepository linkTypeRepository;
 
     // **1. 전체 프로젝트 조회**
     public List<FindProjectDto> getAllFindProjects() {
@@ -53,7 +51,7 @@ public class FindProjectService {
 
         Link link = Link.builder()
                 .user(userRepository.findById(findProjectDto.getUserId()).orElseThrow())
-                .linkType(linkTypeRepository.findById(1L).getName())
+                .linkType(linkTypeRepository.findById(1L).orElseThrow())
                 .url(findProjectDto.getLinks())
                 .description("123")
                 .build();

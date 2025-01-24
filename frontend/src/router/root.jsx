@@ -10,7 +10,7 @@ const Main = lazy(() => import("../pages/Main"));
 const FindProject = lazy(() => import("../pages/findProject/IndexPage"));
 const JoinProjectIndex = lazy(() => import("../pages/joinProject/IndexPage"));
 const MyPage = lazy(() => import("../pages/MyPage"));
-
+const Link = lazy(() => import("../components/common/Link"));
 const root = Router([
 	{
 		path: "/",
@@ -47,6 +47,12 @@ const root = Router([
 					<Suspense fallback={Loading}><MyPage /></Suspense>
 				),
 			},
+			{
+				path: "/link",
+				element: (
+					<Suspense fallback={Loading}><Link /></Suspense>
+				),
+			}
 		],
 	},
 ]);

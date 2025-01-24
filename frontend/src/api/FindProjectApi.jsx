@@ -42,7 +42,7 @@ const findProjectApi = {
   // 새 프로젝트 생성
   createProject: async (projectData) => {
     try {
-      const response = await axios.post(`${prefix}`, projectData);
+      const response = await axios.post(`${prefix}/create`, projectData);
       return response.data;
     } catch (error) {
       console.error("새 프로젝트 생성 실패:", error);

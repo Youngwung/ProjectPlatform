@@ -19,6 +19,4 @@ public class Skill {
     @ManyToOne
     @JoinColumn(name = "skill_category_id")
     private SkillCategory skillCategory;
-
-    private String description;
 }

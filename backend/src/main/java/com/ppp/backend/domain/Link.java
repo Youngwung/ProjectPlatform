@@ -2,11 +2,14 @@ package com.ppp.backend.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
@@ -18,7 +21,7 @@ public class Link {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+        private User user;
 
     @ManyToOne
     @JoinColumn(name = "link_type_id")
@@ -29,8 +32,11 @@ public class Link {
     @Column(length = 1000)
     private String description;
 
+    @CreationTimestamp
     @Column(name = "created_at")
     private Timestamp createdAt;
+
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 }

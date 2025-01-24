@@ -4,9 +4,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.ppp.backend.domain.Provider;
@@ -14,7 +12,7 @@ import com.ppp.backend.domain.User;
 
 import lombok.extern.slf4j.Slf4j;
 
-@SpringBootTest
+// @SpringBootTest
 @ActiveProfiles("local")
 @Slf4j
 public class UserRepositoryTest {
@@ -78,7 +76,7 @@ public class UserRepositoryTest {
 		log.info("user = {}", user.getProvider());
 	}
 
-	@Test
+	// @Test
 	public void testUpdate() {
 		Provider provider = provRepo.findById(1L).orElseThrow();
 

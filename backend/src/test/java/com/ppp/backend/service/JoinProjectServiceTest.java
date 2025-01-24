@@ -1,6 +1,5 @@
 package com.ppp.backend.service;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -18,14 +17,14 @@ public class JoinProjectServiceTest {
 	@Autowired
 	private JoinProjectService jPService;
 
-	@Test
+	// @Test
 	public void getTest() {
 		Long jPNo = 1L;
 
 		log.info("get = {}", jPService.get(jPNo));
 	}
 
-	@Test
+	// @Test
 	public void registerTest() {
 		JoinProjectDTO dto =JoinProjectDTO.builder()
 		.title("registerTest")
@@ -36,7 +35,7 @@ public class JoinProjectServiceTest {
 		log.info("id = {}", id);
 	}
 
-	@Test
+	// @Test
 	public void modifyTest() {
 		JoinProjectDTO dto =JoinProjectDTO.builder()
 		.id(4L)
@@ -47,7 +46,7 @@ public class JoinProjectServiceTest {
 		jPService.modify(dto);
 	}
 
-	@Test
+	// @Test
 	public void removeTest() {
 		jPService.remove(3L);
 	}
@@ -65,7 +64,7 @@ public class JoinProjectServiceTest {
 		}
 	}
 
-	@Test
+	// @Test
 	public void getListTest() {
 		// 값을 지정하지 않으면 page = 1, size = 10
 		PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(1).build();

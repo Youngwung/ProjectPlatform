@@ -34,4 +34,6 @@ public class JoinProjectDTO {
 	@ToString.Exclude
 	private LocalDateTime updatedAt;
 
+	// 클라이언트에서 전달받은 정규 표현식 문자열을 저장하는 컬럼.
+	private String skills;
 }

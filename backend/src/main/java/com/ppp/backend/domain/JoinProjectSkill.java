@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -19,6 +20,7 @@ import lombok.ToString;
 @Table(name = "JOINPROJECT_SKILL")
 @Getter
 @ToString
+@EqualsAndHashCode
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
@@ -29,6 +31,7 @@ public class JoinProjectSkill {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "joinproject_id", nullable = false)
+	@ToString.Exclude
 	private JoinProject joinProject;
 
 	@ManyToOne(fetch = FetchType.LAZY)

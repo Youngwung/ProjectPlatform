@@ -23,6 +23,8 @@ public class ValidationService {
 
 	private final SkillLevelRepository skillLevelRepo;
 
+	private final SkillDtoConverter skillDtoConverter;
+
 	/**
 	 * 기술 스택 입력 창에서 전달받은 정규 표현식의 유효성을 검사하는 메서드
 	 * @param skills 정규 표현식으로 작성된 기술과 숙련도의 문자열
@@ -30,7 +32,7 @@ public class ValidationService {
 	 */
 	public List<String> validateSkills(String skills) {
 		List<String> invalidList = new ArrayList<>();
-		Map<String, String> skillMap = SkillDtoConverter.convertSkillDtoToMap(skills);
+		Map<String, String> skillMap = skillDtoConverter.convertSkillDtoToMap(skills);
 
 		skillMap.forEach((key, value) -> {
 			Skill skill = skillRepo.findByNameIgnoreCase(key);

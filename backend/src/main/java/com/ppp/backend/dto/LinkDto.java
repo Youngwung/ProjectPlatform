@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 public class LinkDto {
     private Long id;
     private Long userId;
-    private String linkTypeName;
+    private Long linkTypeId;
     private String url;
     private String description;
     private Timestamp createdAt;

@@ -10,7 +10,7 @@ const Main = lazy(() => import("../pages/Main"));
 const FindProject = lazy(() => import("../pages/findProject/IndexPage"));
 const JoinProjectIndex = lazy(() => import("../pages/joinProject/IndexPage"));
 const MyPage = lazy(() => import("../pages/MyPage"));
-const Link = lazy(() => import("../components/common/Link"));
+const Link = lazy(() => import("../pages/Link"));
 const root = Router([
 	{
 		path: "/",

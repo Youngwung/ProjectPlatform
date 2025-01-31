@@ -52,8 +52,8 @@ public class LinkService {
         link.setDescription(linkDto.getDescription());
 
         // 링크 타입 설정
-        if (linkDto.getLinkTypeName() != null) {
-            LinkType linkType = linkTypeRepository.findByName(linkDto.getLinkTypeName())
+        if (linkDto.getLinkTypeId() != null) {
+            LinkType linkType = linkTypeRepository.findById(linkDto.getLinkTypeId())
                     .orElseThrow(() -> new IllegalArgumentException("해당 이름의 링크 타입을 찾을 수 없습니다."));
             link.setLinkType(linkType);
         }
@@ -72,11 +72,12 @@ public class LinkService {
 
     // **Entity -> DTO 변환**
     private LinkDto toDto(Link link) {
-        String linkTypeName = link.getLinkType() != null ? link.getLinkType().getName() : null;
+        Long linkTypeId = link.getLinkType().getId() != null ? link.getLinkType().getId() : null;
 
         return LinkDto.builder()
+                .id(link.getId())
                 .userId(link.getUser() != null ? link.getUser().getId() : 1L)
-                .linkTypeName(linkTypeName) // 링크 타입 이름 설정
+                .linkTypeId(linkTypeId) // 링크 타입 Id 설정
                 .url(link.getUrl())
                 .description(link.getDescription())
                 .build();
@@ -87,7 +88,7 @@ public class LinkService {
         return Link.builder()
                 .user(userRepository.findById(linkDto.getUserId())
                         .orElseThrow(() -> new IllegalArgumentException("해당 ID의 유저를 찾을 수 없습니다.")))
-                .linkType(linkTypeRepository.findByName(linkDto.getLinkTypeName())
+                .linkType(linkTypeRepository.findById(linkDto.getLinkTypeId())
                         .orElseThrow(() -> new IllegalArgumentException("해당 이름의 링크 타입을 찾을 수 없습니다.")))
                 .url(linkDto.getUrl())
                 .description(linkDto.getDescription())

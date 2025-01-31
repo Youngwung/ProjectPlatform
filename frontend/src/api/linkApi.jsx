@@ -15,7 +15,7 @@ const linkApi = {
       throw error;
     }
   },
-  getOne: async (id) => {
+  getOneLink: async (id) => {
     try {
       const response = await axios.get(`${linkPrefix}/list/${id}`);
       return response.data;
@@ -37,6 +37,7 @@ const linkApi = {
   updateLink: async (id, updatedData) => {
     try {
       const response = await axios.put(`${linkPrefix}/${id}`, updatedData);
+      console.log("updatedData:", updatedData);
       return response.data;
     } catch (error) {
       console.error("링크 수정 실패:", error);
@@ -50,6 +51,7 @@ const linkApi = {
       return response.data;
     } catch (error) {
       console.error("링크 삭제 실패:", error);
+      console.error("id:", id);
       throw error;
     }
   },

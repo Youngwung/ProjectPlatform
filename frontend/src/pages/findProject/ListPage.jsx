@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { Pagination } from "react-bootstrap";
-import findProjectApi from "../../api/findProjectApi"; // API 가져오기
+import findProjectApi from "../../api/findProjectApi";
 
 const ListPage = () => {
-  const [findProject, setfindProject] = useState([]); // 전체 포트폴리오 데이터
+  const [findProjects, setfindProjects] = useState([]); // 전체 포트폴리오 데이터
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 상태
   const findProjectPerPage = 12; // 페이지당 포트폴리오 수
   const { searchTerm } = useOutletContext(); // Outlet에서 검색어 받아오기
@@ -16,7 +16,7 @@ const ListPage = () => {
   const indexOfFirstfindProject = indexOfLastfindProject - findProjectPerPage;
 
   // 검색 및 페이지 처리
-  const filteredfindProject = findProject.filter((findProject) =>
+  const filteredfindProject = findProjects.filter((findProject) =>
     findProject.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
   const currentfindProject = filteredfindProject.slice(
@@ -44,7 +44,7 @@ const ListPage = () => {
       try {
         const response = await findProjectApi.getAllProjects(); // getAllProjects 호출
         console.log("전체 프로젝트 조회 성공:", response);
-        setfindProject(response);
+        setfindProjects(response);
       } catch (error) {
         console.error("전체 프로젝트 조회 실패:", error);
       }

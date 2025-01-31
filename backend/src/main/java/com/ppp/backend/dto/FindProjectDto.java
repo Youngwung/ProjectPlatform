@@ -15,7 +15,7 @@ public class FindProjectDto {
     private Long userId;
     private String title;
     private String description;
-    private List<Long> linkIds;
+    private String links;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 }

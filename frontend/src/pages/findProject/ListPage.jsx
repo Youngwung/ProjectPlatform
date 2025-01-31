@@ -73,6 +73,7 @@ const ListPage = () => {
                   <strong>기술스택:</strong> {findProject.skills}
                 </Card.Text>
                 <Card.Text>
+                  {/* TODO 링크 user.id 로 link정보 가져오는 api호출 */}
                   <strong>링크 :</strong> 
                 </Card.Text>
               </Card.Body>

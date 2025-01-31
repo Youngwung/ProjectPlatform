@@ -21,7 +21,7 @@ public class Link {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-        private User user;
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "link_type_id")

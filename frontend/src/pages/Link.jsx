@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import linkApi from "../api/linkApi";
 import LinkList from "../components/link/LinkList";
 import LinkForm from "../components/link/LinkForm";
+import { Container } from "react-bootstrap";
 
 const Link = () => {
   const [links, setLinks] = useState([]);
@@ -52,12 +53,12 @@ const Link = () => {
   };
 
   return (
-    <div>
-      <h1>Link 관리</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <Container>
+      <h1 className="mt-4">Link 관리</h1>
+      {error && <p className="text-danger">{error}</p>}
       <LinkForm {...{ newLink, setNewLink, editLink, setEditLink, handleCreateLink, handleUpdateLink, linkTypes }} />
       <LinkList {...{ links, linkTypes, setEditLink, handleDeleteLink }} />
-    </div>
+    </Container>
   );
 };
 

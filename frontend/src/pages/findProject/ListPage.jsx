@@ -37,6 +37,7 @@ const ListPage = () => {
     imageUrl: "",
     createAt: "",
     updateAt: "",
+    links: "",
   }
   // 전체 프로젝트 가져오기
   useEffect(() => {
@@ -70,6 +71,9 @@ const ListPage = () => {
                 <Card.Text>{findProject.description}</Card.Text>
                 <Card.Text>
                   <strong>기술스택:</strong> {findProject.skills}
+                </Card.Text>
+                <Card.Text>
+                  <strong>링크 :</strong> 
                 </Card.Text>
               </Card.Body>
             </Card>

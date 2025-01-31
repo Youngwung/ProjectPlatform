@@ -1,7 +1,6 @@
 package com.ppp.backend.service;
 
 import com.ppp.backend.domain.Link;
-import com.ppp.backend.domain.LinkType;
 import com.ppp.backend.domain.User;
 import com.ppp.backend.dto.FindProjectDto;
 import com.ppp.backend.domain.FindProject;
@@ -21,9 +20,7 @@ public class FindProjectService {
 
     private final FindProjectRepository findProjectRepository;
     private final UserRepository userRepository;
-    private final SkillRepository skillRepository;
     private final LinkRepository linkRepository;
-    private final LinkTypeRepository linkTypeRepository;
 
     // **1. 전체 프로젝트 조회**
     public List<FindProjectDto> getAllFindProjects() {
@@ -48,15 +45,22 @@ public class FindProjectService {
 
     // **4. 새 프로젝트 생성**
     public FindProjectDto createFindProject(FindProjectDto findProjectDto) {
+        User user = userRepository.findById(findProjectDto.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 유저를 찾을 수 없습니다."));
 
-        Link link = Link.builder()
-                .user(userRepository.findById(findProjectDto.getUserId()).orElseThrow())
-                .linkType(linkTypeRepository.findById(1L).orElseThrow())
-                .url(findProjectDto.getLinks())
-                .description("123")
+        // ✅ linkIds에 해당하는 Link 객체들을 조회
+        List<Link> links = linkRepository.findAllById(findProjectDto.getLinkIds());
+
+        // ✅ 프로젝트 저장
+        FindProject project = FindProject.builder()
+                .title(findProjectDto.getTitle())
+                .description(findProjectDto.getDescription())
+                .user(user)
+                .links(links) // ✅ 여러 개의 Link 객체 저장
+                .createdAt(findProjectDto.getCreatedAt())
+                .updatedAt(findProjectDto.getUpdatedAt())
                 .build();
-        linkRepository.save(link);
-        FindProject project = convertToEntity(findProjectDto);
+
         FindProject savedProject = findProjectRepository.save(project);
         return convertToDto(savedProject);
     }
@@ -65,8 +69,14 @@ public class FindProjectService {
     public FindProjectDto updateFindProject(Long id, FindProjectDto findProjectDto) {
         FindProject project = findProjectRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 프로젝트를 찾을 수 없습니다."));
+
+        // ✅ linkIds를 기반으로 Link 객체 리스트 조회
+        List<Link> updatedLinks = linkRepository.findAllById(findProjectDto.getLinkIds());
+
         project.setTitle(findProjectDto.getTitle());
         project.setDescription(findProjectDto.getDescription());
+        project.setLinks(updatedLinks); // ✅ 링크 리스트 업데이트
+
         FindProject updatedProject = findProjectRepository.save(project);
         return convertToDto(updatedProject);
     }
@@ -86,22 +96,25 @@ public class FindProjectService {
                 .userId(project.getUser().getId())
                 .title(project.getTitle())
                 .description(project.getDescription())
+                .linkIds(project.getLinks().stream().map(Link::getId).collect(Collectors.toList()))
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
                 .build();
     }
 
-
     // **DTO -> Entity 변환**
     private FindProject convertToEntity(FindProjectDto dto) {
-        User user = userRepository.findById(dto.getUserId()) // userId로 User 조회
+        User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 유저를 찾을 수 없습니다."));
+
+        List<Link> links = linkRepository.findAllById(dto.getLinkIds()); // ✅ 링크 리스트 조회
 
         return FindProject.builder()
                 .id(dto.getId())
                 .title(dto.getTitle())
-                .user(user)
                 .description(dto.getDescription())
+                .user(user)
+                .links(links) // ✅ 링크 리스트 저장
                 .createdAt(dto.getCreatedAt())
                 .updatedAt(dto.getUpdatedAt())
                 .build();

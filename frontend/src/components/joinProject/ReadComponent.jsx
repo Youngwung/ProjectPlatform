@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Badge, Button, Card, Col, Container, Row } from "react-bootstrap";
 import { getOne } from "../../api/joinProjectApi";
 import useCustomMove from "../../hooks/useCustomMove";
+import SkillTagComponent from "../skill/SkillTagComponent";
+import SkillTagGuideComponent from "../skill/SkillTagGuideComponent";
 
 // 조회 기능을 구현하기 위한 컴포넌트
 
@@ -70,6 +72,12 @@ export default function ReadComponent({ jpNo }) {
 								<Badge bg={getStatusVariant(joinProject.status)}>
 									{joinProject.status}
 								</Badge>
+							</Col>
+						</Row>
+						<Row className="mb-3">
+							<Col>
+								<SkillTagGuideComponent />
+								<SkillTagComponent skills = {joinProject.skills}/>
 							</Col>
 						</Row>
 						<Row className="mb-3">

@@ -26,9 +26,6 @@ public interface JoinProjectService {
 
 	PageResponseDTO<JoinProjectDTO> getList(PageRequestDTO PageRequestDTO);
 
-	// 전달받은 정규 표현식 기술 문자열이 유효한 지 검사하는 메서드;
-	public boolean isSkillExist(String skillName);
-
 	// Entity → DTO 변환
 	default JoinProjectDTO fromEntity(JoinProject entity) {
 		if (entity == null) {

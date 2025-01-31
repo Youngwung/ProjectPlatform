@@ -49,7 +49,7 @@ public class JoinProjectServiceImpl implements JoinProjectService {
 		jPSkills.forEach(jPSkill -> {
 			jPSkillMap.put(jPSkill.getSkill().getName(), jPSkill.getSkillLevel().getName());
 		});
-
+		
 		String skillString = skillDtoConverter.convertMapToSkillDto(jPSkillMap);
 		dto.setSkills(skillString);
 		return dto;
@@ -166,12 +166,12 @@ public class JoinProjectServiceImpl implements JoinProjectService {
 					// 레벨이 다른 경우 객체를 생성해 updateList에 추가
 					SkillLevel newLevelObj = skillLevelRepo.findByNameIgnoreCase(newLevel);
 					JoinProjectSkill updateSkill = JoinProjectSkill.builder()
-					// 이 경우 update이므로 고유 키를 명시해서 객체를 생성
+							// 이 경우 update이므로 고유 키를 명시해서 객체를 생성
 							.id(existingSkill.getId())
 							.joinProject(joinProject)
 							.skill(existingSkill.getSkill())
 							.skillLevel(newLevelObj)
-						.build();
+							.build();
 					updateList.add(updateSkill);
 				}
 				// 비교가 끝난 스킬은 새로운 스킬 맵에서 제거
@@ -193,7 +193,7 @@ public class JoinProjectServiceImpl implements JoinProjectService {
 						.joinProject(joinProject)
 						.skill(newSkill)
 						.skillLevel(newLevel)
-					.build();
+						.build();
 				updateList.add(skillObj);
 			});
 		}
@@ -213,6 +213,8 @@ public class JoinProjectServiceImpl implements JoinProjectService {
 
 	@Override
 	public void remove(Long jpNo) {
+		int result = joinProjectSkillRepo.deleteByJoinProjectId(jpNo);
+		log.info("result = {}", result);
 		jPRepo.deleteById(jpNo);
 	}
 
@@ -223,19 +225,26 @@ public class JoinProjectServiceImpl implements JoinProjectService {
 		Page<JoinProject> result = jPRepo.search1(PageRequestDTO);
 
 		// ! JoinProject List => JoinProjectDTO List
-		List<JoinProjectDTO> dtoList = result.get().map(joinProject -> fromEntity(joinProject))
-				.collect(Collectors.toList());
+		List<JoinProjectDTO> dtoList = result.get().map(joinProject -> {
+			JoinProjectDTO dto = fromEntity(joinProject);
 
+			Map<String, String> skillMap = joinProjectSkillRepo.findByJoinProjectId(joinProject.getId())
+					.stream()
+					.collect(Collectors.toMap(
+							joinProjectSkill -> joinProjectSkill.getSkill().getName(),
+							joinProjectSkill -> joinProjectSkill.getSkillLevel().getName()
+			));
+			
+			// Map을 String으로 변환하는 메서드를 호출한 후 dto의 skills 필드를 초기화
+			String skillString = skillDtoConverter.convertMapToSkillDto(skillMap);
+			dto.setSkills(skillString);
+			return dto;
+		}).collect(Collectors.toList());
+
+		// 페이징 처리
 		PageResponseDTO<JoinProjectDTO> pageResponseDTO = new PageResponseDTO<>(dtoList, PageRequestDTO,
 				result.getTotalElements());
 
 		return pageResponseDTO;
-	}
-
-	@Override
-	public boolean isSkillExist(String skillName) {
-		Map<String, String> skillMap = skillDtoConverter.convertSkillDtoToMap(skillName);
-
-		return false;
 	}
 }

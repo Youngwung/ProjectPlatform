@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { postAdd } from "../../api/joinProjectApi";
 import useCustomMove from "../../hooks/useCustomMove";
+import InputSkillComponent from "../skill/InputSkillComponent";
 import ModalComponent from "./ModalComponent";
 
 export default function AddComponent() {
@@ -10,10 +11,11 @@ export default function AddComponent() {
 		jpNo: 0,
 		userId: 0,
 		title: "",
+		skill: "",
 		description: "",
 		maxPeople: 0,
 		status: "모집_중",
-		public: false
+		public: false,
 	};
 	const [joinProject, setJoinProject] = useState({ ...initState });
 
@@ -53,15 +55,19 @@ export default function AddComponent() {
 
 	// userId를 가져오는 로직 추가
 	useEffect(() => {
-		const userId = localStorage.getItem('userId');
-		if(userId) {
-			setJoinProject({...initState, userId: userId})
+		const userId = localStorage.getItem("userId");
+		if (userId) {
+			setJoinProject({ ...initState, userId: userId });
 		} else {
 			// 원래는 아무 기능을 하지 않아야 하지만 개발 당시 로그인 기능을 구현하지 않았으므로 강제로 userId = 1을 주입
-			setJoinProject({...initState, userId: 1})
+			setJoinProject({ ...initState, userId: 1 });
 		}
-	}, [])
-	
+	}, []);
+
+	// 스킬 입력 창의 Blur 이벤트 리스너
+  const handleValidation = (isValid) => {
+    console.log('Input is valid:', isValid);
+  };
 
 	return (
 		<div>
@@ -88,6 +94,12 @@ export default function AddComponent() {
 						placeholder="프로젝트 설명을 입력하세요"
 					/>
 				</Form.Group>
+
+				<InputSkillComponent
+					label="요구 기술"
+					onChange={handleChange}
+					onValidation={handleValidation}
+				/>
 
 				<Row>
 					<Col>

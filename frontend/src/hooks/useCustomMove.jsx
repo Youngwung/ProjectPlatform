@@ -17,10 +17,10 @@ export default function useCustomMove() {
 
 	// 쿼리스트링 값이 존재하면 그 값을 가져오고, 존재하지 않으면 기본값을 사용하는 로직 작성.
 	const page = getNum(queryParams.get("page"), 1);
-	const size = getNum(queryParams.get("size"), 10);
+	const size = getNum(queryParams.get("size"), 12);
 
 	// 변수로 저장되어있는 값을 주소창에서 사용할 수 있는 형태로 변환
-	// ? page=1&size=10
+	// ? page=1&size=12
 	const queryDefault = createSearchParams({page, size}).toString()
 
 	// 같은 페이지를 클릭했을 때 새로고침이 되어 데이터를 가져올 수 있도록 구현
@@ -40,7 +40,7 @@ export default function useCustomMove() {
 
 		if (pageParam) {
 			const pageNum = getNum(pageParam.page, 1)
-			const sizeNum = getNum(pageParam.size, 10)
+			const sizeNum = getNum(pageParam.size, 12)
 			queryStr = createSearchParams({page:pageNum, size: sizeNum}).toString();
 		} else {
 			queryStr = queryDefault;

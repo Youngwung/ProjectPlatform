@@ -42,13 +42,11 @@ public class JoinProjectServiceTest {
 		log.info("id = {}", id);
 	}
 
-	@Test
+	// @Test
 	public void modifyTest() {
-		// SkillLevel newLevelObj = skillLevelRepo.findByNameIgnoreCase("고급");
-		// log.info("newLevelObj = {}", newLevelObj);
 		String skills = "#React:고급, #Java:초급";
 		JoinProjectDTO dto =JoinProjectDTO.builder()
-		.id(37L)
+		.id(38L)
 		.title("modifySkillTest3")
 		.description("testSkillDescription")
 		.skills(skills)
@@ -59,7 +57,7 @@ public class JoinProjectServiceTest {
 
 	// @Test
 	public void removeTest() {
-		jPService.remove(3L);
+		jPService.remove(38L);
 	}
 
 	// @Test
@@ -75,7 +73,7 @@ public class JoinProjectServiceTest {
 		}
 	}
 
-	// @Test
+	@Test
 	public void getListTest() {
 		// 값을 지정하지 않으면 page = 1, size = 10
 		PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(1).build();

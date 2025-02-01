@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { postAdd } from "../../api/joinProjectApi";
 import useCustomMove from "../../hooks/useCustomMove";
@@ -11,7 +11,7 @@ export default function AddComponent() {
 		jpNo: 0,
 		userId: 0,
 		title: "",
-		skill: "",
+		skills: "",
 		description: "",
 		maxPeople: 0,
 		status: "모집_중",
@@ -34,12 +34,11 @@ export default function AddComponent() {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		console.log(joinProject);
 		// 등록 버튼 클릭 시 모달창 띄움
 		setShowModal(true);
 	};
 
-	const handleClose = () => {
+	const handleModalClose = () => {
 		setShowModal(false);
 	};
 
@@ -53,21 +52,40 @@ export default function AddComponent() {
 		});
 	};
 
-	// userId를 가져오는 로직 추가
+	// TODO: userId를 가져오는 로직 추가
+	const [userId, setUserId] = useState(0);
 	useEffect(() => {
-		const userId = localStorage.getItem("userId");
+		setUserId(localStorage.getItem("userId"));
 		if (userId) {
 			setJoinProject({ ...initState, userId: userId });
 		} else {
 			// 원래는 아무 기능을 하지 않아야 하지만 개발 당시 로그인 기능을 구현하지 않았으므로 강제로 userId = 1을 주입
 			setJoinProject({ ...initState, userId: 1 });
 		}
-	}, []);
+	}, [userId]);
 
-	// 스킬 입력 창의 Blur 이벤트 리스너
-  const handleValidation = (isValid) => {
-    console.log('Input is valid:', isValid);
-  };
+	// 스킬 입력 컴포넌트 불러오기 위한 변수
+	const [validSkill, setValidSkill] = useState(false);
+
+	const handleValidationComplete = useCallback(({ isValid, value }) => {
+		if (isValid) {
+			// 스킬 유효성 검사 통과
+			setValidSkill(true);
+			// joinProject 업데이트
+			setJoinProject(prev => ({
+				...prev,
+				skills: value
+			}))
+		} else {
+			// 등록 버튼 비활성화
+			setValidSkill(false);
+		}
+	}, []);
+	const [onButton, setOnButton] = useState(false);
+
+	useEffect(() => {
+		setOnButton(validSkill);
+	}, [validSkill]);
 
 	return (
 		<div>
@@ -95,11 +113,7 @@ export default function AddComponent() {
 					/>
 				</Form.Group>
 
-				<InputSkillComponent
-					label="요구 기술"
-					onChange={handleChange}
-					onValidation={handleValidation}
-				/>
+				<InputSkillComponent onValidationComplete={handleValidationComplete} />
 
 				<Row>
 					<Col>
@@ -143,14 +157,14 @@ export default function AddComponent() {
 					</Col>
 				</Row>
 
-				<Button variant="primary" type="submit">
+				<Button variant="primary" type="submit" disabled={!onButton}>
 					등록
 				</Button>
 			</Form>
 
 			<ModalComponent
 				show={showModal}
-				handleClose={handleClose}
+				handleClose={handleModalClose}
 				handleConfirm={handleConfirm}
 				description={`"${joinProject.title}"프로젝트를 등록하시겠습니까?`}
 			/>

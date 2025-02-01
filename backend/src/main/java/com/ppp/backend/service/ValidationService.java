@@ -1,8 +1,10 @@
 package com.ppp.backend.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -14,10 +16,12 @@ import com.ppp.backend.util.SkillDtoConverter;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class ValidationService {
 	private final SkillRepository skillRepo;
 
@@ -31,6 +35,7 @@ public class ValidationService {
 	 * @return 잘못 입력된 문자열을 반환
 	 */
 	public List<String> validateSkills(String skills) {
+		log.info("service skills = ", skills);
 		List<String> invalidList = new ArrayList<>();
 		Map<String, String> skillMap = skillDtoConverter.convertSkillDtoToMap(skills);
 
@@ -45,5 +50,23 @@ public class ValidationService {
 			}
 		});
 		return invalidList;
+	}
+
+	public List<String> duplicatedSkills(String skills) {
+		Map<String, String> skillMap = skillDtoConverter.convertSkillDtoToMap(skills);
+
+		Set<String> seenKeys = new HashSet<>();
+		Set<String> duplicatedKeys = new HashSet<>();
+		
+		skillMap.forEach((key, value) -> {
+			String lowerCaseKey = key.toLowerCase();
+			if (seenKeys.contains(lowerCaseKey)) {
+				duplicatedKeys.add(key);
+			} else {
+				seenKeys.add(key);
+			}
+		});
+		
+		return new ArrayList<>(duplicatedKeys);
 	}
 }

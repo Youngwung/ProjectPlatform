@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { deleteOne, getOne, putOne } from "../../api/joinProjectApi";
 import useCustomMove from "../../hooks/useCustomMove";
+import InputSkillComponent from "../skill/InputSkillComponent";
 import ModalComponent from "./ModalComponent";
 
 // 기본값 설정
@@ -9,6 +10,7 @@ const initState = {
 	jpNo: 0,
 	userId: 0,
 	title: "",
+	skill: "",
 	description: "",
 	maxPeople: 0,
 	status: "",
@@ -22,7 +24,7 @@ export default function ModifyComponent({ jpNo }) {
 
 	const [result, setResult] = useState(null);
 
-	const {moveToList, moveToRead} = useCustomMove();
+	const { moveToList, moveToRead } = useCustomMove();
 
 	useEffect(() => {
 		getOne(jpNo).then((data) => {
@@ -79,6 +81,12 @@ export default function ModifyComponent({ jpNo }) {
 			moveToList();
 		});
 	};
+
+	// 스킬 입력 창의 Blur 이벤트 리스너
+	const handleValidation = (isValid) => {
+		// TODO: 정규식 검사 결과 알람 창 띄우기
+		console.log("Input is valid:", isValid);
+	};
 	return (
 		<div>
 			<Form onSubmit={handleClickModify}>
@@ -104,6 +112,12 @@ export default function ModifyComponent({ jpNo }) {
 						placeholder="프로젝트 설명을 입력하세요"
 					/>
 				</Form.Group>
+
+				<InputSkillComponent
+					label="요구 기술"
+					onChange={handleChange}
+					onValidation={handleValidation}
+				/>
 
 				<Row>
 					<Col>

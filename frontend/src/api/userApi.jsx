@@ -4,15 +4,15 @@ export const API_URL = 'http://localhost:8080';
 const prefix = `${API_URL}/api`;
 
 const userApi = {
-  getAllUsers: async () => {
-    try {
-      const response = await axios.get(`${prefix}/user`);
-      return response.data;
-    } catch (error) {
-      console.error("전체 유저 조회 실패:", error);
-      throw error;
-    }
-  },
+    getAllUsers: async () => {
+      try {
+        const response = await axios.get(`${prefix}/user`);
+        return response.data;
+      } catch (error) {
+        console.error("전체 유저 조회 실패:", error);
+        throw error;
+      }
+    },
     getUserById: async (id) => {
         try {
             const response = await axios.get(`${prefix}/user/${id}`);

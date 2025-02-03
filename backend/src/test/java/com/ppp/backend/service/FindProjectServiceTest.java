@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @ActiveProfiles("local")
 public class FindProjectServiceTest {
     @Autowired
-    private FindProjectService fPService;
+    private PortpolioService fPService;
 
     @Test
     public void getOneTest() {

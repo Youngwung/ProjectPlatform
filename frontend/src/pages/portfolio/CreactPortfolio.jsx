@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form, Button, Container } from "react-bootstrap";
-import findProjectApi from "../../api/findProjectApi";
+import portfolioApi from "../../api/portfolioApi";
 
 const CreatePortfolio = () => {
   const [userId, setUserId] = useState(6); // 사용자 ID 상태  
@@ -23,7 +23,7 @@ const CreatePortfolio = () => {
     console.log("포트폴리오 데이터:", portfolioData);
 
     try {
-      const response = await findProjectApi.createProject(portfolioData);
+      const response = await portfolioApi.createProject(portfolioData);
       console.log("포트폴리오 저장 성공:", response);
       alert("포트폴리오가 성공적으로 저장되었습니다!");
     } catch (error) {

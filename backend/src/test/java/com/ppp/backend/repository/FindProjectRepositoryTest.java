@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.ppp.backend.domain.FindProject;
+import com.ppp.backend.domain.Portpolio;
 import com.ppp.backend.domain.User;
 
 import jakarta.transaction.Transactional;
@@ -37,7 +37,7 @@ public class FindProjectRepositoryTest {
                 .orElseThrow(() -> new RuntimeException("User not found with ID 1"));
 
         // FindProject 생성
-        FindProject findProject = FindProject.builder()
+        Portpolio findProject = Portpolio.builder()
                 .user(user)
                 .title("Find Project Title")
                 .description("This is a test project.")
@@ -51,7 +51,7 @@ public class FindProjectRepositoryTest {
     @Transactional
     public void updateFindProject() {
         // 기존 FindProject 조회
-        FindProject findProject = findProjectRepository.findById(1L)
+        Portpolio findProject = findProjectRepository.findById(1L)
                 .orElseThrow(() -> new RuntimeException("FindProject not found with ID 1"));
 
         // FindProject 정보 수정
@@ -73,7 +73,7 @@ public class FindProjectRepositoryTest {
         log.info("Deleted FindProject with ID: {}", findProjectId);
 
         // 삭제 확인
-        Optional<FindProject> deletedProject = findProjectRepository.findById(findProjectId);
+        Optional<Portpolio> deletedProject = findProjectRepository.findById(findProjectId);
         Assertions.assertTrue(deletedProject.isEmpty());
     }
 }

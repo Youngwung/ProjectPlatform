@@ -203,3 +203,6 @@ gradle-app.setting
 
 # End of https://www.toptal.com/developers/gitignore/api/react,java,gradle,intellij,visualstudiocode
 backend/.vscode/launch.json
+
+/.vscode
+/node_modules

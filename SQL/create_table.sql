@@ -66,7 +66,7 @@ CREATE TABLE user_skill (
 );
 
 -- joinproject 테이블 생성
-CREATE TABLE joinproject (
+CREATE TABLE project (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     title VARCHAR(255) NOT NULL,
@@ -79,15 +79,15 @@ CREATE TABLE joinproject (
 );
 
 -- joinproject_skill 테이블 생성
-CREATE TABLE joinproject_skill (
+CREATE TABLE project_skill (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    joinproject_id BIGINT NOT NULL,
+    project_id BIGINT NOT NULL,
     skill_id BIGINT NOT NULL,
     skill_level_id BIGINT NOT NULL
 );
 
 -- findproject 테이블 생성
-CREATE TABLE findproject (
+CREATE TABLE portpolio (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     title VARCHAR(255) NOT NULL,
@@ -99,7 +99,7 @@ CREATE TABLE findproject (
 -- notice 테이블 생성
 CREATE TABLE alert (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    joinproject_id BIGINT,
+    project_id BIGINT,
     user_id BIGINT NOT NULL,
     content TEXT,
     status ENUM('초대','접수', '합격', '불합격') ,

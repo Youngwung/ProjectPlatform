@@ -25,9 +25,9 @@ const Top = () => {
                 <NavDropdown.Item as={Link} to="/joinProject/backend">backend</NavDropdown.Item>
               </NavDropdown>
               <NavDropdown title="구직" id="navbarScrollingDropdown">
-                <NavDropdown.Item as={Link} to="/findProject">전체보기</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/findProject/frontend">frontend</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/findProject/backend">backend</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/portfolio">전체보기</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/portfolio/frontend">frontend</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/portfolio/backend">backend</NavDropdown.Item>
               </NavDropdown>
               <Nav.Link as={Link} to="/link">링크</Nav.Link>
               <Nav.Link as={Link} to="/mypage">마이페이지 기능작동x</Nav.Link>

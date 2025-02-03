@@ -19,7 +19,7 @@ import java.sql.Timestamp;
 @DynamicInsert
 @DynamicUpdate
 @Builder(toBuilder = true)
-@Table(name = "findproject")
+@Table(name = "portfolio")
 public class Portfolio {
 
     @Id

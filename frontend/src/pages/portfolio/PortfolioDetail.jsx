@@ -44,14 +44,14 @@ const PortfolioDetail = () => {
           <Button
             variant="primary"
             onClick={() =>
-              navigate(`/findProject/modify/${projectId}`, { state: { portfolio } })
+              navigate(`/portfolio/modify/${projectId}`, { state: { portfolio } })
             }
           >
             수정
           </Button>
         </Card.Body>
       </Card>
-      <Link to="/findProject/list">
+      <Link to="/portfolio/list">
         <Button variant="secondary" className="mt-4">
           목록으로 돌아가기
         </Button>

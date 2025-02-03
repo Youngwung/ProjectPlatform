@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 @Getter
 @Builder(toBuilder = true)
 @ToString
-public class PortpolioDto {
+public class PortfolioDto {
     private Long id;
     private Long userId;
     private String title;

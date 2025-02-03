@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 @DynamicUpdate
 @Builder(toBuilder = true)
 @Table(name = "findproject")
-public class Portpolio {
+public class Portfolio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

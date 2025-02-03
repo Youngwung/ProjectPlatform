@@ -7,8 +7,8 @@ export const API_SERVER_HOST = 'http://localhost:8080'
 const prefix = `${API_SERVER_HOST}/api/joinProject`
 
 // tno로 글 하나 가져오는 비동기 통신 메서드
-export const getOne = async (jPno) => {
-	const res = await axios.get(`${prefix}/${jPno}`)
+export const getOne = async (jpNo) => {
+	const res = await axios.get(`${prefix}/${jpNo}`)
 
 	return res.data
 }
@@ -22,6 +22,29 @@ export const getList = async (pageParam) => {
 	// 비동기 통신에서 쿼리스트링을 사용하는 방법
 	// 1. pageParam의 page와 size를 빼둔 후 두번째 아규먼트로  {params:{page, size}} 로 전달.
 	// 2. pageParam을 그대로 전달. {params:{...pageParam}} => .3개임
+
+	return res.data
+}
+
+// 등록 api를 호출하는 비동기 통신 메서드
+
+export const postAdd = async (joinProjectObj) => {
+	const res = await axios.post(`${prefix}/`, joinProjectObj);
+
+	return res.data
+}
+
+// 수정 api를 호출하는 비동기 통신 메서드
+export const putOne = async (joinProjectObj) => {
+	const res = await axios.put(`${prefix}/${joinProjectObj.id}`, joinProjectObj);
+
+	return res.data
+}
+
+// 삭제 api를 호출하는 비동기 통신 메서드
+export const deleteOne = async (jpNo) => {
+
+	const res = await axios.delete(`${prefix}/${jpNo}`)
 
 	return res.data
 }

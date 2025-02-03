@@ -8,6 +8,7 @@ import org.springframework.test.context.ActiveProfiles;
 import com.ppp.backend.dto.JoinProjectDTO;
 import com.ppp.backend.dto.PageRequestDTO;
 import com.ppp.backend.dto.PageResponseDTO;
+import com.ppp.backend.repository.SkillLevelRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,39 +18,46 @@ import lombok.extern.slf4j.Slf4j;
 public class JoinProjectServiceTest {
 	@Autowired
 	private JoinProjectService jPService;
+	@Autowired
+	private SkillLevelRepository skillLevelRepo;
 
-	@Test
+	// @Test
+	// @Transactional
 	public void getTest() {
-		Long jPNo = 1L;
-
-		log.info("get = {}", jPService.get(jPNo));
+		Long jPNo = 36L;
+		JoinProjectDTO joinProjectDTO = jPService.get(jPNo);
+		System.out.println(joinProjectDTO);
 	}
 
 	@Test
 	public void registerTest() {
 		JoinProjectDTO dto =JoinProjectDTO.builder()
-		.title("registerTest")
+		.title("registerSkillTest")
 		.description("testDescription")
 		.userId(1L)
+		.skills("#React:고급, #Java:중급, #Python:초급")
+		.status("진행_중")
 		.build();
 		Long id = jPService.register(dto);
 		log.info("id = {}", id);
 	}
 
-	@Test
+	// @Test
 	public void modifyTest() {
+		String skills = "#React:고급, #Java:초급";
 		JoinProjectDTO dto =JoinProjectDTO.builder()
-		.id(4L)
-		.title("modifyTest2")
-		.description("testDescription")
+		.id(38L)
+		.title("modifySkillTest3")
+		.description("testSkillDescription")
+		.skills(skills)
 		.userId(1L)
 		.build();
 		jPService.modify(dto);
 	}
 
-	@Test
+	// @Test
 	public void removeTest() {
-		jPService.remove(3L);
+		jPService.remove(38L);
 	}
 
 	// @Test

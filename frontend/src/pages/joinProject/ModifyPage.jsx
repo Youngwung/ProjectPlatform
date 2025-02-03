@@ -1,9 +1,12 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import ModifyComponent from '../../components/joinProject/ModifyComponent';
 
 export default function ModifyPage() {
-	const {jPno} = useParams();
+	const {jpNo} = useParams();
 	return (
-		<div>ModifyPage 수정할 글 번호: {jPno}</div>
+		<div>
+			<ModifyComponent jpNo = {jpNo}/>
+		</div>
 	)
 }

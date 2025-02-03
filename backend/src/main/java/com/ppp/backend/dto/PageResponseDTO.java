@@ -23,6 +23,9 @@ public class PageResponseDTO<E> {
 
 	// 이전 페이지가 몇인 지, 다음 페이지가 몇인 지 등을 저장하는 필드
 	private int totalCount, prevPage, nextPage, totalPage, current;
+
+	// 화면에 표시할 페이지 번호 개수를 상수로 정의
+	private static final int PAGE_NUM_COUNT = 10;
 	
 	// 생성자
 	public PageResponseDTO(List<E> dtoList, PageRequestDTO pageRequestDTO, long total) {
@@ -38,11 +41,11 @@ public class PageResponseDTO<E> {
 
 		// 끝 페이지 end가 몇 인 지 구하기.
 		// 나누는 숫자가 실수여야 원하는 결과가 나옴.
-		int end = (int) (Math.ceil(pageRequestDTO.getPage() / (pageRequestDTO.getSize() + 0.0))) * pageRequestDTO.getSize(); 
+		int end = (int) (Math.ceil(pageRequestDTO.getPage() / (double) PAGE_NUM_COUNT) * PAGE_NUM_COUNT); 
 		// ceil: 올림 함수
 
 		// 시작 페이지가 몇 인 지 구하기
-		int start = end - (pageRequestDTO.getSize() - 1);
+		int start = end - (PAGE_NUM_COUNT - 1);
 
 		// 완전 끝 페이지
 		int last = (int) (Math.ceil(totalCount/(double) pageRequestDTO.getSize()));

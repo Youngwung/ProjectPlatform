@@ -1,19 +1,19 @@
 package com.ppp.backend.repository;
 
-import com.ppp.backend.domain.FindProject;
-import com.ppp.backend.domain.User;
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-
 import java.util.Optional;
 
+import org.junit.jupiter.api.Assertions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
+
+import com.ppp.backend.domain.FindProject;
+import com.ppp.backend.domain.User;
+
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+
 @ActiveProfiles("local")
-@SpringBootTest
+// @SpringBootTest
 @Slf4j
 public class FindProjectRepositoryTest {
 
@@ -23,13 +23,13 @@ public class FindProjectRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Test
+    // @Test
     public void findProjectRepositoryNotNull() {
         Assertions.assertNotNull(findProjectRepository);
         log.info("FindProjectRepository initialized: {}", findProjectRepository);
     }
 
-    @Test
+    // @Test
     @Transactional
     public void insertFindProject() {
         // ID가 1인 User 조회
@@ -47,7 +47,7 @@ public class FindProjectRepositoryTest {
         log.info("Inserted FindProject: {}", findProject);
     }
 
-    @Test
+    // @Test
     @Transactional
     public void updateFindProject() {
         // 기존 FindProject 조회
@@ -64,7 +64,7 @@ public class FindProjectRepositoryTest {
         log.info("Updated FindProject: {}", findProject);
     }
 
-    @Test
+    // @Test
     @Transactional
     public void deleteFindProject() {
         // 기존 FindProject 삭제

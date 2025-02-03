@@ -1,4 +1,5 @@
 // 페이지 이동 관련 useNavigate 들을 한 곳에서 관리하기 위한 커스텀 훅
+import { useState } from "react";
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom";
 
 const getNum = (param, defaultValue) => {
@@ -16,11 +17,14 @@ export default function useCustomMove() {
 
 	// 쿼리스트링 값이 존재하면 그 값을 가져오고, 존재하지 않으면 기본값을 사용하는 로직 작성.
 	const page = getNum(queryParams.get("page"), 1);
-	const size = getNum(queryParams.get("size"), 10);
+	const size = getNum(queryParams.get("size"), 12);
 
 	// 변수로 저장되어있는 값을 주소창에서 사용할 수 있는 형태로 변환
-	// ? page=1&size=10
+	// ? page=1&size=12
 	const queryDefault = createSearchParams({page, size}).toString()
+
+	// 같은 페이지를 클릭했을 때 새로고침이 되어 데이터를 가져올 수 있도록 구현
+	const [refresh, setRefresh] = useState(false);
 
 
 	/**
@@ -36,11 +40,13 @@ export default function useCustomMove() {
 
 		if (pageParam) {
 			const pageNum = getNum(pageParam.page, 1)
-			const sizeNum = getNum(pageParam.size, 10)
+			const sizeNum = getNum(pageParam.size, 12)
 			queryStr = createSearchParams({page:pageNum, size: sizeNum}).toString();
 		} else {
 			queryStr = queryDefault;
 		}
+		// 함수를 호출할 때 마다 값이 변경됨
+		setRefresh(!refresh);
 		navigate({pathname: '../list', search: queryStr})
 	}
 
@@ -52,6 +58,14 @@ export default function useCustomMove() {
 		})
 	}
 
-	return {moveToList, moveToModify, page, size}
+	const moveToRead = (jpNo) => {
+		navigate({
+			pathname: `../read/${jpNo}`,
+			search: queryDefault
+		})
+	}
+
+	// refresh 값 반환
+	return {moveToList, moveToModify, moveToRead, page, size, refresh}
 	// 커스텀 훅과 쿼리스트링에서 받아온 page 변수와 size 변수를 다른 페이지에서도 사용할 수 있게 반환
 }

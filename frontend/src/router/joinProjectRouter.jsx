@@ -20,7 +20,7 @@ const joinProjectRouter = () => {
 			element: <Navigate replace to="list"/>
 		},
 		{
-			path: "read/:jPno",
+			path: "read/:jpNo",
 			element: <Suspense fallback={Loading}><JProjectReadPage/></Suspense>
 		},
 		{
@@ -28,7 +28,7 @@ const joinProjectRouter = () => {
 			element: <Suspense fallback={Loading}><JProjectAddPage/></Suspense>
 		},
 		{
-			path: "modify/:jPno",
+			path: "modify/:jpNo",
 			element: <Suspense fallback={Loading}><JProjectModifyPage/></Suspense>
 		}
 	];

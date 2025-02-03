@@ -11,7 +11,7 @@ public class UserDto {
     Long id;
     String name;
     String email;
-    String phone;
+    String phoneNumber;
     String experience;
     String skills;
 }

@@ -11,7 +11,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/user")
 public class UserApiController {
 
     private final UserService userService;
@@ -26,6 +26,12 @@ public class UserApiController {
     public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
         UserDto userDto = userService.getUserById(id);
         return ResponseEntity.ok(userDto);
+    }
+
+    @GetMapping("/create")
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
+        UserDto userDtoCreated = userService.createUser(userDto);
+        return ResponseEntity.ok(userDtoCreated);
     }
 
     @PutMapping("/list/{id}")

@@ -32,7 +32,7 @@ public class UserService {
         User user = User.builder()
                 .name(userDto.getName())
                 .email(userDto.getEmail())
-                .phoneNumber(userDto.getPhone())
+                .phoneNumber(userDto.getPhoneNumber())
                 .experience(userDto.getExperience())
                 .password("defaultPassword")
                 .build();
@@ -63,7 +63,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userDto.getId()));
         existingUser.setName(userDto.getName());
         existingUser.setEmail(userDto.getEmail());
-        existingUser.setPhoneNumber(userDto.getPhone());
+        existingUser.setPhoneNumber(userDto.getPhoneNumber());
         existingUser.setExperience(userDto.getExperience());
 
         User updatedUser = userRepository.save(existingUser);
@@ -87,9 +87,9 @@ public class UserService {
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
-                .phone(user.getPhoneNumber())
+                .phoneNumber(user.getPhoneNumber())
                 .experience(user.getExperience())
-                // todo skills 연동 필요
+                // TODO skills 연동 필요
                 .skills(null)
                 .build();
     }

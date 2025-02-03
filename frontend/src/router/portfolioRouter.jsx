@@ -4,8 +4,8 @@ import { Navigate } from "react-router-dom";
 const Loading = <div>Loading...</div>;
 const PortfolioListPage = lazy(() => import("../pages/portfolio/ListPage"));
 const PortfolioDetail = lazy(() => import("../pages/portfolio/PortfolioDetail"));
-const Createportpolio = lazy(() => import("../pages/portfolio/CreactPortfolio"));
-const Modifyportpolio = lazy(() => import("../pages/portfolio/ModifyPortfolio"));
+const CreatePortfolio = lazy(() => import("../pages/portfolio/CreatePortfolio"));
+const ModifyPortfolio = lazy(() => import("../pages/portfolio/ModifyPortfolio"));
 
 const portfolioRouter = () => {
   return [
@@ -22,7 +22,7 @@ const portfolioRouter = () => {
       element: <Navigate replace to="list" />,
     },
     {
-      path: "list/:projectId",
+      path: "list/:portfolioId",
       element: (
         <Suspense fallback={Loading}>
           <PortfolioDetail />
@@ -33,15 +33,15 @@ const portfolioRouter = () => {
       path: "create",
       element: (
         <Suspense fallback={Loading}>
-          <Createportpolio />
+          <CreatePortfolio />
         </Suspense>
       ),
     },
     {
-      path: "modify/:projectId",
+      path: "modify/:portfolioId",
       element: (
         <Suspense fallback={Loading}>
-          <Modifyportpolio/>
+          <ModifyPortfolio/>
         </Suspense>
       ),
     },

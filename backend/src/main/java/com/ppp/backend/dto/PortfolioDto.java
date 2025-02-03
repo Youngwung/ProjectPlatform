@@ -5,12 +5,11 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 @Getter
 @Builder(toBuilder = true)
 @ToString
-public class FindProjectDto {
+public class PortfolioDto {
     private Long id;
     private Long userId;
     private String title;

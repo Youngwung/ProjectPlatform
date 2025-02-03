@@ -2,10 +2,10 @@ import axios from 'axios';
 
 // API 기본 URL 설정
 export const API_URL = 'http://localhost:8080';
-const prefix = `${API_URL}/api/findProject`;
+const prefix = `${API_URL}/api/portfolio`;
 
-// FindProject API 함수 모듈
-const findProjectApi = {
+// portfolio API 함수 모듈
+const portfolioApi = {
   // 프로젝트 하나만 조회
   getOne: async (id) => {
     try {
@@ -73,4 +73,4 @@ const findProjectApi = {
   },
 };
 
-export default findProjectApi;
+export default portfolioApi;

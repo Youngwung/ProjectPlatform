@@ -12,23 +12,23 @@ import java.util.stream.Collectors;
 // @SpringBootTest
 @Slf4j
 @ActiveProfiles("local")
-public class FindProjectServiceTest {
+public class PortfolioServiceTest {
     @Autowired
-    private FindProjectService fPService;
+    private PortfolioService portfolioService;
 
     // @Test
     public void getOneTest() {
-        Long fPNo = 1L;
+        Long Id = 1L;
 
-        log.info("get = {}", fPService.getFindProjectById(fPNo));
+        log.info("get = {}", portfolioService.getPortfolioById(Id));
     }
     // @Test
     public void getAllTest() {
-        log.info("all={}",fPService.getAllFindProjects());
+        log.info("all={}",portfolioService.getAllPortfolios());
     }
 
     // @Test
     public void createTest() {
-        log.info("create={}",fPService.createFindProject(fPService.getFindProjectById(1L)));
+        log.info("create={}",portfolioService.createPortfolio(portfolioService.getPortfolioById(1L)));
     }
 }

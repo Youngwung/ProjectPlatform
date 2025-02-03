@@ -19,8 +19,8 @@ import java.sql.Timestamp;
 @DynamicInsert
 @DynamicUpdate
 @Builder(toBuilder = true)
-@Table(name = "findproject")
-public class FindProject {
+@Table(name = "portfolio")
+public class Portfolio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

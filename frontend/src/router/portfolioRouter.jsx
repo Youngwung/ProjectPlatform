@@ -2,18 +2,18 @@ import { lazy, Suspense } from "react";
 import { Navigate } from "react-router-dom";
 
 const Loading = <div>Loading...</div>;
-const FindProjectListPage = lazy(() => import("../pages/findProject/ListPage"));
-const FindProjectPortfolioDetail = lazy(() => import("../pages/findProject/PortfolioDetail"));
-const CreateFindProject = lazy(() => import("../pages/findProject/CreactPortfolio"));
-const ModifyFindProject = lazy(() => import("../pages/findProject/ModifyPortfolio"));
+const PortfolioListPage = lazy(() => import("../pages/portfolio/ListPage"));
+const PortfolioDetail = lazy(() => import("../pages/portfolio/PortfolioDetail"));
+const Createportpolio = lazy(() => import("../pages/portfolio/CreactPortfolio"));
+const Modifyportpolio = lazy(() => import("../pages/portfolio/ModifyPortfolio"));
 
-const findProjectRouter = () => {
+const portfolioRouter = () => {
   return [
     {
       path: "list",
       element: (
         <Suspense fallback={Loading}>
-          <FindProjectListPage />
+          <PortfolioListPage />
         </Suspense>
       ),
     },
@@ -25,7 +25,7 @@ const findProjectRouter = () => {
       path: "list/:projectId",
       element: (
         <Suspense fallback={Loading}>
-          <FindProjectPortfolioDetail />
+          <PortfolioDetail />
         </Suspense>
       ),
     },
@@ -33,7 +33,7 @@ const findProjectRouter = () => {
       path: "create",
       element: (
         <Suspense fallback={Loading}>
-          <CreateFindProject />
+          <Createportpolio />
         </Suspense>
       ),
     },
@@ -41,11 +41,11 @@ const findProjectRouter = () => {
       path: "modify/:projectId",
       element: (
         <Suspense fallback={Loading}>
-          <ModifyFindProject/>
+          <Modifyportpolio/>
         </Suspense>
       ),
     },
   ];
 };
 
-export default findProjectRouter;
+export default portfolioRouter;

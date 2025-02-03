@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card, Col, Container, Row } from "react-bootstrap";
-import { getList } from "../../api/joinProjectApi";
+import { getList } from "../../api/projectApi";
 import useCustomMove from "../../hooks/useCustomMove";
 import PageComponent from "../common/PageComponent";
 import SkillTagComponent from "../skill/SkillTagComponent";

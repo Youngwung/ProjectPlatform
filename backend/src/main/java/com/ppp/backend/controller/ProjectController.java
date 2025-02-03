@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ppp.backend.dto.JoinProjectDTO;
 import com.ppp.backend.dto.PageRequestDTO;
 import com.ppp.backend.dto.PageResponseDTO;
-import com.ppp.backend.service.JoinProjectService;
+import com.ppp.backend.dto.ProjectDTO;
+import com.ppp.backend.service.ProjectService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,29 +22,29 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/joinProject")
-public class JoinProjectController {
+@RequestMapping("/api/project")
+public class ProjectController {
 
-	private final JoinProjectService joinProjectService;
+	private final ProjectService projectService;
 
-	@GetMapping("/{jpNo}")
-	public JoinProjectDTO get(@PathVariable("jpNo") Long jpNo) {
+	@GetMapping("/{projectId}")
+	public ProjectDTO get(@PathVariable("projectId") Long projectId) {
 		// 테스트 완료
 		// ? 로그에 한글이 깨지는 문제가 있음.
-		JoinProjectDTO joinProjectDTO = joinProjectService.get(jpNo);
-		log.info("dto = {}", joinProjectDTO);
-		return joinProjectDTO;
+		ProjectDTO projectDTO = projectService.get(projectId);
+		log.info("dto = {}", projectDTO);
+		return projectDTO;
 	}
 
 	@GetMapping("/list")
-	public PageResponseDTO<JoinProjectDTO> getList(PageRequestDTO pageRequestDTO) {
+	public PageResponseDTO<ProjectDTO> getList(PageRequestDTO pageRequestDTO) {
 		log.info("list = {}", pageRequestDTO);
 		
-		return joinProjectService.getList(pageRequestDTO);
+		return projectService.getList(pageRequestDTO);
 	}
 
 	@PostMapping("/")
-	public Map<String, Long> register(@RequestBody JoinProjectDTO dto) {
+	public Map<String, Long> register(@RequestBody ProjectDTO dto) {
 		/*
 		 * 포스트맨 등록 기능 JSON데이터 
 {
@@ -55,14 +55,14 @@ public class JoinProjectController {
 		 */
 		log.info("dto = {}", dto);
 
-		Long jpNo = joinProjectService.register(dto);
+		Long projectId = projectService.register(dto);
 		
 		// JSON 형태로 값을 전달하기 위해 Map으로 리턴
-		return Map.of("JPNO", jpNo);
+		return Map.of("projectId", projectId);
 	}
 
-	@PutMapping("/{jpNo}")
-	public Map<String, String> modify(@PathVariable("jpNo") Long jpNo, @RequestBody JoinProjectDTO dto) {
+	@PutMapping("/{projectId}")
+	public Map<String, String> modify(@PathVariable("projectId") Long projectId, @RequestBody ProjectDTO dto) {
 		/*
 		 * 포스트맨 수정 기능 JSON데이터 
 {
@@ -72,16 +72,16 @@ public class JoinProjectController {
 }
 		 */
 		// 경로변수와 번호를 동기화
-		dto.setId(jpNo);
+		dto.setId(projectId);
 
-		joinProjectService.modify(dto);
+		projectService.modify(dto);
 		
 		return Map.of("RESULT", "SUCCESS");
 	}
 
-	@DeleteMapping("/{jpNo}")
-	public Map<String, String> remove(@PathVariable("jpNo") Long jpNo) {
-		joinProjectService.remove(jpNo);
+	@DeleteMapping("/{projectId}")
+	public Map<String, String> remove(@PathVariable("projectId") Long projectId) {
+		projectService.remove(projectId);
 		return Map.of("RESULT", "SUCCESS");
 	}
 }

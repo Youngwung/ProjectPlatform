@@ -87,7 +87,7 @@ CREATE TABLE project_skill (
 );
 
 -- findproject 테이블 생성
-CREATE TABLE portpolio (
+CREATE TABLE portfolio (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     title VARCHAR(255) NOT NULL,

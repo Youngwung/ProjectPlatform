@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
-import { deleteOne, getOne, putOne } from "../../api/joinProjectApi";
+import { deleteOne, getOne, putOne } from "../../api/projectApi";
 import useCustomMove from "../../hooks/useCustomMove";
 import InputSkillComponent from "../skill/InputSkillComponent";
 import ModalComponent from "./ModalComponent";
 
 // 기본값 설정
 const initState = {
-	jpNo: 0,
+	projectId: 0,
 	userId: 0,
 	title: "",
 	skills: "",
@@ -19,24 +19,24 @@ const initState = {
 	updatedAt: "",
 };
 
-export default function ModifyComponent({ jpNo }) {
-	const [joinProject, setJoinProject] = useState(initState);
+export default function ModifyComponent({ projectId }) {
+	const [project, setProject] = useState(initState);
 
 	const [result, setResult] = useState(null);
 
 	const { moveToList, moveToRead } = useCustomMove();
 
 	useEffect(() => {
-		getOne(jpNo).then((data) => {
+		getOne(projectId).then((data) => {
 			console.log(data);
-			setJoinProject(data);
+			setProject(data);
 		});
-	}, [jpNo]);
+	}, [projectId]);
 
 	const handleChange = (e) => {
 		const { name, value, type, checked } = e.target;
-		setJoinProject({
-			...joinProject,
+		setProject({
+			...project,
 			[name]: type === "checkbox" ? checked : value,
 		});
 		console.log(e.target.value);
@@ -53,7 +53,7 @@ export default function ModifyComponent({ jpNo }) {
 	// 수정 버튼 클릭 시
 	const handleClickModify = (e) => {
 		e.preventDefault();
-		console.log(joinProject);
+		console.log(project);
 		setResult("Modified");
 		setShowModal(true);
 	};
@@ -61,22 +61,22 @@ export default function ModifyComponent({ jpNo }) {
 	// 삭제 버튼 클릭 시
 	const handleClickDelete = (e) => {
 		e.preventDefault();
-		console.log(joinProject);
+		console.log(project);
 		setResult("Deleted");
 		setShowModal(true);
 	};
 
 	// 수정 모달 "확인" 클릭 시
 	const handleModifyConfirm = () => {
-		putOne(joinProject).then((data) => {
+		putOne(project).then((data) => {
 			console.log("modify result: " + data.RESULT); // {RESULT: SUCCESS}
-			moveToRead(joinProject.id);
+			moveToRead(project.id);
 		});
 	};
 
 	// 삭제 모달 "확인" 클릭 시
 	const handleDeleteConfirm = (e) => {
-		deleteOne(jpNo).then((data) => {
+		deleteOne(projectId).then((data) => {
 			console.log("delete result: " + data.RESULT); // {RESULT: SUCCESS}
 			moveToList();
 		});
@@ -91,7 +91,7 @@ export default function ModifyComponent({ jpNo }) {
 			// 스킬 유효성 검사 통과
 			setValidSkill(true);
 			// joinProject 업데이트
-			setJoinProject(prev => ({
+			setProject(prev => ({
 				...prev,
 				skills: value
 			}))
@@ -116,7 +116,7 @@ export default function ModifyComponent({ jpNo }) {
 					<Form.Control
 						type="text"
 						name="title"
-						value={joinProject.title}
+						value={project.title}
 						onChange={handleChange}
 						placeholder="프로젝트 제목을 입력하세요"
 					/>
@@ -127,7 +127,7 @@ export default function ModifyComponent({ jpNo }) {
 					<Form.Control
 						as="textarea"
 						name="description"
-						value={joinProject.description}
+						value={project.description}
 						onChange={handleChange}
 						rows={3}
 						placeholder="프로젝트 설명을 입력하세요"
@@ -137,7 +137,7 @@ export default function ModifyComponent({ jpNo }) {
 				{/* 스킬 Input 컴포넌트 불러오기 */}
 				<InputSkillComponent 
 					onValidationComplete={handleValidationComplete} 
-					skills = {joinProject.skills}
+					skills = {project.skills}
 				/>
 
 				<Row>
@@ -147,7 +147,7 @@ export default function ModifyComponent({ jpNo }) {
 							<Form.Control
 								type="number"
 								name="maxPeople"
-								value={joinProject.maxPeople}
+								value={project.maxPeople}
 								onChange={handleChange}
 								placeholder="최대 인원을 입력하세요"
 							/>
@@ -159,7 +159,7 @@ export default function ModifyComponent({ jpNo }) {
 							<Form.Control
 								as="select"
 								name="status"
-								value={joinProject.status}
+								value={project.status}
 								onChange={handleChange}
 							>
 								<option value="모집_중">모집 중</option>
@@ -175,7 +175,7 @@ export default function ModifyComponent({ jpNo }) {
 								type="checkbox"
 								name="public"
 								label="공개"
-								checked={joinProject.public}
+								checked={project.public}
 								onChange={handleChange}
 							/>
 						</Form.Group>
@@ -200,8 +200,8 @@ export default function ModifyComponent({ jpNo }) {
 				// 삭제 버튼 클릭시 삭제 모달 띄워주고 아닌경우 수정 모달 띄워줌
 				description={
 					result === "Deleted"
-						? `"${joinProject.title}"프로젝트를 삭제하시겠습니까?`
-						: `"${joinProject.title}"프로젝트를 위 내용으로 수정하시겠습니까?`
+						? `"${project.title}"프로젝트를 삭제하시겠습니까?`
+						: `"${project.title}"프로젝트를 위 내용으로 수정하시겠습니까?`
 				}
 			/>
 		</div>

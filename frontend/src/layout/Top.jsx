@@ -19,15 +19,15 @@ const Top = () => {
               style={{ maxHeight: '100px' }}
               navbarScroll
             >
-              <NavDropdown title="구인" id="navbarScrollingDropdown">
-                <NavDropdown.Item as={Link} to="/joinProject">전체보기</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/joinProject/frontend">frontend</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/joinProject/backend">backend</NavDropdown.Item>
+              <NavDropdown title="프로젝트" id="navbarScrollingDropdown">
+                <NavDropdown.Item as={Link} to="/project">전체보기</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/project/frontend">frontend</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/project/backend">backend</NavDropdown.Item>
               </NavDropdown>
-              <NavDropdown title="구직" id="navbarScrollingDropdown">
-                <NavDropdown.Item as={Link} to="/findProject">전체보기</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/findProject/frontend">frontend</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/findProject/backend">backend</NavDropdown.Item>
+              <NavDropdown title="포트폴리오" id="navbarScrollingDropdown">
+                <NavDropdown.Item as={Link} to="/portfolio">전체보기</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/portfolio/frontend">frontend</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/portfolio/backend">backend</NavDropdown.Item>
               </NavDropdown>
               <Nav.Link as={Link} to="/link">링크</Nav.Link>
               <Nav.Link as={Link} to="/mypage">마이페이지 기능작동x</Nav.Link>

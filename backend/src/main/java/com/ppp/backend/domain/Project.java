@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.ppp.backend.status.JoinProjectStatus;
+import com.ppp.backend.status.ProjectStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,14 +27,14 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Table(name = "JOINPROJECT")
+@Table(name = "PROJECT")
 @Getter
 @ToString
 @EqualsAndHashCode
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
-public class JoinProject {
+public class Project {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -52,7 +52,7 @@ public class JoinProject {
 
 	// enum 타입 컬럼 저장
 	@Enumerated(EnumType.STRING)
-	private JoinProjectStatus status;
+	private ProjectStatus status;
 
 	@Column(insertable = false)
 	private boolean isPublic;

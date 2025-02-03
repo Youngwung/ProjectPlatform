@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Badge, Button, Card, Col, Container, Row } from "react-bootstrap";
-import { getOne } from "../../api/joinProjectApi";
+import { getOne } from "../../api/projectApi";
 import useCustomMove from "../../hooks/useCustomMove";
 import SkillTagComponent from "../skill/SkillTagComponent";
 import SkillTagGuideComponent from "../skill/SkillTagGuideComponent";
@@ -9,7 +9,7 @@ import SkillTagGuideComponent from "../skill/SkillTagGuideComponent";
 
 // 기본값 설정
 const initState = {
-	jpNo: 0,
+	projectId: 0,
 	userId: 0,
 	title: "",
 	description: "",
@@ -34,50 +34,50 @@ const getStatusVariant = (status) => {
 	}
 };
 
-export default function ReadComponent({ jpNo }) {
-	const [joinProject, setJoinProject] = useState(initState);
+export default function ReadComponent({ projectId }) {
+	const [project, setProject] = useState(initState);
 
 	// 커스텀 훅에서 리스트 페이지로 이동하는 함수 가져옴
 	const {moveToList, moveToModify} = useCustomMove();
 
 	useEffect(() => {
-		getOne(jpNo).then((data) => {
-			setJoinProject(data);
+		getOne(projectId).then((data) => {
+			setProject(data);
 
 		});
 		
 		return () => {};
-	}, [jpNo]);
+	}, [projectId]);
 	
-	console.log(joinProject);
+	console.log(project);
 	return (
 		<div>
 			<Container className="mt-4">
 				<Card>
 					<Card.Header>
-						<h4>{joinProject.title}</h4>
-						<Badge bg={joinProject.public ? "primary" : "danger"}>
-							{joinProject.public ? "공개" : "비공개"}
+						<h4>{project.title}</h4>
+						<Badge bg={project.public ? "primary" : "danger"}>
+							{project.public ? "공개" : "비공개"}
 						</Badge>
 					</Card.Header>
 					<Card.Body>
 						<Row className="mb-3">
 							<Col>
-								<strong>작성자:</strong> {joinProject.userId}
+								<strong>작성자:</strong> {project.userId}
 							</Col>
 							<Col>
-								<strong>최대 인원:</strong> {joinProject.maxPeople}명
+								<strong>최대 인원:</strong> {project.maxPeople}명
 							</Col>
 							<Col>
-								<Badge bg={getStatusVariant(joinProject.status)}>
-									{joinProject.status}
+								<Badge bg={getStatusVariant(project.status)}>
+									{project.status}
 								</Badge>
 							</Col>
 						</Row>
 						<Row className="mb-3">
 							<Col>
 								<SkillTagGuideComponent />
-								<SkillTagComponent skills = {joinProject.skills}/>
+								<SkillTagComponent skills = {project.skills}/>
 							</Col>
 						</Row>
 						<Row className="mb-3">
@@ -86,22 +86,22 @@ export default function ReadComponent({ jpNo }) {
 							</Col>
 						</Row>
 						<Row>
-							<Col>{joinProject.description}</Col>
+							<Col>{project.description}</Col>
 						</Row>
 						<Row className="mt-4">
 							<Col>
 								<Button variant="primary" onClick={() => moveToList()}>리스트</Button>
 							</Col>
 							<Col>
-								<Button variant="primary" onClick={() => moveToModify(joinProject.id)}>수정</Button>
+								<Button variant="primary" onClick={() => moveToModify(project.id)}>수정</Button>
 							</Col>
 						</Row>
 						<Row className="mt-2 text-muted">
 							<Col>
-								생성 시간: {new Date(joinProject.createdAt).toLocaleString()}
+								생성 시간: {new Date(project.createdAt).toLocaleString()}
 							</Col>
 							<Col>
-								수정 시간: {new Date(joinProject.updatedAt).toLocaleString()}
+								수정 시간: {new Date(project.updatedAt).toLocaleString()}
 							</Col>
 						</Row>
 					</Card.Body>

@@ -9,15 +9,15 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import com.ppp.backend.domain.JoinProject;
-import com.ppp.backend.domain.JoinProjectSkill;
+import com.ppp.backend.domain.Project;
+import com.ppp.backend.domain.ProjectSkill;
 import com.ppp.backend.domain.Skill;
 import com.ppp.backend.domain.SkillLevel;
-import com.ppp.backend.dto.JoinProjectDTO;
 import com.ppp.backend.dto.PageRequestDTO;
 import com.ppp.backend.dto.PageResponseDTO;
-import com.ppp.backend.repository.JoinProjectRepository;
-import com.ppp.backend.repository.JoinProjectSkillRepository;
+import com.ppp.backend.dto.ProjectDTO;
+import com.ppp.backend.repository.ProjectRepository;
+import com.ppp.backend.repository.ProjectSkillRepository;
 import com.ppp.backend.repository.SkillLevelRepository;
 import com.ppp.backend.repository.SkillRepository;
 import com.ppp.backend.repository.UserRepository;
@@ -31,35 +31,35 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
-public class JoinProjectServiceImpl implements JoinProjectService {
-	private final JoinProjectRepository jPRepo;
+public class ProjectServiceImpl implements ProjectService {
+	private final ProjectRepository projectRepo;
 	private final UserRepository userRepo;
 	private final SkillRepository skillRepo;
 	private final SkillLevelRepository skillLevelRepo;
-	private final JoinProjectSkillRepository joinProjectSkillRepo;
+	private final ProjectSkillRepository projectSkillRepo;
 	private final SkillDtoConverter skillDtoConverter;
 
 	@Override
-	public JoinProjectDTO get(Long jPNo) {
-		JoinProject jProject = jPRepo.findById(jPNo).orElseThrow();
-		JoinProjectDTO dto = fromEntity(jProject);
+	public ProjectDTO get(Long jPNo) {
+		Project project = projectRepo.findById(jPNo).orElseThrow();
+		ProjectDTO dto = fromEntity(project);
 
-		List<JoinProjectSkill> jPSkills = joinProjectSkillRepo.findByJoinProjectId(jPNo);
-		Map<String, String> jPSkillMap = new HashMap<>();
-		jPSkills.forEach(jPSkill -> {
-			jPSkillMap.put(jPSkill.getSkill().getName(), jPSkill.getSkillLevel().getName());
+		List<ProjectSkill> projectSkills = projectSkillRepo.findByProjectId(jPNo);
+		Map<String, String> skillMap = new HashMap<>();
+		projectSkills.forEach(jPSkill -> {
+			skillMap.put(jPSkill.getSkill().getName(), jPSkill.getSkillLevel().getName());
 		});
 		
-		String skillString = skillDtoConverter.convertMapToSkillDto(jPSkillMap);
+		String skillString = skillDtoConverter.convertMapToSkillDto(skillMap);
 		dto.setSkills(skillString);
 		return dto;
 	}
 
 	@Override
-	public Long register(JoinProjectDTO dto) {
-		JoinProject jProject = toEntity(dto, userRepo);
+	public Long register(ProjectDTO dto) {
+		Project project = toEntity(dto, userRepo);
 
-		// !등록된 글 번호로 JoinProjectSkill 객체를 DB에 등록
+		// !등록된 글 번호로 ProjectSkill 객체를 DB에 등록
 		// 정규 표현식으로 작성된 문자열
 		String skills = dto.getSkills();
 
@@ -70,7 +70,7 @@ public class JoinProjectServiceImpl implements JoinProjectService {
 
 		// 유효성 검사 리스트
 		List<String> invalidList = new ArrayList<>();
-		List<JoinProjectSkill> joinProjectSkills = new ArrayList<>();
+		List<ProjectSkill> projectSkills = new ArrayList<>();
 
 		skillMap.forEach((key, value) -> {
 			Skill skill = skillRepo.findByNameIgnoreCase(key);
@@ -81,14 +81,14 @@ public class JoinProjectServiceImpl implements JoinProjectService {
 			if (skillLevel == null) {
 				invalidList.add("Invalid skill level: " + value);
 			}
-			// 유효한 데이터인 경우 JoinProjectSkill 객체 생성 후 리스트에 추가
-			JoinProjectSkill joinProjectSkill = JoinProjectSkill.builder()
-					.joinProject(jProject)
+			// 유효한 데이터인 경우 ProjectSkill 객체 생성 후 리스트에 추가
+			ProjectSkill projectSkill = ProjectSkill.builder()
+					.project(project)
 					.skill(skill)
 					.skillLevel(skillLevel)
 					.build();
 
-			joinProjectSkills.add(joinProjectSkill);
+			projectSkills.add(projectSkill);
 		});
 
 		// 유효하지 않은 데이터가 있는 경우
@@ -98,11 +98,11 @@ public class JoinProjectServiceImpl implements JoinProjectService {
 		}
 
 		// 유효성 검사를 통과한 경우 프로젝트 데이터 저장
-		JoinProject result = jPRepo.save(jProject);
+		Project result = projectRepo.save(project);
 
-		// Skill과 SkillLevel을 joinProjectSkill 테이블에 저장
-		joinProjectSkills.forEach((joinProject) -> {
-			joinProjectSkillRepo.save(joinProject);
+		// Skill과 SkillLevel을 ProjectSkill 테이블에 저장
+		projectSkills.forEach((projectSkill) -> {
+			projectSkillRepo.save(projectSkill);
 		});
 
 		// 등록된 프로젝트 번호 리턴
@@ -110,15 +110,15 @@ public class JoinProjectServiceImpl implements JoinProjectService {
 	}
 
 	@Override
-	public void modify(JoinProjectDTO dto) {
+	public void modify(ProjectDTO dto) {
 		// 반드시 업데이트 메서드 작성 시 기존 엔터티를 가져올 필요는 없지만
 		// 업데이트 시 공개 여부 변수(isPublic)이 false로 초기화되는 문제를 해결하기 위해
 		// 기존 엔터티의 데이터를 가져와서 삽입해 주었음.
-		JoinProject entity = jPRepo.findById(dto.getId()).orElseThrow();
+		Project entity = projectRepo.findById(dto.getId()).orElseThrow();
 		dto.setPublic(entity.isPublic());
 
-		JoinProject joinProject = toEntity(dto, userRepo);
-		jPRepo.save(joinProject);
+		Project project = toEntity(dto, userRepo);
+		projectRepo.save(project);
 
 		// 유효성 검사 리스트
 		List<String> invalidList = new ArrayList<>();
@@ -147,12 +147,12 @@ public class JoinProjectServiceImpl implements JoinProjectService {
 		}
 
 		// 기존 스킬 리스트를 가져옴
-		List<JoinProjectSkill> existingSkills = joinProjectSkillRepo.findByJoinProjectId(dto.getId());
+		List<ProjectSkill> existingSkills = projectSkillRepo.findByProjectId(dto.getId());
 		log.info("existingSkills = {}", existingSkills);
 
-		List<JoinProjectSkill> updateList = new ArrayList<>();
+		List<ProjectSkill> updateList = new ArrayList<>();
 		// 기존 스킬로 초기화
-		List<JoinProjectSkill> removeList = new ArrayList<>();
+		List<ProjectSkill> removeList = new ArrayList<>();
 
 		// 기존 스킬 리스트를 순회하면서 비교
 		existingSkills.forEach(existingSkill -> {
@@ -165,10 +165,10 @@ public class JoinProjectServiceImpl implements JoinProjectService {
 				if (!skillLevel.equals(newLevel)) {
 					// 레벨이 다른 경우 객체를 생성해 updateList에 추가
 					SkillLevel newLevelObj = skillLevelRepo.findByNameIgnoreCase(newLevel);
-					JoinProjectSkill updateSkill = JoinProjectSkill.builder()
+					ProjectSkill updateSkill = ProjectSkill.builder()
 							// 이 경우 update이므로 고유 키를 명시해서 객체를 생성
 							.id(existingSkill.getId())
-							.joinProject(joinProject)
+							.project(project)
 							.skill(existingSkill.getSkill())
 							.skillLevel(newLevelObj)
 							.build();
@@ -189,8 +189,8 @@ public class JoinProjectServiceImpl implements JoinProjectService {
 				SkillLevel newLevel = skillLevelRepo.findByNameIgnoreCase(skillLevel);
 
 				// update가 아니라 insert이므로 번호를 안 넣어줘도 됨.
-				JoinProjectSkill skillObj = JoinProjectSkill.builder()
-						.joinProject(joinProject)
+				ProjectSkill skillObj = ProjectSkill.builder()
+						.project(project)
 						.skill(newSkill)
 						.skillLevel(newLevel)
 						.build();
@@ -202,37 +202,37 @@ public class JoinProjectServiceImpl implements JoinProjectService {
 		// log.info("updateList = {}", updateList);
 		// 제거 리스트에 있는 객체를 제거
 		removeList.forEach(remove -> {
-			joinProjectSkillRepo.delete(remove);
+			projectSkillRepo.delete(remove);
 		});
 		// 업데이트 리스트에 있는 객체를 추가
 		updateList.forEach(update -> {
-			joinProjectSkillRepo.save(update);
+			projectSkillRepo.save(update);
 		});
 
 	}
 
 	@Override
 	public void remove(Long jpNo) {
-		int result = joinProjectSkillRepo.deleteByJoinProjectId(jpNo);
+		int result = projectSkillRepo.deleteByProjectId(jpNo);
 		log.info("result = {}", result);
-		jPRepo.deleteById(jpNo);
+		projectRepo.deleteById(jpNo);
 	}
 
 	@Override
-	public PageResponseDTO<JoinProjectDTO> getList(PageRequestDTO PageRequestDTO) {
+	public PageResponseDTO<ProjectDTO> getList(PageRequestDTO PageRequestDTO) {
 		// TODO: Skills 관련 로직 추가
 		// JPA
-		Page<JoinProject> result = jPRepo.search1(PageRequestDTO);
+		Page<Project> result = projectRepo.search1(PageRequestDTO);
 
-		// ! JoinProject List => JoinProjectDTO List
-		List<JoinProjectDTO> dtoList = result.get().map(joinProject -> {
-			JoinProjectDTO dto = fromEntity(joinProject);
+		// ! Project List => ProjectDTO List
+		List<ProjectDTO> dtoList = result.get().map(project -> {
+			ProjectDTO dto = fromEntity(project);
 
-			Map<String, String> skillMap = joinProjectSkillRepo.findByJoinProjectId(joinProject.getId())
+			Map<String, String> skillMap = projectSkillRepo.findByProjectId(project.getId())
 					.stream()
 					.collect(Collectors.toMap(
-							joinProjectSkill -> joinProjectSkill.getSkill().getName(),
-							joinProjectSkill -> joinProjectSkill.getSkillLevel().getName()
+							projectSkill -> projectSkill.getSkill().getName(),
+							projectSkill -> projectSkill.getSkillLevel().getName()
 			));
 			
 			// Map을 String으로 변환하는 메서드를 호출한 후 dto의 skills 필드를 초기화
@@ -242,7 +242,7 @@ public class JoinProjectServiceImpl implements JoinProjectService {
 		}).collect(Collectors.toList());
 
 		// 페이징 처리
-		PageResponseDTO<JoinProjectDTO> pageResponseDTO = new PageResponseDTO<>(dtoList, PageRequestDTO,
+		PageResponseDTO<ProjectDTO> pageResponseDTO = new PageResponseDTO<>(dtoList, PageRequestDTO,
 				result.getTotalElements());
 
 		return pageResponseDTO;

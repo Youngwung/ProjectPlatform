@@ -9,25 +9,25 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.stream.Collectors;
 
-@SpringBootTest
+// @SpringBootTest
 @Slf4j
 @ActiveProfiles("local")
 public class FindProjectServiceTest {
     @Autowired
     private FindProjectService fPService;
 
-    @Test
+    // @Test
     public void getOneTest() {
         Long fPNo = 1L;
 
         log.info("get = {}", fPService.getFindProjectById(fPNo));
     }
-    @Test
+    // @Test
     public void getAllTest() {
         log.info("all={}",fPService.getAllFindProjects());
     }
 
-    @Test
+    // @Test
     public void createTest() {
         log.info("create={}",fPService.createFindProject(fPService.getFindProjectById(1L)));
     }

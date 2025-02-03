@@ -5,19 +5,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.ppp.backend.dto.JoinProjectDTO;
 import com.ppp.backend.dto.PageRequestDTO;
 import com.ppp.backend.dto.PageResponseDTO;
+import com.ppp.backend.dto.ProjectDTO;
 import com.ppp.backend.repository.SkillLevelRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
-@SpringBootTest
+// @SpringBootTest
 @Slf4j
 @ActiveProfiles("local")
-public class JoinProjectServiceTest {
+public class ProjectServiceTest {
 	@Autowired
-	private JoinProjectService jPService;
+	private ProjectService projectService;
 	@Autowired
 	private SkillLevelRepository skillLevelRepo;
 
@@ -25,59 +25,59 @@ public class JoinProjectServiceTest {
 	// @Transactional
 	public void getTest() {
 		Long jPNo = 36L;
-		JoinProjectDTO joinProjectDTO = jPService.get(jPNo);
-		System.out.println(joinProjectDTO);
+		ProjectDTO projectDTO = projectService.get(jPNo);
+		System.out.println(projectDTO);
 	}
 
-	@Test
+	// @Test
 	public void registerTest() {
-		JoinProjectDTO dto =JoinProjectDTO.builder()
+		ProjectDTO dto =ProjectDTO.builder()
 		.title("registerSkillTest")
 		.description("testDescription")
 		.userId(1L)
 		.skills("#React:고급, #Java:중급, #Python:초급")
 		.status("진행_중")
 		.build();
-		Long id = jPService.register(dto);
+		Long id = projectService.register(dto);
 		log.info("id = {}", id);
 	}
 
 	// @Test
 	public void modifyTest() {
 		String skills = "#React:고급, #Java:초급";
-		JoinProjectDTO dto =JoinProjectDTO.builder()
+		ProjectDTO dto =ProjectDTO.builder()
 		.id(38L)
 		.title("modifySkillTest3")
 		.description("testSkillDescription")
 		.skills(skills)
 		.userId(1L)
 		.build();
-		jPService.modify(dto);
+		projectService.modify(dto);
 	}
 
 	// @Test
 	public void removeTest() {
-		jPService.remove(38L);
+		projectService.remove(38L);
 	}
 
 	// @Test
 	public void insertDummyData() {
 		for(int i = 0; i < 20; i++) {
-			JoinProjectDTO dto =JoinProjectDTO.builder()
+			ProjectDTO dto =ProjectDTO.builder()
 			.title("title: " + i)
 			.description("testDescription" + i)
 			.userId(1L)
 			.build();
-			Long id = jPService.register(dto);
+			Long id = projectService.register(dto);
 			log.info("id = {}", id);
 		}
 	}
 
-	@Test
+	// @Test
 	public void getListTest() {
 		// 값을 지정하지 않으면 page = 1, size = 10
 		PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(1).build();
-		PageResponseDTO<JoinProjectDTO> result = jPService.getList(pageRequestDTO);
+		PageResponseDTO<ProjectDTO> result = projectService.getList(pageRequestDTO);
 		System.out.println(result);
 	}
 

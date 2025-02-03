@@ -3,36 +3,36 @@ package com.ppp.backend.service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import com.ppp.backend.domain.JoinProject;
+import com.ppp.backend.domain.Project;
 import com.ppp.backend.domain.User;
-import com.ppp.backend.dto.JoinProjectDTO;
 import com.ppp.backend.dto.PageRequestDTO;
 import com.ppp.backend.dto.PageResponseDTO;
+import com.ppp.backend.dto.ProjectDTO;
 import com.ppp.backend.repository.UserRepository;
-import com.ppp.backend.status.JoinProjectStatus;
+import com.ppp.backend.status.ProjectStatus;
 
 import jakarta.transaction.Transactional;
 
 @Transactional
-public interface JoinProjectService {
+public interface ProjectService {
 
-	JoinProjectDTO get(Long jPno);
+	ProjectDTO get(Long jPno);
 
-	Long register(JoinProjectDTO dto);
+	Long register(ProjectDTO dto);
 
-	void modify(JoinProjectDTO dto);
+	void modify(ProjectDTO dto);
 
 	void remove(Long jpNo);
 
-	PageResponseDTO<JoinProjectDTO> getList(PageRequestDTO PageRequestDTO);
+	PageResponseDTO<ProjectDTO> getList(PageRequestDTO PageRequestDTO);
 
 	// Entity → DTO 변환
-	default JoinProjectDTO fromEntity(JoinProject entity) {
+	default ProjectDTO fromEntity(Project entity) {
 		if (entity == null) {
 			return null;
 		}
 
-		JoinProjectDTO dto = JoinProjectDTO.builder()
+		ProjectDTO dto = ProjectDTO.builder()
 				.id(entity.getId())
 				.userId(entity.getUser().getId()) // User 객체에서 ID 추출
 				.title(entity.getTitle())
@@ -54,7 +54,7 @@ public interface JoinProjectService {
 	}
 
 	// DTO → Entity 변환
-	default JoinProject toEntity(JoinProjectDTO dto, UserRepository userRepository) {
+	default Project toEntity(ProjectDTO dto, UserRepository userRepository) {
 		if (dto == null) {
 			return null;
 		}
@@ -68,13 +68,13 @@ public interface JoinProjectService {
 			dto.setStatus("모집_중");
 		}
 
-		JoinProject entity = JoinProject.builder()
+		Project entity = Project.builder()
 				.id(dto.getId())
 				.user(user) // User 객체를 직접 설정
 				.title(dto.getTitle())
 				.description(dto.getDescription())
 				.maxPeople(dto.getMaxPeople())
-				.status(JoinProjectStatus.valueOf(dto.getStatus()))
+				.status(ProjectStatus.valueOf(dto.getStatus()))
 				.isPublic(dto.isPublic())
 				.createdAt(dto.getCreatedAt() == null ? Timestamp.valueOf(LocalDateTime.now()) : Timestamp.valueOf(dto.getCreatedAt()))
 				.updatedAt(dto.getUpdatedAt() == null ? Timestamp.valueOf(LocalDateTime.now()) : Timestamp.valueOf(dto.getUpdatedAt()))

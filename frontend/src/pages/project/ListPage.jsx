@@ -1,5 +1,5 @@
 import React from 'react';
-import ListComponent from '../../components/joinProject/ListComponent';
+import ListComponent from '../../components/project/ListComponent';
 import useCustomMove from '../../hooks/useCustomMove';
 
 export default function ListPage() {

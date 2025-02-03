@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
-import { postAdd } from "../../api/joinProjectApi";
+import { postAdd } from "../../api/projectApi";
 import useCustomMove from "../../hooks/useCustomMove";
 import InputSkillComponent from "../skill/InputSkillComponent";
 import ModalComponent from "./ModalComponent";
@@ -8,7 +8,7 @@ import ModalComponent from "./ModalComponent";
 export default function AddComponent() {
 	// 기본값 설정
 	const initState = {
-		jpNo: 0,
+		projectId: 0,
 		userId: 0,
 		title: "",
 		skills: "",

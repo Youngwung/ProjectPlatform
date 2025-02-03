@@ -17,22 +17,22 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Table(name = "JOINPROJECT_SKILL")
+@Table(name = "PROJECT_SKILL")
 @Getter
 @ToString
 @EqualsAndHashCode
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
-public class JoinProjectSkill {
+public class ProjectSkill {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "joinproject_id", nullable = false)
+	@JoinColumn(name = "project_id", nullable = false)
 	@ToString.Exclude
-	private JoinProject joinProject;
+	private Project project;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "skill_id", nullable = false)

@@ -12,7 +12,7 @@ import lombok.ToString;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JoinProjectDTO {
+public class ProjectDTO {
 	private Long id;
 
 	private Long userId;

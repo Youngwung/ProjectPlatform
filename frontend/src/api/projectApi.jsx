@@ -4,11 +4,11 @@ import axios from "axios";
 // 서버가 바뀌는 경우 여기만 수정해주면 됨.
 // TODO: .env 파일로 서버 주소 비공개 처리
 export const API_SERVER_HOST = 'http://localhost:8080'
-const prefix = `${API_SERVER_HOST}/api/joinProject`
+const prefix = `${API_SERVER_HOST}/api/project`
 
 // tno로 글 하나 가져오는 비동기 통신 메서드
-export const getOne = async (jpNo) => {
-	const res = await axios.get(`${prefix}/${jpNo}`)
+export const getOne = async (projectId) => {
+	const res = await axios.get(`${prefix}/${projectId}`)
 
 	return res.data
 }
@@ -28,23 +28,23 @@ export const getList = async (pageParam) => {
 
 // 등록 api를 호출하는 비동기 통신 메서드
 
-export const postAdd = async (joinProjectObj) => {
-	const res = await axios.post(`${prefix}/`, joinProjectObj);
+export const postAdd = async (projectObj) => {
+	const res = await axios.post(`${prefix}/`, projectObj);
 
 	return res.data
 }
 
 // 수정 api를 호출하는 비동기 통신 메서드
-export const putOne = async (joinProjectObj) => {
-	const res = await axios.put(`${prefix}/${joinProjectObj.id}`, joinProjectObj);
+export const putOne = async (projectObj) => {
+	const res = await axios.put(`${prefix}/${projectObj.id}`, projectObj);
 
 	return res.data
 }
 
 // 삭제 api를 호출하는 비동기 통신 메서드
-export const deleteOne = async (jpNo) => {
+export const deleteOne = async (projectId) => {
 
-	const res = await axios.delete(`${prefix}/${jpNo}`)
+	const res = await axios.delete(`${prefix}/${projectId}`)
 
 	return res.data
 }

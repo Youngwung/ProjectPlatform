@@ -50,17 +50,17 @@ export default function useCustomMove() {
 		navigate({pathname: '../list', search: queryStr})
 	}
 
-	const moveToModify = (jpNo) => {
+	const moveToModify = (projectId) => {
 		// 수정 페이지는 글 번호를 알아야 함. 아규먼트로 전달받음
 		navigate({
-			pathname: `../modify/${jpNo}`,
+			pathname: `../modify/${projectId}`,
 			search: queryDefault
 		})
 	}
 
-	const moveToRead = (jpNo) => {
+	const moveToRead = (projectId) => {
 		navigate({
-			pathname: `../read/${jpNo}`,
+			pathname: `../read/${projectId}`,
 			search: queryDefault
 		})
 	}

@@ -8,7 +8,7 @@ import {
 	validateSkillsString,
 } from "./SkillTagUtil";
 
-export default function InputSkillComponent({ onValidationComplete }) {
+export default function InputSkillComponent({ onValidationComplete, skills }) {
 	const [skillsInput, setSkillsInput] = useState("");
 	const [isValidating, setIsValidating] = useState(false);
 	const [validationError, setValidationError] = useState("");
@@ -92,6 +92,14 @@ export default function InputSkillComponent({ onValidationComplete }) {
 				value: skillsInput,
 			});
 	}, [isValid, skillsInput, onValidationComplete]);
+
+	// 처음 컴포넌트를 마운트 할 때 기존 스킬 데이터를 불러오기 위한 훅
+	useEffect(() => {
+		if (skills){
+			setSkillsInput(skills)
+		}
+	}, [skills])
+	
 
 	return (
 		<Form.Group className="mb-3">

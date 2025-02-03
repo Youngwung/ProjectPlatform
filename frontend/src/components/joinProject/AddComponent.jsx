@@ -113,6 +113,7 @@ export default function AddComponent() {
 					/>
 				</Form.Group>
 
+				{/* 스킬 Input 컴포넌트 불러오기 */}
 				<InputSkillComponent onValidationComplete={handleValidationComplete} />
 
 				<Row>

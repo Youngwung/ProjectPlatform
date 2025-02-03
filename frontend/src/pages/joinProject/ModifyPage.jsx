@@ -6,7 +6,6 @@ export default function ModifyPage() {
 	const {jpNo} = useParams();
 	return (
 		<div>
-			수정 페이지
 			<ModifyComponent jpNo = {jpNo}/>
 		</div>
 	)

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { deleteOne, getOne, putOne } from "../../api/joinProjectApi";
 import useCustomMove from "../../hooks/useCustomMove";
@@ -10,7 +10,7 @@ const initState = {
 	jpNo: 0,
 	userId: 0,
 	title: "",
-	skill: "",
+	skills: "",
 	description: "",
 	maxPeople: 0,
 	status: "",
@@ -82,11 +82,32 @@ export default function ModifyComponent({ jpNo }) {
 		});
 	};
 
-	// 스킬 입력 창의 Blur 이벤트 리스너
-	const handleValidation = (isValid) => {
-		// TODO: 정규식 검사 결과 알람 창 띄우기
-		console.log("Input is valid:", isValid);
-	};
+	// 스킬 유효성 검사 결과를 저장하기 위한 변수 선언
+	const [validSkill, setValidSkill] = useState(false);
+
+	// 스킬 Input 컴포넌트로부터 데이터 불러오기
+	const handleValidationComplete = useCallback(({isValid, value}) => {
+		if(isValid) {
+			// 스킬 유효성 검사 통과
+			setValidSkill(true);
+			// joinProject 업데이트
+			setJoinProject(prev => ({
+				...prev,
+				skills: value
+			}))
+		} else {
+			setValidSkill(false);
+		}
+	}, []);
+
+	// 수정 버튼 활성화/비활성화 여부를 저장하는 변수 선언
+	const [onButton, setOnButton] = useState(false);
+
+	// validSkill이 변경되면 setOnButton을 초기화
+	useEffect(() => {
+		setOnButton(validSkill);
+	}, [validSkill]);
+	
 	return (
 		<div>
 			<Form onSubmit={handleClickModify}>
@@ -113,10 +134,10 @@ export default function ModifyComponent({ jpNo }) {
 					/>
 				</Form.Group>
 
-				<InputSkillComponent
-					label="요구 기술"
-					onChange={handleChange}
-					onValidation={handleValidation}
+				{/* 스킬 Input 컴포넌트 불러오기 */}
+				<InputSkillComponent 
+					onValidationComplete={handleValidationComplete} 
+					skills = {joinProject.skills}
 				/>
 
 				<Row>
@@ -161,7 +182,8 @@ export default function ModifyComponent({ jpNo }) {
 					</Col>
 				</Row>
 
-				<Button variant="primary" type="submit">
+				{/* 모든 유효성 검사를 통과해야 수정 버튼 활성화 */}
+				<Button variant="primary" type="submit" disabled={!onButton}>
 					수정
 				</Button>
 				<Button variant="danger" onClick={handleClickDelete}>

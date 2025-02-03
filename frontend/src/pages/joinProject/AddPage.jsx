@@ -3,7 +3,7 @@ import AddComponent from '../../components/joinProject/AddComponent'
 
 export default function AddPage() {
 	return (
-		<div>AddPage
+		<div>
 
 			<div>
 				<AddComponent />

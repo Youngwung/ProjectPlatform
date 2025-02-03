@@ -11,9 +11,6 @@ export default function ReadPage() {
 
 	return (
 		<div>
-			Join Project Read Page 글 번호: {jpNo}
-			<button onClick={() => moveToModify(jpNo)}>Test Modify</button>
-			<button onClick={moveToList}>Test List</button>
 			{/* props 전달 */}
 			<ReadComponent jpNo = {jpNo}></ReadComponent>
 		</div>

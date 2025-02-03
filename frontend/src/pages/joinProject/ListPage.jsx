@@ -8,7 +8,6 @@ export default function ListPage() {
 
 	return (
 		<div>
-			ListPage --- page = {page} --- size = {size}
 			<div>
 				<ListComponent />
 			</div>

@@ -30,7 +30,9 @@ const Top = () => {
                 <NavDropdown.Item as={Link} to="/portfolio/backend">backend</NavDropdown.Item>
               </NavDropdown>
               <Nav.Link as={Link} to="/link">링크</Nav.Link>
-              <Nav.Link as={Link} to="/mypage">마이페이지 기능작동x</Nav.Link>
+              <Nav.Link as={Link} to="/mypage">마이페이지 유저아이디 1고정임</Nav.Link>
+              <Nav.Link as={Link} to="/login">로그인</Nav.Link>
+              <Nav.Link as={Link} to="/signup">회원가입</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>

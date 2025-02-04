@@ -81,6 +81,17 @@ const MyPage = () => {
     return <div>Loading...</div>;
   }
 
+  const handleDeleteUser = async () => {
+    try {
+      await userApi.deleteUser(3);
+      window.alert("계정 삭제에 성공했습니다.");
+      window.location.href = "/";
+    } catch (error) {
+      console.error("계정 삭제 오류:", error);
+      window.alert("계정 삭제에 실패했습니다.");
+    }
+  }
+
   return (
     <Container className="mt-5 px-4">
       {/* 메인 유저 정보 카드 */}
@@ -248,12 +259,12 @@ const MyPage = () => {
           <Modal.Title>사용자 설정</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
+          <Form onSubmit={handleDeleteUser}>
             <Form.Group className="mb-3">
               <Form.Check type="switch" label="이메일 알림 수신" />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Button variant="danger" className="ms-2">계정 삭제</Button>
+              <Button variant="danger" className="ms-2" onClick={handleDeleteUser}>계정 삭제</Button>
             </Form.Group>
           </Form>
         </Modal.Body>

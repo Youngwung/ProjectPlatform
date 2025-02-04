@@ -1,5 +1,6 @@
 package com.ppp.backend.controller;
 
+import com.ppp.backend.domain.User;
 import com.ppp.backend.dto.UserDto;
 import com.ppp.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class UserApiController {
         return ResponseEntity.ok(userDto);
     }
 
-    @GetMapping("/create")
+    @PostMapping("/create")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
         UserDto userDtoCreated = userService.createUser(userDto);
         return ResponseEntity.ok(userDtoCreated);
@@ -47,6 +48,16 @@ public class UserApiController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
-    // 만약 비밀번호 변경, 포트폴리오 관리 등 추가적인 기능이 필요하다면
-    // 별도의 엔드포인트를 추가할 수 있습니다.
+    @GetMapping("/list/check-email")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+        boolean exist = userService.isNotNullUserEmail(email);
+        return ResponseEntity.ok(exist);
+    }
+
+    //TODO 비밀번호 변경
+//    public ResponseEntity<UserDto> updataPassword(@RequestBody UserDto userDto) {
+//
+//    }
+//
+//    public ResponseEntity<UserDto>
 }

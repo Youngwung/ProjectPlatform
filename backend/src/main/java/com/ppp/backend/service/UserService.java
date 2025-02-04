@@ -1,7 +1,9 @@
 package com.ppp.backend.service;
 
+import com.ppp.backend.domain.Provider;
 import com.ppp.backend.domain.User;
 import com.ppp.backend.dto.UserDto;
+import com.ppp.backend.repository.ProviderRepository;
 import com.ppp.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final ProviderRepository providerRepository;
 
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
@@ -28,16 +31,19 @@ public class UserService {
      * @return 저장된 사용자 정보를 DTO로 반환
      */
     public UserDto createUser(UserDto userDto) {
+        Long providerId = 4L;//기본값 로컬 TODO 소셜로그인을 해결한뒤에 수정
+        Provider provider = providerRepository.findById(providerId).orElseThrow();
+
         User user = User.builder()
                 .name(userDto.getName())
                 .email(userDto.getEmail())
+                .password(userDto.getPassword())
                 .phoneNumber(userDto.getPhoneNumber())
                 .experience(userDto.getExperience())
-                .password("defaultPassword")
+                .provider(provider)
                 .build();
         // 변환한 User 엔티티를 데이터베이스에 저장합니다.
         User savedUser = userRepository.save(user);
-        // 저장된 User 엔티티를 다시 DTO로 변환하여 반환합니다.
         return convertToDto(savedUser);
     }
     /**
@@ -50,6 +56,9 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
         return convertToDto(user);
+    }
+    public Boolean isNotNullUserEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 
     /**

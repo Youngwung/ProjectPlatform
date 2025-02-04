@@ -1,15 +1,15 @@
 package com.ppp.backend.dto;
 
+import java.sql.Timestamp;
+
 import lombok.Builder;
 import lombok.Getter;
-
-import java.sql.Timestamp;
 
 @Getter
 @Builder
 public class AlertDto {
     private Long id;
-    private Long joinProjectId;
+    private Long projectId;
     private Long skillId;
     private String status;
     private String content;

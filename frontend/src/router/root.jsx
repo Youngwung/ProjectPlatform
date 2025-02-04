@@ -1,15 +1,15 @@
 import React, { lazy, Suspense } from "react";
 import { createBrowserRouter as Router } from "react-router-dom";
-import joinProjectRouter from "./joinProjectRouter";
-import findProjectRouter from "./findProjectRouter";
+import projectRouter from "./projectRouter";
+import portfolioRouter from "./portfolioRouter";
 
 const Loading = <div>Loading....</div>; // 로딩 중에 보여줄 요소
 const Layout = lazy(() => import("../layout/Layout"));
 // const ErrorPage = lazy(() => import("../pages/ErrorPage"));
 //
 const Main = lazy(() => import("../pages/Main"));
-const FindProject = lazy(() => import("../pages/findProject/IndexPage"));
-const JoinProjectIndex = lazy(() => import("../pages/joinProject/IndexPage"));
+const ProjectIndex = lazy(() => import("../pages/project/IndexPage"));
+const Portfolio = lazy(() => import("../pages/portfolio/IndexPage"));
 const MyPage = lazy(() => import("../pages/MyPage"));
 const Link = lazy(() => import("../pages/Link"));
 const root = Router([
@@ -29,18 +29,18 @@ const root = Router([
 				),
 			},
 			{
-				path: "/findProject",
+				path: "/portfolio",
 				element: (
-					<Suspense fallback={Loading}><FindProject /></Suspense>
+					<Suspense fallback={Loading}><Portfolio /></Suspense>
 				),
-				children: findProjectRouter(),
+				children: portfolioRouter(),
 			},
 			{
-				path: "/joinProject",
+				path: "/project",
 				element: (
-					<Suspense fallback={Loading}><JoinProjectIndex /></Suspense>
+					<Suspense fallback={Loading}><ProjectIndex /></Suspense>
 				),
-				children: joinProjectRouter(),
+				children: projectRouter(),
 			},
 			{
 				path: "/mypage",

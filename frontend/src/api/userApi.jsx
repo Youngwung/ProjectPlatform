@@ -70,6 +70,19 @@ const userApi = {
             console.error("📌 요청 정보:", error.config);
             throw error;
         }
-    }
+    },
+    login : async (email,password) => {
+        try {
+            const response = await axios.post(`${prefix}/login`, {email, password});
+            console.log(response);
+            return response.data;
+        } catch (error) {
+            if (error.response && error.response.status !== 401) {
+                console.error("❌ 서버 오류!");
+            }
+        }
+        
+    },
+
 };
 export default userApi;

@@ -8,9 +8,11 @@ import com.ppp.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,6 +21,25 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ProviderRepository providerRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    //TOOOOOOODo login boolean형으로 바꾸기 그리고 패스워드 엔코딩 해슁 매칭 확인해서 로그인까지
+
+    public UserDto login(String email, String password) {
+        // 1️⃣ 이메일로 사용자 조회
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        // 2️⃣ 사용자 존재 여부 확인
+        if (optionalUser.isEmpty()) {
+            return null; // 로그인 실패 (이메일 없음)
+        }
+        User user = optionalUser.get();
+        // 3️⃣ 비밀번호 검증 (암호화된 비밀번호 비교)
+        if (!password.equals(user.getPassword())) {
+            return null; // 로그인 실패 (비밀번호 불일치)
+        }
+        // 4️⃣ 로그인 성공 시 UserDto 반환
+        return convertToDto(user);
+    }
 
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
@@ -33,11 +54,12 @@ public class UserService {
     public UserDto createUser(UserDto userDto) {
         Long providerId = 4L;//기본값 로컬 TODO 소셜로그인을 해결한뒤에 수정
         Provider provider = providerRepository.findById(providerId).orElseThrow();
+        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
 
         User user = User.builder()
                 .name(userDto.getName())
                 .email(userDto.getEmail())
-                .password(userDto.getPassword())
+                .password(encodedPassword)
                 .phoneNumber(userDto.getPhoneNumber())
                 .experience(userDto.getExperience())
                 .provider(provider)
@@ -84,7 +106,6 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
-
     /**
      * User 엔티티를 UserDto로 변환하는 헬퍼 메서드입니다.
      * @param user 변환할 User 엔티티
@@ -94,6 +115,7 @@ public class UserService {
         return UserDto.builder()
                 .id(user.getId())
                 .name(user.getName())
+                .password(user.getPassword())
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
                 .experience(user.getExperience())
@@ -101,4 +123,5 @@ public class UserService {
                 .skills(null)
                 .build();
     }
+
 }

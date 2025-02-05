@@ -3,6 +3,8 @@ import { Form, Button, Card,Container,Row,Col,InputGroup} from 'react-bootstrap'
 import userApi from '../api/userApi'
 
 
+//TODO 아이디 찾기 오류 발생하여 수정해야함
+
 const handleSubmit = async (e) => {
     e.preventDefault();
     const email = e.target.email.value;

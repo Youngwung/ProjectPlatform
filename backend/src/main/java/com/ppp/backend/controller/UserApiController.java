@@ -4,8 +4,10 @@ import com.ppp.backend.domain.User;
 import com.ppp.backend.dto.UserDto;
 import com.ppp.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/user")
+@Slf4j
 public class UserApiController {
 
     private final UserService userService;
@@ -54,10 +57,22 @@ public class UserApiController {
         return ResponseEntity.ok(exist);
     }
 
-    //TODO 비밀번호 변경
+//    TODO 비밀번호 변경
 //    public ResponseEntity<UserDto> updataPassword(@RequestBody UserDto userDto) {
 //
 //    }
 //
-//    public ResponseEntity<UserDto>
+    @PostMapping("/login")
+    public ResponseEntity<UserDto> login(@RequestBody UserDto userDto) {
+        log.info("Received userDto: email={}, password={}", userDto.getEmail(), userDto.getPassword()); // 디버깅용 로그 추가
+
+        UserDto loginUser = userService.login(userDto.getEmail(), userDto.getPassword());
+        log.info("loginuser ========== {}", loginUser);
+
+        if (loginUser == null) {
+            return ResponseEntity.status(401).body(null);
+        }
+        return ResponseEntity.ok(loginUser);
+    }
+
 }

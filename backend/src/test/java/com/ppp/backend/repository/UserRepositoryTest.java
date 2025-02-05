@@ -1,16 +1,18 @@
 package com.ppp.backend.repository;
 
+import static org.assertj.core.api.Assertions.*;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+
 import com.ppp.backend.domain.Provider;
 import com.ppp.backend.domain.User;
+
 import lombok.extern.slf4j.Slf4j;
-import static org.assertj.core.api.Assertions.assertThat;
 
 // @SpringBootTest
 @ActiveProfiles("local")

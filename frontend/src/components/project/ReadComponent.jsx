@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Badge, Button, Card, Col, Container, Row } from "react-bootstrap";
 import { getOne } from "../../api/projectApi";
 import useCustomMove from "../../hooks/useCustomMove";
+import useCustomString from "../../hooks/useCustomString";
 import SkillTagComponent from "../skill/SkillTagComponent";
 import SkillTagGuideComponent from "../skill/SkillTagGuideComponent";
 
@@ -40,6 +41,9 @@ export default function ReadComponent({ projectId }) {
 	// 커스텀 훅에서 리스트 페이지로 이동하는 함수 가져옴
 	const {moveToList, moveToModify} = useCustomMove();
 
+	// 커스텀 훅에서 스테이터스의 _를 공백으로 바꿔주는 함수 가져옴
+	const {statusToString} = useCustomString();
+
 	useEffect(() => {
 		getOne(projectId).then((data) => {
 			setProject(data);
@@ -70,7 +74,7 @@ export default function ReadComponent({ projectId }) {
 							</Col>
 							<Col>
 								<Badge bg={getStatusVariant(project.status)}>
-									{project.status}
+									{statusToString(project.status)}
 								</Badge>
 							</Col>
 						</Row>

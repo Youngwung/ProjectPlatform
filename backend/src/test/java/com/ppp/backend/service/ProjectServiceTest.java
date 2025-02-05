@@ -8,18 +8,15 @@ import org.springframework.test.context.ActiveProfiles;
 import com.ppp.backend.dto.PageRequestDTO;
 import com.ppp.backend.dto.PageResponseDTO;
 import com.ppp.backend.dto.ProjectDTO;
-import com.ppp.backend.repository.SkillLevelRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
-// @SpringBootTest
+@SpringBootTest
 @Slf4j
 @ActiveProfiles("local")
 public class ProjectServiceTest {
 	@Autowired
 	private ProjectService projectService;
-	@Autowired
-	private SkillLevelRepository skillLevelRepo;
 
 	// @Test
 	// @Transactional
@@ -35,22 +32,25 @@ public class ProjectServiceTest {
 		.title("registerSkillTest")
 		.description("testDescription")
 		.userId(1L)
-		.skills("#React:고급, #Java:중급, #Python:초급")
+		.skills("#React:고급, #Java:중급")
 		.status("진행_중")
 		.build();
 		Long id = projectService.register(dto);
 		log.info("id = {}", id);
 	}
 
-	// @Test
+	@Test
 	public void modifyTest() {
 		String skills = "#React:고급, #Java:초급";
 		ProjectDTO dto =ProjectDTO.builder()
-		.id(38L)
+		.id(43L)
 		.title("modifySkillTest3")
 		.description("testSkillDescription")
 		.skills(skills)
 		.userId(1L)
+		.isPublic(false)
+		.maxPeople(4)
+		.status("모집_중")
 		.build();
 		projectService.modify(dto);
 	}

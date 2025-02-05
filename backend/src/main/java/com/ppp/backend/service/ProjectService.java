@@ -11,9 +11,6 @@ import com.ppp.backend.dto.ProjectDTO;
 import com.ppp.backend.repository.UserRepository;
 import com.ppp.backend.status.ProjectStatus;
 
-import jakarta.transaction.Transactional;
-
-@Transactional
 public interface ProjectService {
 
 	ProjectDTO get(Long jPno);

@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import com.ppp.backend.domain.Project;
 import com.ppp.backend.domain.QProject;
 import com.ppp.backend.dto.PageRequestDTO;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPQLQuery;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +29,17 @@ public class ProjectSearchImpl extends QuerydslRepositorySupport implements Proj
 	}
 
 	@Override
-	public Page<Project> search1(PageRequestDTO pageRequestDTO) {
+	public Page<Project> searchString(PageRequestDTO pageRequestDTO) {
 
 		QProject project = QProject.project;
 
+		BooleanExpression isPublic = project.isPublic.eq(true);
+
 		// JoinProject 테이블에서
 		JPQLQuery<Project> query = from(project);
+
+		// 공개 변수가 true인 조건 설정
+		query.where(isPublic);
 
 		// pageable 객체 생성
 		// DTO의 값으로 수정

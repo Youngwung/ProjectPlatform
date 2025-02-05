@@ -19,7 +19,7 @@ public class ProjectSearchTest {
 	// @Test
 	@Transactional
 	public void search1Test() {
-		projectRepo.search1(null);
+		projectRepo.searchString(null);
 	}
 	
 }

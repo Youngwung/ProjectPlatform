@@ -1,6 +1,7 @@
 package com.ppp.backend.domain;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -24,11 +25,13 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity
 @Table(name = "PROJECT")
 @Getter
+@Setter
 @ToString
 @EqualsAndHashCode
 @Builder
@@ -37,15 +40,16 @@ import lombok.ToString;
 public class Project {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable=false)
+	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
-	
+
 	@Column(nullable = false)
 	private String title;
-	
+
 	private String description;
 
 	private int maxPeople;
@@ -67,4 +71,13 @@ public class Project {
 	@ToString.Exclude
 	@UpdateTimestamp
 	private Timestamp updatedAt;
+
+	public void update (String title, String description, int maxPeople, String status, boolean isPublic) {
+		this.title = title;
+		this.description = description;
+		this.maxPeople = maxPeople;
+		this.status = ProjectStatus.valueOf(status);
+		this.isPublic = isPublic;
+		this.updatedAt = Timestamp.valueOf(LocalDateTime.now());
+	}
 }

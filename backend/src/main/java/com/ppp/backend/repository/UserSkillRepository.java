@@ -15,8 +15,8 @@ public interface UserSkillRepository extends BaseSkillRepository<UserSkill> {
 
     @Override
     @Query("""
-            SELECT u FROM UserSkill u WHERE p.user.id = :ownerId
+            SELECT u FROM UserSkill u WHERE u.user.id = :ownerId
             """)
-    List<UserSkill> findByOwner(@Param("ownerId")Long ownerId);
+    List<UserSkill> findByOwner(@Param("ownerId") Long ownerId);
 
 }

@@ -20,24 +20,28 @@ public class UserApiController {
 
     private final UserService userService;
 
+    // 모든 사용자 조회
     @GetMapping("/list")
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> userList = userService.getAllUsers();
         return ResponseEntity.ok(userList);
     }
 
+    //특정 사용자 조회
     @GetMapping("/list/{id}")
     public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
         UserDto userDto = userService.getUserById(id);
         return ResponseEntity.ok(userDto);
     }
 
+    //새로운 사용자 생성
     @PostMapping("/create")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
         UserDto userDtoCreated = userService.createUser(userDto);
         return ResponseEntity.ok(userDtoCreated);
     }
 
+    //사용자 업데이트
     @PutMapping("/list/{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
         // URL의 id와 DTO의 id가 일치하도록 설정합니다.
@@ -46,33 +50,20 @@ public class UserApiController {
         return ResponseEntity.ok(updatedUser);
     }
 
+    //사용자 삭제
     @DeleteMapping("/list/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
-    @GetMapping("/list/check-email")
-    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+    @PostMapping("/list/check-email")
+    public ResponseEntity<Boolean> checkEmail(@RequestBody String email) {
         boolean exist = userService.isNotNullUserEmail(email);
         return ResponseEntity.ok(exist);
     }
 
 //    TODO 비밀번호 변경
 //    public ResponseEntity<UserDto> updataPassword(@RequestBody UserDto userDto) {
-//
 //    }
-//
-    @PostMapping("/login")
-    public ResponseEntity<UserDto> login(@RequestBody UserDto userDto) {
-        log.info("Received userDto: email={}, password={}", userDto.getEmail(), userDto.getPassword()); // 디버깅용 로그 추가
-
-        UserDto loginUser = userService.login(userDto.getEmail(), userDto.getPassword());
-        log.info("loginuser ========== {}", loginUser);
-
-        if (loginUser == null) {
-            return ResponseEntity.status(401).body(null);
-        }
-        return ResponseEntity.ok(loginUser);
-    }
-
+//ㄴ
 }

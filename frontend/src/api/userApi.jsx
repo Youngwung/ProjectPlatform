@@ -52,9 +52,7 @@ const userApi = {
     },
     checkEmail: async (email) => {
         try {
-            const response = await axios.get(`${prefix}/list/check-email`, {  // ✅ 올바른 API 경로
-                params: { email },  // ✅ 쿼리 파라미터로 email 전달
-            });
+            const response = await axios.post(`${prefix}/list/check-email`, email);
             return response.data;  // `true` 또는 `false` 반환
         } catch (error) {
             console.error("❌ 이메일 중복 확인 오류!");

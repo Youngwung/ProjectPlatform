@@ -25,20 +25,18 @@ public class UserService {
 
     //TOOOOOOODo login boolean형으로 바꾸기 그리고 패스워드 엔코딩 해슁 매칭 확인해서 로그인까지
 
-    public UserDto login(String email, String password) {
+    public boolean login(String email, String password) {
         // 1️⃣ 이메일로 사용자 조회
         Optional<User> optionalUser = userRepository.findByEmail(email);
+
+
         // 2️⃣ 사용자 존재 여부 확인
         if (optionalUser.isEmpty()) {
-            return null; // 로그인 실패 (이메일 없음)
+            return false; // 로그인 실패 (이메일 없음)
         }
         User user = optionalUser.get();
         // 3️⃣ 비밀번호 검증 (암호화된 비밀번호 비교)
-        if (!password.equals(user.getPassword())) {
-            return null; // 로그인 실패 (비밀번호 불일치)
-        }
-        // 4️⃣ 로그인 성공 시 UserDto 반환
-        return convertToDto(user);
+        return passwordEncoder.matches(password, user.getPassword()); // 성공
     }
 
     public List<UserDto> getAllUsers() {

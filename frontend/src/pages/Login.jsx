@@ -1,6 +1,6 @@
 import React,{useState} from 'react'
 import { Form, Button, Card,Container,Row,Col} from 'react-bootstrap'
-import userApi from '../api/userApi';
+import AuthApi from '../api/AuthApi';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -15,12 +15,12 @@ const Login = () => {
     } 
     else{
         try {
-          const response = await userApi.login(email, password);
+          const response = await AuthApi.login(email, password);
           console.log("서버에 보낸 정보"+response);
           if(response){
             alert('로그인 성공'); 
             console.log("로그인아이디:"+email+ "로그인비번"+password);
-            //TODO : main 페이지로 리다이렉트
+            window.location.href = '/'; //로그인 성공시 홈으로 이동
           }else{
             //401 에러일때
             alert('이메일 주소 또는 비밀번호가 올바르지 않습니다.');

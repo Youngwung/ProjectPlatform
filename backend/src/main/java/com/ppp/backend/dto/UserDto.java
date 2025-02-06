@@ -15,4 +15,5 @@ public class UserDto {
     String phoneNumber;
     String experience;
     String skills;
+    //TODO provider추가;
 }

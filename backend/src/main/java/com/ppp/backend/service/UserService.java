@@ -19,15 +19,15 @@ import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
-public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSkillRepository, User>{
+public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSkillRepository, User> {
 
     private final UserRepository userRepository;
 
     public UserService(
-        UserSkillRepository repository, 
-        SkillRepository skillRepo, 
-        SkillLevelRepository skillLevelRepo, 
-        UserRepository userRepository) {
+            UserSkillRepository repository,
+            SkillRepository skillRepo,
+            SkillLevelRepository skillLevelRepo,
+            UserRepository userRepository) {
         super(repository, skillRepo, skillLevelRepo);
         this.userRepository = userRepository;
     }
@@ -46,6 +46,7 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
 
     /**
      * 사용자 정보를 생성하는 메서드입니다.
+     * 
      * @param userDto 클라이언트로부터 전달받은 사용자 정보(DTO)
      * @return 저장된 사용자 정보를 DTO로 반환
      */
@@ -56,9 +57,9 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
                 .phoneNumber(userDto.getPhoneNumber())
                 .experience(userDto.getExperience())
                 .password("defaultPassword")
-        .build();
+                .build();
 
-        //  ------------------ 스킬 관련 로직 구현 부분
+        // ------------------ 스킬 관련 로직 구현 부분
         // 스킬 유효성 검사
         boolean existingSkill = existingSkill(userDto.getSkills());
         if (!existingSkill) {
@@ -73,8 +74,10 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
         // 저장된 User 엔티티를 다시 DTO로 변환하여 반환합니다.
         return convertToDto(savedUser);
     }
+
     /**
      * 사용자 ID로 사용자 정보를 조회하는 메서드입니다.
+     * 
      * @param id 사용자 ID
      * @return 조회된 사용자 정보를 DTO로 반환
      */
@@ -92,6 +95,7 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
 
     /**
      * 사용자 정보를 업데이트하는 메서드입니다.
+     * 
      * @param userDto 업데이트할 정보가 담긴 DTO (ID가 반드시 포함되어야 합니다.)
      * @return 업데이트된 사용자 정보를 DTO로 반환
      */
@@ -104,13 +108,15 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
         existingUser.setExperience(userDto.getExperience());
 
         User updatedUser = userRepository.save(existingUser);
-        
+
         // 유저 스킬 업데이트 메서드 호출
         modifySkill(userDto.getId(), userDto, existingUser);
         return convertToDto(updatedUser);
     }
+
     /**
      * 사용자 정보를 삭제하는 메서드입니다.
+     * 
      * @param id 삭제할 사용자의 ID
      */
     public void deleteUser(Long id) {
@@ -119,6 +125,7 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
 
     /**
      * User 엔티티를 UserDto로 변환하는 헬퍼 메서드입니다.
+     * 
      * @param user 변환할 User 엔티티
      * @return 변환된 UserDto
      */
@@ -133,13 +140,14 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
                 .skills(null)
                 .build();
     }
+
     @Override
     UserSkill createSkillInstance(Long id, User parentEntity, Skill skill, SkillLevel skillLevel) {
         return UserSkill.builder()
-            .id(id)
-            .skill(skill)
-            .skillLevel(skillLevel)
-            .user(parentEntity)
-            .build();
+                .id(id)
+                .skill(skill)
+                .skillLevel(skillLevel)
+                .user(parentEntity)
+                .build();
     }
 }

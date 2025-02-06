@@ -23,4 +23,7 @@ public class UserDto extends BaseSkillDto{
     String email;
     String phoneNumber;
     String experience;
+    String password;
+    Long providerId;
+    //String skills;
 }

@@ -2,6 +2,8 @@ import React, { lazy, Suspense } from "react";
 import { createBrowserRouter as Router } from "react-router-dom";
 import projectRouter from "./projectRouter";
 import portfolioRouter from "./portfolioRouter";
+import Login from "../pages/Login";
+import Signup from "../pages/Signup";
 
 const Loading = <div>Loading....</div>; // 로딩 중에 보여줄 요소
 const Layout = lazy(() => import("../layout/Layout"));
@@ -52,6 +54,18 @@ const root = Router([
 				path: "/link",
 				element: (
 					<Suspense fallback={Loading}><Link /></Suspense>
+				),
+			},
+			{
+				path: "/login",
+				element: (
+					<Suspense fallback={Loading}><Login /></Suspense>
+				),
+			},
+			{
+				path: "/signup",
+				element: (
+					<Suspense fallback={Loading}><Signup /></Suspense>
 				),
 			}
 		],

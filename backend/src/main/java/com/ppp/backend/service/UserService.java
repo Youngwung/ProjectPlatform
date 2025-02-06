@@ -1,15 +1,19 @@
 package com.ppp.backend.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ppp.backend.domain.Provider;
 import com.ppp.backend.domain.Skill;
 import com.ppp.backend.domain.SkillLevel;
 import com.ppp.backend.domain.User;
 import com.ppp.backend.domain.UserSkill;
 import com.ppp.backend.dto.UserDto;
+import com.ppp.backend.repository.ProviderRepository;
 import com.ppp.backend.repository.SkillLevelRepository;
 import com.ppp.backend.repository.SkillRepository;
 import com.ppp.backend.repository.UserRepository;
@@ -22,14 +26,35 @@ import jakarta.transaction.Transactional;
 public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSkillRepository, User> {
 
     private final UserRepository userRepository;
+    private final ProviderRepository providerRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(
             UserSkillRepository repository,
             SkillRepository skillRepo,
             SkillLevelRepository skillLevelRepo,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            ProviderRepository providerRepository) {
         super(repository, skillRepo, skillLevelRepo);
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.providerRepository = providerRepository;
+    }
+
+    // TOOOOOOODo login boolean형으로 바꾸기 그리고 패스워드 엔코딩 해슁 매칭 확인해서 로그인까지
+
+    public boolean login(String email, String password) {
+        // 1️⃣ 이메일로 사용자 조회
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        // 2️⃣ 사용자 존재 여부 확인
+        if (optionalUser.isEmpty()) {
+            return false; // 로그인 실패 (이메일 없음)
+        }
+        User user = optionalUser.get();
+        // 3️⃣ 비밀번호 검증 (암호화된 비밀번호 비교)
+        return passwordEncoder.matches(password, user.getPassword()); // 성공
     }
 
     public List<UserDto> getAllUsers() {
@@ -51,12 +76,18 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
      * @return 저장된 사용자 정보를 DTO로 반환
      */
     public UserDto createUser(UserDto userDto) {
+        Long providerId = 4L;// 기본값 로컬 TODO 소셜로그인을 해결한뒤에 수정
+        Provider provider = providerRepository.findById(providerId).orElseThrow();
+        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
+
         User user = User.builder()
                 .name(userDto.getName())
                 .email(userDto.getEmail())
+                .password(encodedPassword)
                 .phoneNumber(userDto.getPhoneNumber())
                 .experience(userDto.getExperience())
-                .password("defaultPassword")
+                .password(encodedPassword)
+                .provider(provider)
                 .build();
 
         // ------------------ 스킬 관련 로직 구현 부분
@@ -70,6 +101,7 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
         // 변환한 User 엔티티를 데이터베이스에 저장합니다.
         User savedUser = userRepository.save(user);
 
+        // 유저 스킬 저장 메서드 호출
         saveParentEntity(userDto, savedUser);
         // 저장된 User 엔티티를 다시 DTO로 변환하여 반환합니다.
         return convertToDto(savedUser);
@@ -91,6 +123,10 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
         UserDto dto = convertToDto(user);
         dto.setSkills(skill);
         return dto;
+    }
+
+    public Boolean isNotNullUserEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 
     /**
@@ -133,6 +169,7 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
         return UserDto.builder()
                 .id(user.getId())
                 .name(user.getName())
+                .password(user.getPassword())
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
                 .experience(user.getExperience())

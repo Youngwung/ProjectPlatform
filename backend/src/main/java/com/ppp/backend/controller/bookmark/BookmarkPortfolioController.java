@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ppp.backend.dto.PageRequestDTO;
 import com.ppp.backend.dto.PageResponseDTO;
-import com.ppp.backend.dto.bookmark.BookmarkProjectDto;
-import com.ppp.backend.service.bookmark.BookmarkProjectService;
+import com.ppp.backend.dto.bookmark.BookmarkPortfolioDto;
+import com.ppp.backend.service.bookmark.BookmarkPortfolioService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,41 +26,41 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/bookmark/project")
-public class BookmarkProjectController {
-	private final BookmarkProjectService bookmarkProjectService;
+@RequestMapping("/api/bookmark/portfolio")
+public class BookmarkPortfolioController {
+	private final BookmarkPortfolioService bookmarkPortfolioService;
 
 	@GetMapping("/{id}")
-	public BookmarkProjectDto get(@PathVariable("id") Long id) {
-		BookmarkProjectDto dto = bookmarkProjectService.get(id);
+	public BookmarkPortfolioDto get(@PathVariable("id") Long id) {
+		BookmarkPortfolioDto dto = bookmarkPortfolioService.get(id);
 		log.info("get() dto = {}", dto);
 		return dto;
 	}
 
 	@GetMapping("/list")
-	public PageResponseDTO<BookmarkProjectDto> getList() {
-		PageResponseDTO<BookmarkProjectDto> list = bookmarkProjectService.getList(PageRequestDTO.builder().size(4).build());
+	public PageResponseDTO<BookmarkPortfolioDto> getList() {
+		PageResponseDTO<BookmarkPortfolioDto> list = bookmarkPortfolioService.getList(PageRequestDTO.builder().size(4).build());
 		return list;
 	}
 	
 
 	@PostMapping("/")
-	public Map<String, Long> register(@RequestBody BookmarkProjectDto dto) {
+	public Map<String, Long> register(@RequestBody BookmarkPortfolioDto dto) {
 		log.info("register() dto = {}", dto);
-		Long bookmarkProjectId = bookmarkProjectService.create(dto);
-		return Map.of("bookmarkProjectId", bookmarkProjectId);
+		Long bookmarkPortfolioId = bookmarkPortfolioService.create(dto);
+		return Map.of("bookmarkPortfolioId", bookmarkPortfolioId);
 	}
 
 	@DeleteMapping("/{id}")
 	public Map<String, String> remove(@PathVariable("id") Long id) {
-		Long result = bookmarkProjectService.delete(id);
+		Long result = bookmarkPortfolioService.delete(id);
 		log.info("remove() delete = {}", result);
 		return Map.of("RESULT", "SUCCESS");
 	}
 
 	@PostMapping("/check")
-	public ResponseEntity<Long> getMethodName(@RequestBody BookmarkProjectDto	dto) {
-		Long result = bookmarkProjectService.checkBookmark(dto);
+	public ResponseEntity<Long> getMethodName(@RequestBody BookmarkPortfolioDto	dto) {
+		Long result = bookmarkPortfolioService.checkBookmark(dto);
 		return ResponseEntity.ok(result);
 	}
 	

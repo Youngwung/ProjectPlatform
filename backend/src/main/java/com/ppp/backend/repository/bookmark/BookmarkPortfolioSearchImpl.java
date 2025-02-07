@@ -9,31 +9,32 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
-import com.ppp.backend.domain.bookmark.BookmarkProject;
-import com.ppp.backend.domain.bookmark.QBookmarkProject;
+import com.ppp.backend.domain.bookmark.BookmarkPortfolio;
+import com.ppp.backend.domain.bookmark.QBookmarkPortfolio;
 import com.ppp.backend.dto.PageRequestDTO;
 import com.querydsl.jpa.JPQLQuery;
 
-public class BookmarkProjectSearchImpl extends QuerydslRepositorySupport implements BookmarkProjectSearch {
+public class BookmarkPortfolioSearchImpl extends QuerydslRepositorySupport implements	BookmarkPortfolioSearch {
 
-	public BookmarkProjectSearchImpl() {
-		super(BookmarkProject.class);
+	public BookmarkPortfolioSearchImpl() {
+		super(BookmarkPortfolio.class);
 	}
 
 	@Override
-	public Page<BookmarkProject> bookmarkProjectSearch(PageRequestDTO pageRequestDTO) {
-		QBookmarkProject bookmarkProject = QBookmarkProject.bookmarkProject;
+	public Page<BookmarkPortfolio> bookmarkPortfolioSearch(PageRequestDTO pageRequestDTO) {
+		QBookmarkPortfolio bookmarkPortfolio = QBookmarkPortfolio.bookmarkPortfolio;
 
-		JPQLQuery<BookmarkProject> query = from(bookmarkProject);
+		JPQLQuery<BookmarkPortfolio> query = from(bookmarkPortfolio);
 
 		Pageable pageable = PageRequest.of(pageRequestDTO.getPage() - 1, pageRequestDTO.getSize(), Sort.by("id").descending());
 
 		this.getQuerydsl().applyPagination(pageable, query);
 
-		List<BookmarkProject> list = query.fetch();
+		List<BookmarkPortfolio> list = query.fetch();
 
 		long total = query.fetchCount();
 
 		return new PageImpl<>(list, pageable, total);
 	}
+	
 }

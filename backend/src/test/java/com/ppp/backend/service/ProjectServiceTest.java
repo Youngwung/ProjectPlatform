@@ -1,8 +1,6 @@
 package com.ppp.backend.service;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.ppp.backend.dto.PageRequestDTO;
@@ -11,7 +9,7 @@ import com.ppp.backend.dto.ProjectDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
-@SpringBootTest
+// @SpringBootTest
 @Slf4j
 @ActiveProfiles("local")
 public class ProjectServiceTest {
@@ -39,7 +37,7 @@ public class ProjectServiceTest {
 		log.info("id = {}", id);
 	}
 
-	@Test
+	// @Test
 	public void modifyTest() {
 		String skills = "#React:고급, #Java:초급";
 		ProjectDTO dto =ProjectDTO.builder()

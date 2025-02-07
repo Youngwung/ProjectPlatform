@@ -64,6 +64,22 @@ public class BookmarkProjectService {
 		return result.getId();
 	}
 
+	/**
+	 * 
+	 * @param dto
+	 * @return 북마크가 되어있으면 북마크 아이디, 북마크가 안되어있으면 -1L 리턴
+	 */
+	public Long checkBookmark(BookmarkProjectDto dto) {
+		BookmarkProject result = bookmarkProjectRepo.findByProjectIdAndUserId(dto.getProjectId(), dto.getUserId()).orElse(null);
+
+		if (result == null) {
+			// 북마크가 안되어있는 경우
+			return null;
+		}
+		// 북마크가 되어있는 경우
+		return result.getId();
+	}
+
 	private BookmarkProject toEntity(BookmarkProjectDto dto) {
 		User user = userRepo.findById(dto.getUserId()).orElseThrow();
 		Project project = projectRepo.findById(dto.getProjectId()).orElseThrow();

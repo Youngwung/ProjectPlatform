@@ -3,6 +3,7 @@ import { Badge, Button, Card, Col, Container, Row } from "react-bootstrap";
 import { getOne } from "../../api/projectApi";
 import useCustomMove from "../../hooks/useCustomMove";
 import useCustomString from "../../hooks/useCustomString";
+import BookmarkProjectBtn from "../bookmark/BookmarkProjectBtn";
 import SkillTagComponent from "../skill/SkillTagComponent";
 import SkillTagGuideComponent from "../skill/SkillTagGuideComponent";
 
@@ -10,7 +11,7 @@ import SkillTagGuideComponent from "../skill/SkillTagGuideComponent";
 
 // 기본값 설정
 const initState = {
-	projectId: 0,
+	id: 0,
 	userId: 0,
 	title: "",
 	description: "",
@@ -47,7 +48,6 @@ export default function ReadComponent({ projectId }) {
 	useEffect(() => {
 		getOne(projectId).then((data) => {
 			setProject(data);
-
 		});
 		
 		return () => {};
@@ -66,6 +66,12 @@ export default function ReadComponent({ projectId }) {
 					</Card.Header>
 					<Card.Body>
 						<Row className="mb-3">
+						<Col>
+								<BookmarkProjectBtn
+									projectId = {project.id}
+									userId = {project.userId}
+								/>
+							</Col>
 							<Col>
 								<strong>작성자:</strong> {project.userId}
 							</Col>

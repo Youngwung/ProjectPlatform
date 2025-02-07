@@ -31,6 +31,7 @@ export const getBookmarkProjectList = async (pageParam) => {
 // 등록 api를 호출하는 비동기 통신 메서드
 
 export const postBookmarkProjectAdd = async (bookmarkProjectObj) => {
+	console.log(bookmarkProjectObj)
 	const res = await axios.post(`${prefix}/`, bookmarkProjectObj);
 
 	return res.data
@@ -41,5 +42,11 @@ export const deleteBookmarkProjectOne = async (id) => {
 
 	const res = await axios.delete(`${prefix}/${id}`)
 
+	return res.data
+}
+
+// 삭제 api를 호출하는 비동기 통신 메서드
+export const checkBookmarkProject = async (bookmarkParam) => {
+	const res = await axios.post(`${prefix}/check`, bookmarkParam)
 	return res.data
 }

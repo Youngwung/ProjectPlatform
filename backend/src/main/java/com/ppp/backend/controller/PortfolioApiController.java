@@ -1,11 +1,13 @@
 package com.ppp.backend.controller;
 
 import com.ppp.backend.dto.PortfolioDto;
+import com.ppp.backend.security.CustomUserDetails;
 import com.ppp.backend.service.PortfolioService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -44,18 +46,22 @@ public class PortfolioApiController {
 
     // **4. 새 프로젝트 생성 (POST)**
     @PostMapping("/create")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PortfolioDto> createPortfolio(
             @RequestBody PortfolioDto portfolioDto,
-            @AuthenticationPrincipal UserDetails userDetails // ✅ JWT에서 유저 정보 가져오기
+            @AuthenticationPrincipal CustomUserDetails userDetails // ✅ JWT에서 유저 정보 가져오기
     ) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
+        Long userId = userDetails.getUserId();
         // ✅ JWT에서 `userId` 추출하여 자동 설정
-        Long userId = Long.parseLong(userDetails.getUsername());
-        portfolioDto.setUserId(userId);
-        PortfolioDto createdProject = portfolioService.createPortfolio(portfolioDto);
+        log.info("userDetails: {}", userDetails);
+        String userName = userDetails.getUsername();
+        log.info("userName유저 이름: {}", userName);
+
+        PortfolioDto createdProject = portfolioService.createPortfolio(portfolioDto,userId);
         return ResponseEntity.ok(createdProject);
     }
 

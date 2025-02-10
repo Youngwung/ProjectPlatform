@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Nav, Navbar, NavDropdown,OverlayTrigger,Tooltip } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate} from 'react-router-dom';
 import { FaUser} from "react-icons/fa"; // 🔹 react-icons에서 가져옴
 import AuthApi from '../api/authApi';
 
 const Top = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userName, setUsername] = useState('');
+  const [userName, setUsername] = useState('21332112');
+
+  const navigate = useNavigate();
+  
 
   // ✅ 로그인 상태 확인
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const userData = await AuthApi.getAuthenticatedUser(); // 🔥 사용자 정보 가져오기
-        console.log(userData)
+        const rs = await AuthApi.getAuthenticatedUser(); // 🔥 사용자 정보 가져오기
+        console.log(rs);
         setIsAuthenticated(true);
-        setUsername(userData.name); // 🔹 사용자 이름 저장 (현재 이메일)
+        setUsername(rs.name); // 🔹 사용자 이름 저장 (현재 이메일)
       } catch (error) {
         setIsAuthenticated(false);
         setUsername('');
@@ -23,7 +26,7 @@ const Top = () => {
     };
     checkAuth();
   }, []);
-
+  
   // ✅ 로그아웃 함수
   const handleLogout = async () => {
     try {
@@ -31,7 +34,7 @@ const Top = () => {
       alert('로그아웃 되었습니다.');
       setIsAuthenticated(false);
       setUsername('');
-      window.location.href = '/'; // 🔹 홈으로 이동
+      navigate('/');
     } catch (error) {
       alert('로그아웃 실패');
       console.error('로그아웃 에러:', error);

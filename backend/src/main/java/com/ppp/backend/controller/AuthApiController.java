@@ -42,7 +42,6 @@ public class AuthApiController {
         jwtCookie.setSecure(false);
         jwtCookie.setPath("/");
         jwtCookie.setMaxAge(60 * 60 * 24); // 1일 유지
-
         response.addCookie(jwtCookie);
         log.info("✅ 로그인 성공: {} (JWT 발급 완료)", username);
 

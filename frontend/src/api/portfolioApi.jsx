@@ -3,7 +3,6 @@ import axios from "axios";
 // API 기본 URL 설정
 export const API_URL = "http://localhost:8080";
 const prefix = `${API_URL}/api/portfolio`;
-
 // Axios 인스턴스 생성 (쿠키 포함)
 const axiosInstance = axios.create({
   baseURL: prefix,
@@ -50,10 +49,8 @@ const portfolioApi = {
   // 새 프로젝트 생성 (쿠키 인증 포함)
   createProject: async (projectData) => {
     try {
-      const response = await axiosInstance.post("/create", projectData, {
-        withCredentials: true, // ✅ 쿠키 인증 포함 (반드시 추가)
-      });
-
+      const response = await axiosInstance.post("/create", projectData);
+      console.log(response.data);
       return response.data;
     } catch (error) {
       console.error("❌ 새 프로젝트 생성 실패:", error);

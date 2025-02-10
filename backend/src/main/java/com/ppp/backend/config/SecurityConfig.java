@@ -1,6 +1,6 @@
 package com.ppp.backend.config;
 
-import com.ppp.backend.security.CustomUserDetailsService;
+import com.ppp.backend.service.CustomUserDetailsService;
 import com.ppp.backend.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +11,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -58,7 +59,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // ✅ CSRF 보호 비활성화 (쿠키 인증 시 주의 필요)  TODO 나중에 주석처리 할수도?
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // ✅ 로그인 & 회원가입은 인증 필요 없음
-                        .requestMatchers("/api/portfolio/create").authenticated() // ✅ 포트폴리오 등록(POST) 인증 필요
+                        //.requestMatchers("/api/portfolio/create").authenticated() // ✅ 포트폴리오 등록(POST) 인증 필요
                         .requestMatchers("/api/portfolio/edit").authenticated() // ✅ 포트폴리오 수정(PUT) 인증 필요
                         .requestMatchers("/api/portfolio/delete").authenticated() // ✅ 포트폴리오 삭제(DELETE) 인증 필요
                         // TODO project 요청처리해야함
@@ -69,6 +70,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE,"/api/user/list/*").authenticated() // ✅ 프로젝트 삭제(DELETE) 인증 필요
                         .anyRequest().permitAll() // ✅ 나머지 모든 요청은 허용
                 )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // ✅ 세션을 사용하지 않도록 설정
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

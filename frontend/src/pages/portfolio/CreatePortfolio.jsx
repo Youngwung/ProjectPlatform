@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Container } from "react-bootstrap";
 import portfolioApi from "../../api/portfolioApi";
+import authApi from "../../api/authApi"
+import {useNavigate} from "react-router-dom";
+
+
 
 const CreatePortfolio = () => {
+    const navigate = useNavigate();
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [skills, setSkills] = useState("");
@@ -10,7 +15,6 @@ const CreatePortfolio = () => {
   
     const handleSubmit = async (e) => {
       e.preventDefault();
-  
       const portfolioData = {
         title,
         description,
@@ -25,6 +29,7 @@ const CreatePortfolio = () => {
         const response = await portfolioApi.createProject(portfolioData);
         console.log("포트폴리오 저장 성공:", response);
         alert("포트폴리오가 성공적으로 저장되었습니다!");
+        navigate("/portfolio/list");
       } catch (error) {
         console.error("포트폴리오 저장 실패:", error);
         alert("포트폴리오 저장 중 문제가 발생했습니다. 다시 시도해주세요.");

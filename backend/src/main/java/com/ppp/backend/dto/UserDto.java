@@ -3,9 +3,11 @@ package com.ppp.backend.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 @Builder(toBuilder = true)
 public class UserDto {
     Long id;
@@ -15,5 +17,5 @@ public class UserDto {
     String phoneNumber;
     String experience;
     String skills;
-    //TODO provider추가;
+    Long providerId;
 }

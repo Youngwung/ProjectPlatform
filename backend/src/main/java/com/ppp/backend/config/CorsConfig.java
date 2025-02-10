@@ -13,10 +13,9 @@ public class CorsConfig {
 
     @Bean
     public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
 
-        // ✅ 특정 도메인만 허용 (React 개발 환경)
+        // ✅ 프론트엔드 도메인 명시 (withCredentials 사용 시 * 불가)
         config.setAllowedOrigins(List.of("http://localhost:3000"));
 
         // ✅ 허용할 HTTP 메서드 지정
@@ -25,10 +24,15 @@ public class CorsConfig {
         // ✅ 모든 헤더 허용
         config.setAllowedHeaders(List.of("*"));
 
-        // ✅ 인증 정보 포함 (JWT 사용 시 필요)
+        // ✅ 인증 정보 포함 (JWT 사용 시 필수)
         config.setAllowCredentials(true);
 
+        // ✅ HTTP 응답 헤더 설정 (프록시 요청 방지)
+        config.setExposedHeaders(List.of("Authorization"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", config);
+
         return new CorsFilter(source);
     }
 }

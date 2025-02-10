@@ -13,13 +13,14 @@ const portfolioRouter = () => {
       path: "list",
       element: (
         <Suspense fallback={Loading}>
-          <PortfolioListPage />
+          <PortfolioListPage/>
         </Suspense>
       ),
     },
     {
       path: "",
       element: <Navigate replace to="list" />,
+      
     },
     {
       path: "list/:portfolioId",

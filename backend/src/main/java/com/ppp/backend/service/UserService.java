@@ -8,6 +8,7 @@ import com.ppp.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -63,7 +65,10 @@ public class UserService {
                 .provider(provider)
                 .build();
         // 변환한 User 엔티티를 데이터베이스에 저장합니다.
+
+        log.info("user=가나다라{}", user);
         User savedUser = userRepository.save(user);
+        log.info("Saved user:가나다라 {}", savedUser);
         return convertToDto(savedUser);
     }
     /**
@@ -122,4 +127,14 @@ public class UserService {
                 .build();
     }
 
+    public String findUserNameByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(User::getName) // ✅ User 객체에서 name 필드만 가져옴
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+    }
+
+    public User findByEmail(String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        return userOptional.orElse(null); // 사용자가 없으면 null 반환
+    }
 }

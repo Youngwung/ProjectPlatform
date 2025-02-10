@@ -37,6 +37,7 @@ public class UserApiController {
     //새로운 사용자 생성
     @PostMapping("/create")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
+        log.info("userDto============={}",userDto);
         UserDto userDtoCreated = userService.createUser(userDto);
         return ResponseEntity.ok(userDtoCreated);
     }

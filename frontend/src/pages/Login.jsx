@@ -1,6 +1,6 @@
 import React,{useState} from 'react'
 import { Form, Button, Card,Container,Row,Col} from 'react-bootstrap'
-import AuthApi from '../api/AuthApi';
+import AuthApi from '../api/authApi';
 
 const Login = () => {
   const [email, setEmail] = useState('');

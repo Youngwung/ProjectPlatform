@@ -77,4 +77,5 @@ spring:
       max-lifetime: 1800000
       connection-timeout: 30000
 jwt:
-  secret: Gx8pQv6zLsA9mDwN2rTkYfHcWbE3VjKo
+  secret: sdfj3JLKJds32LKJ!@#asdlkjf908sdfLKJASFJ309ASDFLKJ
+

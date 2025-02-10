@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Nav, Navbar, NavDropdown,OverlayTrigger,Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FaUser, FaBell } from "react-icons/fa"; // 🔹 react-icons에서 가져옴
-import AuthApi from '../api/AuthApi';
+import AuthApi from '../api/authApi';
 
 const Top = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

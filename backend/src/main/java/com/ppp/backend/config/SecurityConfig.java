@@ -4,6 +4,7 @@ import com.ppp.backend.security.CustomUserDetailsService;
 import com.ppp.backend.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -60,9 +61,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/portfolio/create").authenticated() // ✅ 포트폴리오 등록(POST) 인증 필요
                         .requestMatchers("/api/portfolio/edit").authenticated() // ✅ 포트폴리오 수정(PUT) 인증 필요
                         .requestMatchers("/api/portfolio/delete").authenticated() // ✅ 포트폴리오 삭제(DELETE) 인증 필요
-                        .requestMatchers("/api/project/register").authenticated() // ✅ 프로젝트 등록(POST) 인증 필요
-                        .requestMatchers("/api/project/edit").authenticated() // ✅ 프로젝트 수정(PUT) 인증 필요
-                        .requestMatchers("/api/project/delete").authenticated() // ✅ 프로젝트 삭제(DELETE) 인증 필요
+                        // TODO project 요청처리해야함
+                        .requestMatchers(HttpMethod.POST,"/api/project/*").authenticated() // ✅ 프로젝트 등록(POST) 인증 필요
+                        .requestMatchers(HttpMethod.PUT,"/api/project/*").authenticated() // ✅ 프로젝트 수정(PUT) 인증 필요
+                        .requestMatchers(HttpMethod.DELETE,"/api/project/*").authenticated() // ✅ 프로젝트 삭제(DELETE) 인증 필요
+                        .requestMatchers(HttpMethod.PUT,"/api/user/list/*").authenticated() // ✅ 프로젝트 수정(PUT) 인증 필요
+                        .requestMatchers(HttpMethod.DELETE,"/api/user/list/*").authenticated() // ✅ 프로젝트 삭제(DELETE) 인증 필요
                         .anyRequest().permitAll() // ✅ 나머지 모든 요청은 허용
                 )
                 .authenticationProvider(authenticationProvider())

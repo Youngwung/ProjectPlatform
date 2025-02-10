@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL = "http://localhost:8080/api/auth";
 
-const AuthApi = {
+const authApi = {
   // ✅ 로그인 요청 (쿠키 기반)
   login: async (email, password) => {
     try {
@@ -52,4 +52,4 @@ const AuthApi = {
   },
 };
 
-export default AuthApi;
+export default authApi;

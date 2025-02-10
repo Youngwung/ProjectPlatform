@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Nav, Navbar, NavDropdown,OverlayTrigger,Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { FaUser, FaBell } from "react-icons/fa"; // 🔹 react-icons에서 가져옴
+import { FaUser} from "react-icons/fa"; // 🔹 react-icons에서 가져옴
 import AuthApi from '../api/authApi';
 
 const Top = () => {
@@ -13,8 +13,9 @@ const Top = () => {
     const checkAuth = async () => {
       try {
         const userData = await AuthApi.getAuthenticatedUser(); // 🔥 사용자 정보 가져오기
+        console.log(userData)
         setIsAuthenticated(true);
-        setUsername(userData); // 🔹 사용자 이름 저장 (현재 이메일)
+        setUsername(userData.name); // 🔹 사용자 이름 저장 (현재 이메일)
       } catch (error) {
         setIsAuthenticated(false);
         setUsername('');

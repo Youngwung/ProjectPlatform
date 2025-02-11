@@ -88,11 +88,14 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
      * @param userDto 클라이언트로부터 전달받은 사용자 정보(DTO)
      * @return 저장된 사용자 정보를 DTO로 반환
      */
-    public UserDto createUser(UserDto userDto) {
-        Long providerId = 4L;// 기본값 로컬 TODO 소셜로그인을 해결한뒤에 수정
-        Provider provider = providerRepository.findById(providerId).orElseThrow();
-        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
 
+    // 소셜로그인하면 거기서 요청할수있는 데이터 를 가져와서 만들어줬음 바로
+    // 마이페이지로 리다이렉트 바로시켜주고
+    // 기본데이터를 입력해야만 사이트 이용하게 했음.
+
+    public UserDto createUser(UserDto userDto) {
+        Provider provider = providerRepository.findById(userDto.getProviderId()).orElseThrow();
+        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
         User user = User.builder()
                 .name(userDto.getName())
                 .email(userDto.getEmail())
@@ -102,7 +105,6 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
                 .password(encodedPassword)
                 .provider(provider)
                 .build();
-
         // ------------------ 스킬 관련 로직 구현 부분
         // 스킬 유효성 검사
         boolean existingSkill = existingSkill(userDto.getSkills());
@@ -113,7 +115,7 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
 
         // 변환한 User 엔티티를 데이터베이스에 저장합니다.
 
-        log.info("user=가나다라{}", user);
+        log.info("user data={}", user);
         User savedUser = userRepository.save(user);
 
         // 유저 스킬 저장 메서드 호출

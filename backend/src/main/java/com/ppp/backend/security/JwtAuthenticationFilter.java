@@ -42,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("✅ JwtAuthenticationFilter 실행됨");
         String token = getJwtFromRequest(request);
         if (token == null) {
-            System.out.println("❌ JWT가 없음! (401 Unauthorized 발생)");
+            System.out.println("❌ JWT가 없음!");
         } else {
             System.out.println("✅ 찾은 JWT: " + token);
         }

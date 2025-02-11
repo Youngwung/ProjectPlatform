@@ -103,7 +103,7 @@ export default function ReadComponent({ projectId }) {
 								<Button variant="primary" onClick={() => moveToList()}>리스트</Button>
 							</Col>
 							<Col>
-								<Button variant="primary" onClick={() => moveToModify(project.id)}>수정</Button>
+								<Button variant="primary" onClick={() => moveToModify(projectId)}>수정</Button>
 							</Col>
 						</Row>
 						<Row className="mt-2 text-muted">

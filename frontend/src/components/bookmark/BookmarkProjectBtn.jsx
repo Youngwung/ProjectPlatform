@@ -4,6 +4,7 @@ import { checkBookmarkProject, deleteBookmarkProjectOne, postBookmarkProjectAdd 
 export default function BookmarkProjectBtn({projectId, userId}) {
 
 	const [bookmarkId, setBookmarkId] = useState(null);
+  const [refresh, setRefresh] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
@@ -19,7 +20,7 @@ export default function BookmarkProjectBtn({projectId, userId}) {
 			}
 		}
 		checkBookmarkStatus();
-	}, [projectId, userId]);
+	}, [projectId, userId, refresh]);
 	 // 즐겨찾기 토글 처리
 	 const handleFavoriteToggle = async () => {
     if (isLoading) return;
@@ -28,12 +29,13 @@ export default function BookmarkProjectBtn({projectId, userId}) {
     const previousState = bookmarkId;
 
     try {
-      setBookmarkId(!previousState);
       
       if (!previousState) {
-        postBookmarkProjectAdd({projectId, userId});
+        await postBookmarkProjectAdd({projectId, userId});
+        setRefresh(!refresh);
       } else {
-        deleteBookmarkProjectOne(bookmarkId);
+        await deleteBookmarkProjectOne(bookmarkId);
+        setRefresh(!refresh);
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);

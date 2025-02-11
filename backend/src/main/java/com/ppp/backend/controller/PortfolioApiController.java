@@ -1,10 +1,15 @@
 package com.ppp.backend.controller;
 
 import com.ppp.backend.dto.PortfolioDto;
+import com.ppp.backend.security.CustomUserDetails;
 import com.ppp.backend.service.PortfolioService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,12 +20,13 @@ import java.util.List;
 @Slf4j
 public class PortfolioApiController {
 
-    private final PortfolioService PortfolioService;
+    private final PortfolioService portfolioService;
+
 
     // **1. 전체 프로젝트 조회 (GET)**
     @GetMapping("/list")
     public ResponseEntity<List<PortfolioDto>> getAllPortfolios() {
-        List<PortfolioDto> projectList = PortfolioService.getAllPortfolios();
+        List<PortfolioDto> projectList = portfolioService.getAllPortfolios();
         log.info("프로젝트 전체조회 요청: {}", projectList);
         return ResponseEntity.ok(projectList);
     }
@@ -28,21 +34,34 @@ public class PortfolioApiController {
     @GetMapping("/search")
     public List<PortfolioDto> searchPortfolios(@RequestParam String searchTerm) {
         log.info("프로젝트 검색 요청: {}", searchTerm);
-        return PortfolioService.searchPortfolios(searchTerm);
+        return portfolioService.searchPortfolios(searchTerm);
     }
 
     // **3. 프로젝트 상세 조회 (GET)**
     @GetMapping("/list/{id}")
     public PortfolioDto getPortfolioById(@PathVariable Long id) {
         log.info("프로젝트 상세 조회 요청: {}", id);
-        return PortfolioService.getPortfolioById(id);
+        return portfolioService.getPortfolioById(id);
     }
 
     // **4. 새 프로젝트 생성 (POST)**
-    @PostMapping
-    public ResponseEntity<PortfolioDto> createPortfolio(@RequestBody PortfolioDto PortfolioDto) {
-        log.info("새로운 프로젝트 생성 요청: {}", PortfolioDto.getTitle());
-        PortfolioDto createdProject = PortfolioService.createPortfolio(PortfolioDto);
+    @PostMapping("/create")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<PortfolioDto> createPortfolio(
+            @RequestBody PortfolioDto portfolioDto,
+            @AuthenticationPrincipal CustomUserDetails userDetails // ✅ JWT에서 유저 정보 가져오기
+    ) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        Long userId = userDetails.getUserId();
+        // ✅ JWT에서 `userId` 추출하여 자동 설정
+        log.info("userDetails: {}", userDetails);
+        String userName = userDetails.getUsername();
+        log.info("userName유저 이름: {}", userName);
+
+        PortfolioDto createdProject = portfolioService.createPortfolio(portfolioDto,userId);
         return ResponseEntity.ok(createdProject);
     }
 
@@ -53,7 +72,7 @@ public class PortfolioApiController {
             @RequestBody PortfolioDto PortfolioDto
     ) {
         log.info("프로젝트 수정 요청: ID={}, Data={}", id, PortfolioDto);
-        PortfolioDto updatedProject = PortfolioService.updatePortfolio(id, PortfolioDto);
+        PortfolioDto updatedProject = portfolioService.updatePortfolio(id, PortfolioDto);
         return ResponseEntity.ok(updatedProject);
     }
 
@@ -61,7 +80,7 @@ public class PortfolioApiController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePortfolio(@PathVariable Long id) {
         log.info("프로젝트 삭제 요청: ID={}", id);
-        PortfolioService.deletePortfolio(id);
+        portfolioService.deletePortfolio(id);
         return ResponseEntity.ok("프로젝트가 성공적으로 삭제되었습니다.");
     }
 }

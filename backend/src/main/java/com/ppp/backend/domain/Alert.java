@@ -32,6 +32,10 @@ public class Alert {
     private Project project;
 
     @ManyToOne
+    @JoinColumn(name ="portfolio_id")
+    private Portfolio portfolio;
+
+    @ManyToOne
     @JoinColumn(name = "skill_id")
     private Skill skill;
 

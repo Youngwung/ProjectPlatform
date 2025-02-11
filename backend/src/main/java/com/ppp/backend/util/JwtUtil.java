@@ -5,59 +5,89 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.Base64;
 
 @Component
 public class JwtUtil {
 
-    // ✅ 비밀 키를 환경 변수에서 가져옴 (`application.properties`에서 설정)
     @Value("${jwt.secret}")
     private String secretKey;
 
-    // ✅ JWT 만료 시간 (1시간)
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60;
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1시간
 
-    // ✅ 비밀키를 Key 객체로 변환 (최신 방식 적용)
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(secretKey.getBytes());
-    }
-
-    // 🔹 **JWT 토큰 생성**
-    public String generateToken(String username) {
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date()) // 발급 시간
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // 만료 시간
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256) // ✅ 최신 signWith 방식 적용
-                .compact();
-    }
-
-    // 🔹 **토큰에서 사용자 정보(이메일 또는 ID) 추출**
-    public String extractUsername(String token) {
-        return getClaims(token).getSubject();
-    }
-
-    // 🔹 **토큰이 유효한지 검사**
-    public boolean validateToken(String token) {
+    private boolean isBase64Encoded(String key) {
         try {
-            return extractUsername(token) != null && !isTokenExpired(token);
-        } catch (Exception e) {
-            return false; // 예외 발생 시 유효하지 않은 토큰 처리
+            byte[] decoded = java.util.Base64.getDecoder().decode(key);
+            return key.equals(java.util.Base64.getEncoder().encodeToString(decoded));
+        } catch (IllegalArgumentException e) {
+            return false;
         }
     }
 
-    // 🔹 **토큰이 만료되었는지 확인**
-    private boolean isTokenExpired(String token) {
-        return getClaims(token).getExpiration().before(new Date());
+    // ✅ 서명 키 생성 (Base64 인코딩 적용)
+    private Key getSigningKey() {
+        byte[] keyBytes;
+
+        if (isBase64Encoded(secretKey)) { // Base64 체크
+            keyBytes = Base64.getDecoder().decode(secretKey);
+        } else {
+            keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+        }
+
+        if (keyBytes.length < 32) {
+            throw new IllegalArgumentException("JWT Secret Key must be at least 256 bits (32 bytes)!");
+        }
+
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // 🔹 **토큰에서 Claims(정보) 추출**
-    private Claims getClaims(String token) {
-        return Jwts.parserBuilder()
+
+    // ✅ JWT 생성 (userId & email 저장)
+    public String generateToken(Long userId, String email) {
+        return Jwts.builder()
+                .setSubject(String.valueOf(userId)) // ✅ sub에 userId 저장
+                .claim("email", email) // ✅ 이메일 추가 저장
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    // ✅ JWT 검증
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    // ✅ JWT에서 userId 추출
+    public Long extractUserId(String token) {
+        Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+
+        return Long.valueOf(claims.getSubject()); // ✅ userId 반환
+    }
+
+    // ✅ JWT에서 이메일(Username) 추출
+    public String extractUsername(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.get("email", String.class); // ✅ JWT claims에서 email 반환
     }
 }

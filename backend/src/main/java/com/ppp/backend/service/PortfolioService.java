@@ -7,6 +7,7 @@ import com.ppp.backend.repository.*;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class PortfolioService {
 
     private final PortfolioRepository portfolioRepository;
@@ -44,9 +46,13 @@ public class PortfolioService {
         }
 
     // **4. 새 프로젝트 생성**
-    public PortfolioDto createPortfolio(PortfolioDto portfolioDto) {
+    public PortfolioDto createPortfolio(PortfolioDto portfolioDto,Long userId) {
+
+            portfolioDto.setUserId(userId);
+
             Portfolio project = convertToEntity(portfolioDto);
             Portfolio savedProject = portfolioRepository.save(project);
+            log.info("save pppp{}",savedProject);
             return convertToDto(savedProject);
         }
 
@@ -86,6 +92,7 @@ public class PortfolioService {
     private Portfolio convertToEntity(PortfolioDto dto) {
             User user = userRepository.findById(dto.getUserId())
                     .orElseThrow(() -> new IllegalArgumentException("해당 ID의 유저를 찾을 수 없습니다."));
+
     
             return Portfolio.builder()
                     .id(dto.getId())

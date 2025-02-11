@@ -27,6 +27,15 @@ export default function AddComponent() {
 		});
 	};
 
+	// 상대적으로 큰 TextArea는 onChange가 아니라 onBlur로 처리.
+	const handleTextArea = (e) => {
+		const { name, value } = e.target;
+		setJoinProject({
+			...joinProject,
+			[name]: value,
+		});
+	}
+
 	// 모달 및 등록 요청 관련 기능 구현
 	const [showModal, setShowModal] = useState(false);
 
@@ -87,6 +96,10 @@ export default function AddComponent() {
 		setOnButton(validSkill);
 	}, [validSkill]);
 
+	// 게시판 유형 구분 로직 구현 부분
+	// All, Content, SKill 세가지 유형 중 하나
+	const [boardType, setBoardType] = useState("All");
+
 	return (
 		<div>
 			<Form onSubmit={handleSubmit}>
@@ -107,7 +120,7 @@ export default function AddComponent() {
 						as="textarea"
 						name="description"
 						value={joinProject.description}
-						onChange={handleChange}
+						onBlur={handleTextArea}
 						rows={3}
 						placeholder="프로젝트 설명을 입력하세요"
 					/>

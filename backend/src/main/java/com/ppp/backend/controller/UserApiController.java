@@ -38,6 +38,7 @@ public class UserApiController {
 
     @GetMapping("/create")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
+        log.info("userDto============={}",userDto);
         UserDto userDtoCreated = userService.createUser(userDto);
         return ResponseEntity.ok(userDtoCreated);
     }

@@ -1,5 +1,17 @@
 package com.ppp.backend.service;
 
+import com.ppp.backend.domain.Provider;
+import com.ppp.backend.domain.User;
+import com.ppp.backend.dto.UserDto;
+import com.ppp.backend.repository.ProviderRepository;
+import com.ppp.backend.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,6 +35,7 @@ import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
+@Slf4j
 public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSkillRepository, User> {
 
     private final UserRepository userRepository;
@@ -99,6 +112,8 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
         }
 
         // 변환한 User 엔티티를 데이터베이스에 저장합니다.
+
+        log.info("user=가나다라{}", user);
         User savedUser = userRepository.save(user);
 
         // 유저 스킬 저장 메서드 호출
@@ -186,5 +201,15 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
                 .skillLevel(skillLevel)
                 .user(parentEntity)
                 .build();
+    }
+    public String findUserNameByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(User::getName) // ✅ User 객체에서 name 필드만 가져옴
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+    }
+
+    public User findByEmail(String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        return userOptional.orElse(null); // 사용자가 없으면 null 반환
     }
 }

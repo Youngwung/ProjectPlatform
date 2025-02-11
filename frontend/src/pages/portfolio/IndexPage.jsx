@@ -15,7 +15,7 @@ const IndexPage = () => {
   return (
     <Container className="mt-4">
       {/* 특정 페이지에서 숨기도록 조건부 렌더링 */}
-      {isListOrDetail && (
+      {/* {isListOrDetail && ( */}
         <>
           <h1 className="text-center mb-4">포트폴리오 목록</h1>
           <div className="d-flex justify-content-between mb-4">
@@ -31,7 +31,7 @@ const IndexPage = () => {
             </Button>
           </div>
         </>
-      )}
+      {/* )} */}
 
       {/* 검색어 상태 전달 */}
       <Outlet context={{ searchTerm }} />

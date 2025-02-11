@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class AlertDto {
+public class AlertProjectDto {
     private Long id;
     private Long projectId;
     private Long skillId;

@@ -6,9 +6,14 @@ import axios from "axios";
 export const API_SERVER_HOST = 'http://localhost:8080'
 const prefix = `${API_SERVER_HOST}/api/project`
 
+const axiosInstance = axios.create({
+	baseURL: prefix,
+	withCredentials: true, // ✅ 쿠키 자동 포함
+  });
+  
 // tno로 글 하나 가져오는 비동기 통신 메서드
 export const getOne = async (projectId) => {
-	const res = await axios.get(`${prefix}/${projectId}`)
+	const res = await axiosInstance.get(`${prefix}/${projectId}`)
 
 	return res.data
 }
@@ -18,7 +23,7 @@ export const getList = async (pageParam) => {
 	
 	const {page, size} = pageParam
 
-	const res = await axios.get(`${prefix}/list`, {params:{page, size}})
+	const res = await axiosInstance.get(`${prefix}/list`, {params:{page, size}})
 	// 비동기 통신에서 쿼리스트링을 사용하는 방법
 	// 1. pageParam의 page와 size를 빼둔 후 두번째 아규먼트로  {params:{page, size}} 로 전달.
 	// 2. pageParam을 그대로 전달. {params:{...pageParam}} => .3개임
@@ -29,14 +34,14 @@ export const getList = async (pageParam) => {
 // 등록 api를 호출하는 비동기 통신 메서드
 
 export const postAdd = async (projectObj) => {
-	const res = await axios.post(`${prefix}/`, projectObj);
+	const res = await axiosInstance.post(`${prefix}/`, projectObj);
 
 	return res.data
 }
 
 // 수정 api를 호출하는 비동기 통신 메서드
 export const putOne = async (projectObj) => {
-	const res = await axios.put(`${prefix}/${projectObj.id}`, projectObj);
+	const res = await axiosInstance.put(`${prefix}/${projectObj.id}`, projectObj);
 
 	return res.data
 }
@@ -44,7 +49,7 @@ export const putOne = async (projectObj) => {
 // 삭제 api를 호출하는 비동기 통신 메서드
 export const deleteOne = async (projectId) => {
 
-	const res = await axios.delete(`${prefix}/${projectId}`)
+	const res = await axiosInstance.delete(`${prefix}/${projectId}`)
 
 	return res.data
 }

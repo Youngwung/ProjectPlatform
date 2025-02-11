@@ -40,4 +40,7 @@ public class ProjectDTO extends BaseSkillDto{
 
 	@ToString.Exclude
 	private LocalDateTime updatedAt;
+
+	// 프로젝트 타입을 받아오기 위한 필드
+	private String type;
 }

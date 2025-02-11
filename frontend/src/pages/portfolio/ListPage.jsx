@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Card, Col, Container, Row } from "react-bootstrap";
+import { Card, Col, Container, Row, Spinner, Alert} from "react-bootstrap";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { Pagination } from "react-bootstrap";
 import portfolioApi from "../../api/portfolioApi";
 
 const ListPage = () => {
-  const [portfolios, setportfolios] = useState([]); // 전체 포트폴리오 데이터
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [nodata, setNodata] = useState(false); // ✅ 상태 변수 추가
+  const [portfolios, setPortfolios] = useState([]); // 전체 포트폴리오 데이터
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 상태
   const portfolioPerPage = 12; // 페이지당 포트폴리오 수
   const { searchTerm } = useOutletContext(); // Outlet에서 검색어 받아오기
-  const navigate = useNavigate();
 
   // 페이지 계산
   const indexOfLastportfolio = currentPage * portfolioPerPage;
@@ -43,19 +46,56 @@ const ListPage = () => {
   useEffect(() => {
     const fetchAllportfolios = async () => {
       try {
-        const response = await portfolioApi.getAllProjects(); // getAllProjects 호출
-        console.log("전체 프로젝트 조회 성공:", response);
-        setportfolios(response);
+        setLoading(true);
+        const response = await portfolioApi.getAllProjects();
+        console.log("✅ 전체 프로젝트 조회 성공:", response);
+
+        if (response.length === 0) {
+          setNodata(true); // ✅ nodata 상태를 true로 변경
+        } else {
+          setPortfolios(response);
+          setNodata(false); // ✅ 데이터가 있으면 false 설정
+        }
       } catch (error) {
-        console.error("전체 프로젝트 조회 실패:", error);
+        console.error("❌ 전체 프로젝트 조회 실패:", error);
+        setError("데이터를 불러오는 중 오류가 발생했습니다.");
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchAllportfolios();
   }, []);
+
+  if (loading) {
+    return (
+      <Container className="text-center mt-4">
+        <Spinner animation="border" variant="primary" />
+        <p>로딩 중...</p>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container className="text-center mt-4">
+        <Alert variant="danger">{error}</Alert>
+      </Container>
+    );
+  }
+
+  if (nodata) {
+    return (
+      <Container className="text-center mt-4">
+        <Alert variant="warning">포트폴리오 데이터가 없습니다.</Alert>
+      </Container>
+    );
+  }
 
   return (
     <Container>
       <Row>
+
         {currentportfolio.map((portfolio) => (
           <Col md={3} className="mb-4" key={portfolio.id}>
             <Card

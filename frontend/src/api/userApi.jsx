@@ -50,26 +50,26 @@ const userApi = {
         throw error;
         }
     },
-    checkEmail: async (email) => {
-        try {
-            const response = await axios.post(`${prefix}/list/check-email`, email);
-            return response.data;  // `true` 또는 `false` 반환
-        } catch (error) {
-            console.error("❌ 이메일 중복 확인 오류!");
-
-            if (error.response) {
-                console.error("📌 응답 상태 코드:", error.response.status);
-                console.error("📌 응답 데이터:", error.response.data);
-            } else if (error.request) {
-                console.error("📌 요청은 전송되었지만 응답 없음:", error.request);
-            } else {
-                console.error("📌 요청 설정 오류:", error.message);
-            }        
-            console.error("📌 요청 정보:", error.config);
-            throw error;
-        }
-    },
     // AUTH로 이식
+    // checkEmail: async (email) => {
+    //     try {
+    //         const response = await axios.post(`${prefix}/check-email`, email);
+    //         return response.data;  // `true` 또는 `false` 반환
+    //     } catch (error) {
+    //         console.error("❌ 이메일 중복 확인 오류!");
+
+    //         if (error.response) {
+    //             console.error("📌 응답 상태 코드:", error.response.status);
+    //             console.error("📌 응답 데이터:", error.response.data);
+    //         } else if (error.request) {
+    //             console.error("📌 요청은 전송되었지만 응답 없음:", error.request);
+    //         } else {
+    //             console.error("📌 요청 설정 오류:", error.message);
+    //         }        
+    //         console.error("📌 요청 정보:", error.config);
+    //         throw error;
+    //     }
+    // },
     // login : async (email,password) => {
     //     try {
     //         const response = await axios.post(`${prefix}/login`, {email, password});

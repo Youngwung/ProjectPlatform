@@ -59,8 +59,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // ✅ CSRF 보호 비활성화 (쿠키 인증 시 주의 필요)  TODO 나중에 주석처리 할수도?
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // ✅ 로그인 & 회원가입은 인증 필요 없음
-                        .requestMatchers("/api/user/create/**").permitAll()
-                        //.requestMatchers("/api/portfolio/create").authenticated() // ✅ 포트폴리오 등록(POST) 인증 필요
+                        .requestMatchers("/api/portfolio/create").authenticated() // ✅ 포트폴리오 등록(POST) 인증 필요
                         .requestMatchers("/api/portfolio/edit").authenticated() // ✅ 포트폴리오 수정(PUT) 인증 필요
                         .requestMatchers("/api/portfolio/delete").authenticated() // ✅ 포트폴리오 삭제(DELETE) 인증 필요
                         // TODO project 요청처리해야함

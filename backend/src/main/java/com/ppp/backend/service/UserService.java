@@ -142,7 +142,7 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
         return dto;
     }
 
-    public Boolean isNotNullUserEmail(String email) {
+    public boolean isEmailExists(String email) {
         return userRepository.existsByEmail(email);
     }
 

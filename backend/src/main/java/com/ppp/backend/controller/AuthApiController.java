@@ -31,7 +31,6 @@ public class AuthApiController {
         if (username == null || !userService.login(loginRequest.getEmail(), loginRequest.getPassword())) {
             return ResponseEntity.status(401).body("❌ 로그인 실패: 이메일 또는 비밀번호가 잘못되었습니다.");
         }
-
         // ✅ JWT 생성 (userId & email 포함)
         Long userId = userService.findByEmail(loginRequest.getEmail()).getId();
         String jwt = jwtUtil.generateToken(userId, loginRequest.getEmail());
@@ -46,6 +45,24 @@ public class AuthApiController {
         log.info("✅ 로그인 성공: {} (JWT 발급 완료)", username);
 
         return ResponseEntity.ok("로그인 성공");
+    }
+
+    /**
+     * ✅ 이메일 중복 확인 API
+     */
+    @PostMapping("/check-email")
+    public ResponseEntity<Boolean> checkEmail(@RequestBody UserDto userDto) {
+        log.info("📧 이메일 중복 확인 요청: {}", userDto.getEmail());
+
+        boolean exists = userService.isEmailExists(userDto.getEmail()); // ✅ 이메일 존재 여부 확인
+
+        if (exists) {
+            log.info("❌ 이메일 중복: {}", userDto.getEmail());
+        } else {
+            log.info("✅ 사용 가능한 이메일: {}", userDto.getEmail());
+        }
+
+        return ResponseEntity.ok(exists); // `true` (중복), `false` (사용 가능)
     }
 
     /**

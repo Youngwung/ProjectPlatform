@@ -12,7 +12,7 @@ const portfolioRouter = () => {
     {
       path: "list",
       element: (
-        <Suspense fallback={Loading}>
+        <Suspense fallback={<Loading/>}>
           <PortfolioListPage/>
         </Suspense>
       ),
@@ -25,7 +25,7 @@ const portfolioRouter = () => {
     {
       path: "list/:portfolioId",
       element: (
-        <Suspense fallback={Loading}>
+        <Suspense fallback={<Loading/>}>
           <PortfolioDetail />
         </Suspense>
       ),
@@ -33,7 +33,7 @@ const portfolioRouter = () => {
     {
       path: "create",
       element: (
-        <Suspense fallback={Loading}>
+        <Suspense fallback={<Loading/>}>
           <CreatePortfolio />
         </Suspense>
       ),
@@ -41,7 +41,7 @@ const portfolioRouter = () => {
     {
       path: "modify/:portfolioId",
       element: (
-        <Suspense fallback={Loading}>
+        <Suspense fallback={<Loading/>}>
           <ModifyPortfolio/>
         </Suspense>
       ),

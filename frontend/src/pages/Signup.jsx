@@ -1,7 +1,7 @@
 import React,{useRef} from 'react'
 import { Form, Button, Card,Container,Row,Col,InputGroup} from 'react-bootstrap'
 import userApi from '../api/userApi'
-
+import authApi from '../api/authApi'
 
 //TODO 아이디 찾기 오류 발생하여 수정해야함
 
@@ -38,7 +38,7 @@ const Signup = () => {
             return;
         }
         try {
-            const response = await userApi.checkEmail(email);
+            const response = await authApi.checkEmail(email);
             if (response) {
                 alert('중복된 이메일입니다.');
             } else {

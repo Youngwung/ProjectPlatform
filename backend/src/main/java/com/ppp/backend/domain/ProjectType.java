@@ -3,6 +3,8 @@ package com.ppp.backend.domain;
 import com.ppp.backend.enums.ProjectTypeEnum;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -37,5 +39,6 @@ public class ProjectType {
 	@JoinColumn(name = "project_id", nullable = false)
 	private Project project;
 
+	@Enumerated(EnumType.STRING)
 	private ProjectTypeEnum type;
 }

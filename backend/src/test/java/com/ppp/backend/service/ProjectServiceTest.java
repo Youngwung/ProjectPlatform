@@ -7,6 +7,7 @@ import com.ppp.backend.dto.PageRequestDTO;
 import com.ppp.backend.dto.PageResponseDTO;
 import com.ppp.backend.dto.ProjectDTO;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 // @SpringBootTest
@@ -17,21 +18,24 @@ public class ProjectServiceTest {
 	private ProjectService projectService;
 
 	// @Test
-	// @Transactional
+	@Transactional
 	public void getTest() {
-		Long jPNo = 36L;
+		Long jPNo = 46L;
 		ProjectDTO projectDTO = projectService.get(jPNo);
 		System.out.println(projectDTO);
 	}
 
 	// @Test
+	@Transactional
 	public void registerTest() {
 		ProjectDTO dto =ProjectDTO.builder()
 		.title("registerSkillTest")
 		.description("testDescription")
-		.userId(1L)
+		.userId(3L)
 		.skills("#React:고급, #Java:중급")
 		.status("진행_중")
+		.type("all")
+		.maxPeople(6)
 		.build();
 		Long id = projectService.register(dto);
 		log.info("id = {}", id);
@@ -41,10 +45,11 @@ public class ProjectServiceTest {
 	public void modifyTest() {
 		String skills = "#React:고급, #Java:초급";
 		ProjectDTO dto =ProjectDTO.builder()
-		.id(43L)
+		.id(46L)
 		.title("modifySkillTest3")
 		.description("testSkillDescription")
 		.skills(skills)
+		.type("all")
 		.userId(1L)
 		.isPublic(false)
 		.maxPeople(4)

@@ -61,7 +61,7 @@ public class ProjectServiceImpl extends
 		String skills = getSkill(projectId);
 		dto.setSkills(skills);
 		// 프로젝트 타입 가져오기
-		ProjectType projectType = projectTypeRepo.findByProjectId(projectId).orElseGet(null);
+		ProjectType projectType = projectTypeRepo.findByProjectId(projectId).orElse(null);
 		if (projectType == null) {
 			// 프로젝트 타입 기능 이전에 만들어진 프로젝트인 경우 all로 설정.
 			dto.setType("all");
@@ -74,30 +74,39 @@ public class ProjectServiceImpl extends
 
 	@Override
 	public Long register(ProjectDTO dto) {
+		log.info("dto = {}", dto);
 		Project project = toEntity(dto);
 
 		// DB에 없는 스킬을 입력받은 경우 -1리턴
 		if (!existingSkill(dto.getSkills())){
-			return -1L;
+			// 그냥 null로 저장
+			dto.setSkills(null);
 		}
 
 		// projectType 검사
 		boolean projectType = isProjectType(dto.getType());
 		// Enum으로 정의되지 않은 값인 경우 -2 리턴
-		if (projectType) {
+		if (!projectType) {
 			return -2L;
 		}
-		// 검사를 통과한 경우 프로젝트 타입 객체 생성
-		ProjectType projectTypeEntity = ProjectType.builder()
-				.project(project)
-				.type(ProjectTypeEnum.valueOf(dto.getType()))
-		.build();
-
 		// 프로젝트 저장
 		Project result = projectRepo.save(project);
-		// 스킬 저장
-		saveParentEntity(dto, project);
+		// skill이 null이 아닌 경우 스킬 저장
+		if (dto.getSkills() != null && !dto.getSkills().isEmpty()) {
+			saveParentEntity(dto, project);
+			// 스킬이 비어있으니 type을 content로 자동 변경
+			dto.setType("content");
+		}
 		// 프로젝트 타입 저장
+		
+		// 프로젝트 타입 객체 생성
+		ProjectType projectTypeEntity = ProjectType.builder()
+		.project(project)
+		.type(ProjectTypeEnum.valueOf(dto.getType()))
+		.build();
+
+		log.info("projectTypeEntity = {}", projectTypeEntity);
+
 		projectTypeRepo.save(projectTypeEntity);
 
 		// 등록된 프로젝트 번호 리턴
@@ -162,12 +171,28 @@ public class ProjectServiceImpl extends
 
 		projectRepo.save(entity);
 
-		modifySkill(dto.getId(), dto, entity);
+		if (dto.getSkills() != null) {
+			// 스킬이 null이 아닌 경우에만 스킬 저장
+			// 스킬이 null일 수 있어 추가한 로직
+			modifySkill(dto.getId(), dto, entity);
+		}
 
 		// 게시글 유형 수정 로직 구현
 		// 1. 게시글 유형이 수정되었는 지 검사
-		ProjectType projectType = projectTypeRepo.findByProjectId(dto.getId()).orElseThrow();
-		boolean isTypeModified = !projectType.getType().toString().equals(dto.getType());
+		// 프로젝트 타입 가져오기
+		ProjectType projectType = projectTypeRepo.findByProjectId(dto.getId()).orElse(null);
+		boolean isTypeModified = true;
+		if (projectType == null) {
+			// 프로젝트 타입 기능 이전에 만들어진 프로젝트인 경우 all로 설정 후 객체 생성
+			dto.setType("all");
+			projectType = ProjectType.builder()
+					.project(entity)
+					.type(ProjectTypeEnum.valueOf("all"))
+					.build();
+		} else {
+			dto.setType(projectType.getType().toString());
+		}
+		isTypeModified = ! (projectType.getType().toString().equals(dto.getType()));
 		// 2. 게시글 유형이 수정되었을 경우 기존 게시글 유형을 삭제하고 새로운 게시글 유형을 추가
 		if (isTypeModified) {
 			projectTypeRepo.delete(projectType);
@@ -302,6 +327,16 @@ public class ProjectServiceImpl extends
 			// // Map을 String으로 변환하는 메서드를 호출한 후 dto의 skills 필드를 초기화
 			// String skillString = skillDtoConverter.convertMapToSkillDto(skillMap);
 			dto.setSkills(skillString);
+
+			ProjectType projectType = projectTypeRepo.findByProjectId(project.getId()).orElse(null);
+
+			if (projectType == null) {
+				// 프로젝트 타입 기능 이전에 만들어진 프로젝트인 경우 all로 설정 후 객체 생성
+				dto.setType("all");
+			} else {
+				dto.setType(projectType.getType().toString());
+			}
+			
 			return dto;
 		}).collect(Collectors.toList());
 

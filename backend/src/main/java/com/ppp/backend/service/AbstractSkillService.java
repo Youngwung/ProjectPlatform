@@ -38,9 +38,13 @@ public abstract class AbstractSkillService<T extends BaseSkill, D extends BaseSk
 			skillMap.put(Skill.getSkill().getName(), Skill.getSkillLevel().getName());
 		});
 
-		String skills = convertMapToString(skillMap);
+		// 스킬이 비어있는 경우 빈 문자열로 리턴
+		if (existingSkills.isEmpty()) {
+			return "";
+		}
 
-		return skills;
+		// 스킬이 비어있지 않은 경우 문자열로 변환해 리턴해주는 메서드
+		return convertMapToString(skillMap);
 	}
 
 	/**
@@ -65,6 +69,10 @@ public abstract class AbstractSkillService<T extends BaseSkill, D extends BaseSk
 
 		// 유효성 검사 리스트
 		List<String> invalidList = new ArrayList<>();
+		if(skillMap.isEmpty()) {
+			// 비어있는 경우 그냥 통과
+			return true;
+		}
 
 		skillMap.forEach((key, value) -> {
 			Skill skill = skillRepo.findByNameIgnoreCase(key);
@@ -165,6 +173,10 @@ public abstract class AbstractSkillService<T extends BaseSkill, D extends BaseSk
 			T insertSkill = createSkillInstance(null, parentEntity, newSkill, newLevel);
 			parents.add(insertSkill);
 		});
+		if (parents.isEmpty()) {
+			return -1L;
+		}
+		// 리스트가 비어있지 않은 경우만 저장
 		repository.saveAll(parents);
 		return 1L;
 	}

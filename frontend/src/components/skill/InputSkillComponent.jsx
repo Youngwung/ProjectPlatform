@@ -32,23 +32,23 @@ export default function InputSkillComponent({
 		});
 	};
 
-	// 통합 검증 처리
-	const handleValidation = async (event) => {
-		const input = event.target.value;
+	// 통합 검증 처리 함수
+	const validateSkills = async (input) => {
 		setSkillsInput(input);
+		console.log(input);
 		// 검사 중인 경우 로딩창을 표시하기 위한 변수 초기화
 		setIsValidating(true);
 		// 에러메세지 초기화
 		setValidationError("");
 		try {
 			// 입력창이 비어있는 지 검사
-			if (!skillsInput.trim()) {
+			if (!input.trim()) {
 				setValidationError("입력값이 없습니다.");
 				return;
 			}
 
 			// 정규식 검사
-			if (!validateSkillsString(skillsInput)) {
+			if (!validateSkillsString(input)) {
 				setValidationError(
 					"형식이 올바르지 않습니다. 예: #React:중급, #Spring:고급"
 				);
@@ -57,16 +57,16 @@ export default function InputSkillComponent({
 			}
 
 			// 중복 검사
-			if (getDuplicatedString(skillsInput).length !== 0) {
+			if (getDuplicatedString(input).length !== 0) {
 				setValidationError(
-					`${getDuplicatedString(skillsInput)}: 중복된 기술이 있습니다`
+					`${getDuplicatedString(input)}: 중복된 기술이 있습니다`
 				);
 				setIsValid(false);
 				return;
 			}
 
 			// DB 단어 검사
-			const result = await getProjectValid({ skills: skillsInput });
+			const result = await getProjectValid({ skills: input });
 			console.log(result.isValid);
 			if (!result.isValid) {
 				setValidationError(
@@ -89,6 +89,10 @@ export default function InputSkillComponent({
 			setIsValidating(false);
 		}
 	};
+	const handleValidation = async (event) => {
+		const input = event.target.value;
+		await validateSkills(input);
+	};
 
 	// 검증 결과가 변경될 때마다 부모 컴포넌트에 알림
 	useEffect(() => {
@@ -103,6 +107,7 @@ export default function InputSkillComponent({
 	useEffect(() => {
 		if (skills) {
 			setSkillsInput(skills);
+			validateSkills(skills);
 		}
 	}, [skills]);
 

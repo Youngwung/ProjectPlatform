@@ -65,61 +65,51 @@ export default function AddComponent() {
 		}
 	}, [userId]);
 
-	// 스킬 입력 컴포넌트 불러오기 위한 변수
-	const [validSkill, setValidSkill] = useState(false);
+	// 통합 유효성 검사 state 선언
+	const [validation, setValidation] = useState({
+		skill: false,
+	});
 
-	const handleSkillValidationComplete = useCallback(({ isValid, value }) => {
+	// 스킬 Input 컴포넌트로부터 데이터 불러오기
+	const handleValidationComplete = useCallback(({ isValid, value }) => {
+		setValidation((prev) => ({
+			...prev,
+			skill: isValid,
+		}));
+
 		if (isValid) {
-			// 스킬 유효성 검사 통과
-			setValidSkill(true);
-			// project 업데이트
 			setProject((prev) => ({
 				...prev,
 				skills: value,
 			}));
-		} else {
-			// 스킬 유효성 검사 실패
-			setValidSkill(false);
 		}
 	}, []);
 
 	// 콤보박스 변수 추적 로직
-	const [type, setType] = useState(project.type);
 	const handleTypeChange = (e) => {
-		setType(e.target.value);
-		setProject({...project,  type: e.target.value });
+		const newType = e.target.value;
+
+		setValidation((prev) => ({
+			...prev,
+			skill: newType === "content", // type이 "content"이면 skill 유효성 검사 통과
+		}));
+		setProject({ ...project, type: newType });
 	};
+
+	// 통합 유효성 검사 state 선언
 	useEffect(() => {
-		if(type === 'content') {
-			setValidSkill(true);
-		} else {
-			setValidSkill(false);
-		}
-	}, [type]);
-	
-	// 인풋 유효성 검사
-	const [isTitleFilled, setIsTitleFilled] = useState(false);
-	const [isContentFilled, setIsContentFilled] = useState(false);
-	const handleInputValidation = (e) => {
-		const { name, value } = e.target;
-		if(name === 'title') {
-			setIsTitleFilled(value.length > 0);
-		} else if(name === 'description') {
-			setIsContentFilled(value.length > 0);
-		}
-	}
+		setOnButton(validation.skill);
+	}, [validation]);
 
 	const [onButton, setOnButton] = useState(false);
 
 	useEffect(() => {
-		const isValid = isTitleFilled && isContentFilled && validSkill;
-		setOnButton(isValid);
-	}, [isContentFilled, isTitleFilled, validSkill]);
+			setOnButton(validation.skill);
+		}, [validation]);
 
 	return (
 		<div>
 			<Form onSubmit={handleSubmit}>
-
 				<Form.Group controlId="formDescription" className="mb-4">
 					<Form.Label>프로젝트 유형 설정</Form.Label>
 					<Form.Select
@@ -141,8 +131,8 @@ export default function AddComponent() {
 						name="title"
 						value={project.title}
 						onChange={handleChange}
-						onBlur={handleInputValidation}
 						placeholder="프로젝트 제목을 입력하세요"
+						required
 					/>
 				</Form.Group>
 
@@ -153,16 +143,16 @@ export default function AddComponent() {
 						name="description"
 						value={project.description}
 						onChange={handleChange}
-						onBlur={handleInputValidation}
 						rows={3}
 						placeholder="프로젝트 설명을 입력하세요"
+						required
 					/>
 				</Form.Group>
 
 				{/* 스킬 Input 컴포넌트 불러오기 */}
-				<InputSkillComponent 
-					onValidationComplete={handleSkillValidationComplete} 
-					disabled={project.type === 'content'}
+				<InputSkillComponent
+					onValidationComplete={handleValidationComplete}
+					disabled={project.type === "content"}
 				/>
 
 				<Row>

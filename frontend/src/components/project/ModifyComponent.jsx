@@ -23,17 +23,18 @@ const initState = {
 export default function ModifyComponent({ projectId }) {
 	const [project, setProject] = useState(initState);
 
-	const [result, setResult] = useState(null);
+	const [result, setResult] = useState(false);
 
 	const { moveToList, moveToRead } = useCustomMove();
 
-	
 	useEffect(() => {
-		getOne(projectId).then((data) => {
+		const fetchData = async () => {
+			const data = await getOne(projectId);
 			console.log(data);
 			setProject(data);
-		});
-	}, [projectId]);
+		}
+			fetchData();
+		}, [projectId]);
 
 	const handleChange = (e) => {
 		const { name, value, type, checked } = e.target;
@@ -86,9 +87,7 @@ export default function ModifyComponent({ projectId }) {
 
 	// 통합 유효성 검사 state 선언
 	const [validation, setValidation] = useState({
-		title: false,
-		description: false,
-		skill: false,
+		skill: false
 	});
 
 	// 스킬 Input 컴포넌트로부터 데이터 불러오기
@@ -107,7 +106,6 @@ export default function ModifyComponent({ projectId }) {
 	}, []);
 
 	// 콤보박스 변수 추적 로직
-	const [type, setType] = useState(project.type);
 	const handleTypeChange = (e) => {
 		const newType = e.target.value;
 		
@@ -115,28 +113,14 @@ export default function ModifyComponent({ projectId }) {
 			...prev,
 			skill: newType === "content", // type이 "content"이면 skill 유효성 검사 통과
 		}));
-		setType(newType);
 		setProject({ ...project, type: newType });
-	};
-
-	// 인풋 유효성 검사
-	const handleInputValidation = (e) => {
-		const { name, value } = e.target;
-		setValidation((prev) => ({
-			...prev,
-			[name]: value.length > 0, // 길이가 0보다 크면 true
-		}));
-		if (name === "title") {
-		}
-		if (name === "description") {
-		}
 	};
 
 	// 수정 버튼 활성화/비활성화 여부를 저장하는 변수 선언
 	const [onButton, setOnButton] = useState(false);
 
 	useEffect(() => {
-		setOnButton(validation.title && validation.description && validation.skill);
+		setOnButton(validation.skill);
 	}, [validation]);
 
 	return (
@@ -162,8 +146,8 @@ export default function ModifyComponent({ projectId }) {
 						name="title"
 						value={project.title}
 						onChange={handleChange}
-						onBlur={handleInputValidation}
 						placeholder="프로젝트 제목을 입력하세요"
+						required
 					/>
 				</Form.Group>
 
@@ -174,16 +158,19 @@ export default function ModifyComponent({ projectId }) {
 						name="description"
 						value={project.description}
 						onChange={handleChange}
-						onBlur={handleInputValidation}
 						rows={3}
 						placeholder="프로젝트 설명을 입력하세요"
+						required
 					/>
 				</Form.Group>
 
 				{/* 스킬 Input 컴포넌트 불러오기 */}
 				<InputSkillComponent
+					// 스킬 유효성 검사 결과를 부모 컴포넌트로 전달
 					onValidationComplete={handleValidationComplete}
+					// 스킬 데이터 초기값 설정
 					skills={project.skills}
+					disabled={project.type === "content"}
 				/>
 
 				<Row>
@@ -239,7 +226,7 @@ export default function ModifyComponent({ projectId }) {
 
 			<ModalComponent
 				show={showModal}
-				handleClose={handleClose}
+				handleClose={() => handleClose()}
 				handleConfirm={
 					result === "Deleted" ? handleDeleteConfirm : handleModifyConfirm
 				}

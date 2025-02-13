@@ -1,7 +1,6 @@
 package com.ppp.backend.service;
 
-import com.ppp.backend.domain.Provider;
-import com.ppp.backend.domain.User;
+import com.ppp.backend.domain.*;
 import com.ppp.backend.dto.UserDto;
 import com.ppp.backend.repository.ProviderRepository;
 import com.ppp.backend.repository.UserRepository;
@@ -20,10 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ppp.backend.domain.Provider;
-import com.ppp.backend.domain.Skill;
-import com.ppp.backend.domain.SkillLevel;
 import com.ppp.backend.domain.User;
-import com.ppp.backend.domain.UserSkill;
 import com.ppp.backend.dto.UserDto;
 import com.ppp.backend.repository.ProviderRepository;
 import com.ppp.backend.repository.SkillLevelRepository;
@@ -93,7 +89,7 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
     // 마이페이지로 리다이렉트 바로시켜주고
     // 기본데이터를 입력해야만 사이트 이용하게 했음.
 
-    public UserDto createUser(UserDto userDto) {
+    public UserDto createUser(UserDto userDto){
         Provider provider = providerRepository.findById(userDto.getProviderId()).orElseThrow();
         String encodedPassword = passwordEncoder.encode(userDto.getPassword());
         User user = User.builder()
@@ -134,11 +130,13 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
         // ID로 User 엔티티를 조회합니다. 존재하지 않으면 예외를 발생시킵니다.
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        String providerName = user.getProvider().getName();
 
         // ----------- 스킬 관련 로직 추가
         String skill = getSkill(id);
         UserDto dto = convertToDto(user);
         dto.setSkills(skill);
+        dto.setProviderName(providerName);
         return dto;
     }
 
@@ -190,10 +188,29 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
                 .experience(user.getExperience())
-                // TODO skills 연동 필요
                 .skills(null)
                 .build();
     }
+
+    private User convertToEntity(UserDto userDto) {
+        // 유저만들기
+//        User user = User.builder()
+//                .name(userDto.getName())
+//                .email(userDto.getEmail())
+//                .password(encodedPassword)
+//                .phoneNumber(userDto.getPhoneNumber())
+//                .experience(userDto.getExperience())
+//                .password(encodedPassword)
+//                .provider(provider)
+//                .build();
+//
+        // dto에서 링크뽑아내기 링크 타입 뽑아내기
+        //유효성검사
+        //TODO alert 관련로직
+        // 저장은 고민해볼겡
+        return null;
+    }
+
 
     @Override
     UserSkill createSkillInstance(Long id, User parentEntity, Skill skill, SkillLevel skillLevel) {

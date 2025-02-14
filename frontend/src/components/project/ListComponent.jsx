@@ -27,12 +27,12 @@ export default function ListComponent() {
 
 	useEffect(() => {
 		getList({ page, size }).then((data) => {
-			console.log(data);
 			setServerData(data);
 		});
 		return () => {};
 		// refresh 값이 변경되면 데이터를 새로 받아옴.
-	}, [page, size, refresh]);
+		// refresh 임시 제거: 이미 데이터를 불러온 페이지 호출 시 이동하지 않는 현상 발생
+	}, [page, size]);
 
 	return (
 		<div>
@@ -49,7 +49,7 @@ export default function ListComponent() {
 												{/* TODO: 유저 이름 출력 (현재 userId 출력) */}
 												<Card.Text>작성자: {project.userId}</Card.Text>
 												<Card.Text>인원: {project.maxPeople}</Card.Text>
-												<Card.Footer>
+												<Card.Footer className="m-0 p-2 py-1">
 													<SkillTagComponent skills={project.skills} />
 												</Card.Footer>
 											</Card.Body>

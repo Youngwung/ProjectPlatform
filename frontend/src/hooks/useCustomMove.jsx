@@ -47,7 +47,7 @@ export default function useCustomMove() {
 		}
 		// 함수를 호출할 때 마다 값이 변경됨
 		setRefresh(!refresh);
-		navigate({pathname: '../list', search: queryStr})
+		navigate({pathname: '/project/list', search: queryStr})
 	}
 
 	const moveToModify = (projectId) => {

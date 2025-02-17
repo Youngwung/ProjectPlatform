@@ -10,6 +10,8 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
+
 @Getter
 @Setter
 @ToString(callSuper = true)
@@ -25,7 +27,8 @@ public class UserDto extends BaseSkillDto{
     String experience;
     String password;
     Long providerId;
-    String links;
+    List<LinkDto> links;
     String providerName;
     //String skills;
+    String newPassword;
 }

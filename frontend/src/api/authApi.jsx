@@ -70,7 +70,53 @@ const authApi = {
         console.error("📌 요청 정보:", error.config);
         throw error;
     }
-}
+  },
+  editUserInfo: async (updatedUserData) => {
+    try {
+      // ✅ 링크 타입 포함하여 변환
+      const formattedLinks = updatedUserData.links?.map((link) => ({
+        url: link.url,
+        linkTypeId: link.linkTypeId || 1,
+        description : link.description || "",
+      })) || [];
+  
+      const response = await axios.put(
+        `${API_URL}/updateuser`,
+        { ...updatedUserData, links: formattedLinks },
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
+  
+      console.log("✅ 사용자 정보 수정 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ 사용자 정보 수정 실패:", error);
+      throw error;
+    }
+  },
+
+  // ✅ 비밀번호 변경 API
+  changePassword: async (newPassword) => {
+    try {
+      const response = await axios.put(
+        `${API_URL}/change-password`, 
+        { newPassword }, 
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true, // ✅ 쿠키 기반 인증 사용
+        }
+      );
+      console.log("✅ 비밀번호 변경 성공");
+      return response.data;
+    } catch (error) {
+      console.error("❌ 비밀번호 변경 실패:", error);
+      throw error;
+    }
+  },
 
 };
 

@@ -44,7 +44,7 @@ const DashboardCard = ({ projectList = [], portfolioList = [] }) => {
             <Tab eventKey="portfolio"
                 title={
                     <>
-                        신청 프로젝트 목록{" "}
+                        신청 포트폴리오 목록{" "}
                         <Badge bg="primary">{portfolioList.length}</Badge>
                     </>
                 }

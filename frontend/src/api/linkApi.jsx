@@ -27,6 +27,7 @@ const linkApi = {
   createLink: async (linkData) => {
     try {
       const response = await axios.post(`${linkPrefix}/create`, linkData);
+      console.log(linkData);
       return response.data;
     } catch (error) {
       console.error("새 링크 생성 실패:", error);
@@ -45,16 +46,19 @@ const linkApi = {
       throw error;
     }
   },
-  deleteLink: async (id) => {
+  deleteLink: async (id, userId) => {
     try {
-      const response = await axios.delete(`${linkPrefix}/${id}`);
+      // axios.delete의 두 번째 인자에 params 객체로 userId 전달
+      const response = await axios.delete(`${linkPrefix}/${id}`, {
+        params: { userId: userId }
+      });
       return response.data;
     } catch (error) {
       console.error("링크 삭제 실패:", error);
-      console.error("id:", id);
       throw error;
     }
   },
+
   getAllLinkTypes: async () => {
     try {
       const response = await axios.get(`${linkTypePrefix}/list`);

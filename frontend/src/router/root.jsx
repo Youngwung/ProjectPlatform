@@ -5,6 +5,7 @@ import portfolioRouter from "./portfolioRouter";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import AlertPage from "../pages/AlertPage";
+import MyPageTotalInfo from "../components/user/MyPageTotalInfo";
 
 const Loading = () => <div>Loading....</div>; // JSX 요소로 변경
 const Layout = lazy(() => import("../layout/Layout"));
@@ -14,9 +15,6 @@ const ProjectIndex = lazy(() => import("../pages/project/IndexPage"));
 const Portfolio = lazy(() => import("../pages/portfolio/IndexPage"));
 const MyPage = lazy(() => import("../pages/MyPage"));
 const Link = lazy(() => import("../pages/Link"));
-console.log("portfolioRouter:", portfolioRouter());
-console.log("projectRouter:", projectRouter());
-
 
 const root = createBrowserRouter([
   {
@@ -70,7 +68,7 @@ const root = createBrowserRouter([
             path: "",
             element: (
               <Suspense fallback={<Loading />}>
-                <MyPage />
+                <MyPageTotalInfo />
               </Suspense>
             ),
           },

@@ -96,27 +96,86 @@ const authApi = {
       throw error;
     }
   },
+  // ✅ 비밀번호 검증 API (verifyPassword 함수)
+verifyPassword: async ({ password }) => {
+  try {
+    // 전달받은 값에 대해 상세 로그 기록 (비밀번호는 민감 정보이므로 존재 여부만 체크)
+    console.log(
+      `🔍 verifyPassword 호출됨 - passwordProvided: ${password ? 'YES' : 'NO'}`
+    );
 
-  // ✅ 비밀번호 변경 API
-  changePassword: async (newPassword) => {
-    try {
-      const response = await axios.put(
-        `${API_URL}/change-password`, 
-        { newPassword }, 
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true, // ✅ 쿠키 기반 인증 사용
-        }
-      );
-      console.log("✅ 비밀번호 변경 성공");
-      return response.data;
-    } catch (error) {
-      console.error("❌ 비밀번호 변경 실패:", error);
-      throw error;
+    // userId는 서버에서 쿠키(accessToken)를 통해 추출하므로 클라이언트에서는 password만 전달합니다.
+    const response = await axios.post(
+      `${API_URL}/verify-password`,
+      { password },
+      {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true, // 쿠키 기반 인증
+      }
+    );
+
+    // 서버로부터 받은 응답을 꼼꼼하게 로그로 기록 (응답 데이터가 boolean 형태라고 가정)
+    console.log("✅ 비밀번호 검증 응답 데이터:", response.data);
+    
+    // 응답 데이터가 true 또는 false인지 확인 후 반환
+    if (typeof response.data !== "boolean") {
+      console.warn("⚠️ 예상과 다른 응답 데이터 형식:", response.data);
     }
-  },
+    
+    return response.data;
+  } catch (error) {
+    // 에러가 발생했을 경우 상세 로그 기록 (에러 객체의 message와 response 정보 포함)
+    console.error("❌ 비밀번호 검증 실패:", {
+      errorMessage: error.message,
+      errorResponse: error.response ? error.response.data : "No response data",
+    });
+    throw error;
+  }
+},
+// ✅ 비밀번호 변경 API (현재 비밀번호와 새 비밀번호 모두 전송)
+changePassword: async (password, newPassword) => {
+  try {
+    // 비밀번호 제공 여부 로그 (민감 정보는 출력하지 않음)
+    console.log(
+      `%c[DEBUG] changePassword 호출됨 - 현재 비밀번호 제공: ${password ? 'YES' : 'NO'}, 새 비밀번호 제공: ${newPassword ? 'YES' : 'NO'}`,
+      'color: green; font-weight: bold;'
+    );
+
+    const response = await axios.put(
+      `${API_URL}/change-password`, 
+      { 
+        password,    // 현재 비밀번호 (검증용)
+        newPassword  // 새 비밀번호 (변경할 값)
+      }, 
+      {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true, // 쿠키 기반 인증 사용
+      }
+    );
+
+    // 응답 데이터 로깅
+    console.log(
+      `%c[INFO] 비밀번호 변경 성공, 응답 데이터: `,
+      'color: blue; font-weight: bold;',
+      response.data
+    );
+    return response.data;
+  } catch (error) {
+    // 에러 메시지와 추가 정보를 로깅
+    console.error(`[ERROR] 비밀번호 변경 실패: ${error.message}`);
+    if (error.response) {
+      console.error(
+        `[ERROR] 상태 코드: ${error.response.status}, 응답 데이터: `,
+        error.response.data
+      );
+    } else {
+      console.error(`[ERROR] 응답 데이터 없음`);
+    }
+    throw error;
+  }
+},
+
+
 
 };
 

@@ -156,7 +156,7 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
 
         UserDto dto = convertToDto(user);
         dto.setProviderName(user.getProvider().getName());
-
+        dto.setPassword(user.getPassword());
         // ✅ 사용자의 링크 조회 후 DTO에 세팅
         List<LinkDto> userLinks = linkService.getUserLinks(user.getId());
         dto.setLinks(userLinks);
@@ -182,7 +182,6 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
         existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
         existingUser.setExperience(updatedUser.getExperience());
 
-        // ✅ 링크 업데이트 방식 개선 (빈 리스트일 경우 초기화)
         if (updatedUser.getLinks() == null) {
             updatedUser.setLinks(linkService.getUserLinks(userId)); // 기존 링크 유지
         } else {
@@ -195,6 +194,17 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
 
         return convertToDto(savedUser);
     }
+    public boolean verifyPassword(Long userId, String password) {
+        if (password == null || password.trim().isEmpty()) {
+            throw new IllegalArgumentException("전달된 비밀번호 값이 null이거나 비어있습니다.");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다. id=" + userId));
+        log.info("{},{}",password,user.getPassword());
+        return passwordEncoder.matches(password, user.getPassword());
+    }
+
 
 
     /** ✅ 사용자 비밀번호 변경 */

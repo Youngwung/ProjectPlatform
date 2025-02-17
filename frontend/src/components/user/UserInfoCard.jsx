@@ -207,6 +207,8 @@ const UserInfoCard = () => {
       <PasswordModal
         show={showEditPasswordModal}
         onHide={() => setShowEditPasswordModal(false)}
+        onPasswordChangeSuccess={(msg) => {
+          console.log("비밀번호 변경 성공:", msg);}}
       />
     </Card>
   );

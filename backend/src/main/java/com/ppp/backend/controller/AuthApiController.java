@@ -35,7 +35,7 @@ public class AuthApiController {
         ResponseEntity<Map<String, Object>> loginResponse = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
 
         // 로그인 실패 시 클라이언트에 실패 응답 반환
-        if (loginResponse.getStatusCode() != org.springframework.http.HttpStatus.OK) {
+        if (loginResponse.getStatusCode() != HttpStatus.OK) {
             return loginResponse;
         }
 
@@ -54,7 +54,6 @@ public class AuthApiController {
         log.info("✅ 로그인 성공: userId={}, email={}", userId, loginRequest.getEmail());
         return ResponseEntity.ok(responseBody);
     }
-
 
     /*
      * ✅ 이메일 중복 확인 API
@@ -96,6 +95,7 @@ public class AuthApiController {
 
         return ResponseEntity.ok("로그아웃 성공");
     }
+    
     /**
      * ✅ 현재 로그인된 사용자 정보 반환
      */
@@ -107,11 +107,14 @@ public class AuthApiController {
         }
 
         UserDto userDto = userService.getUserById(userId);
-        log.info("🔎 사용자 정보 조회 성공: userId={}, name={},dto={}", userDto.getId(), userDto.getName(),userDto);
+        log.info("🔎 사용자 정보 조회 성공: userId={}, name={}, dto={}", userDto.getId(), userDto.getName(), userDto);
 
         return ResponseEntity.ok(userDto);
     }
 
+    /**
+     * ✅ 사용자 정보 수정 API
+     */
     @PutMapping("/updateuser")
     public ResponseEntity<?> updateUserInfo(@RequestBody UserDto updatedUser, HttpServletRequest request) {
         System.out.println("업데이트 유저정보" + updatedUser);
@@ -122,7 +125,7 @@ public class AuthApiController {
         try {
             updatedUser.setProviderId(4L); // TODO: 프로바이더 관련 로직 적용
             UserDto updatedUserInfo = userService.updateUserInfo(userId, updatedUser);
-            log.info("✅ 사용자 정보 수정 완료: userId={},{}", userId,updatedUser);
+            log.info("✅ 사용자 정보 수정 완료: userId={}, {}", userId, updatedUser);
             return ResponseEntity.ok(updatedUserInfo);
         } catch (Exception e) {
             log.error("❌ 사용자 정보 수정 실패: userId={}, 오류={}", userId, e.getMessage());
@@ -131,7 +134,31 @@ public class AuthApiController {
     }
 
     /**
+     * ✅ 비밀번호 검증 API
+     * 클라이언트에서 현재 비밀번호를 전송하면, 해당 비밀번호가 맞는지 검증합니다.
+     */
+    @PostMapping("/verify-password")
+    public ResponseEntity<?> verifyPassword(@RequestBody UserDto passwordRequest, HttpServletRequest request) {
+        // JWT 쿠키에서 userId 추출
+        Long userId = extractUserIdFromCookie(request);
+        if (userId == null) {
+            return ResponseEntity.status(401).body("인증되지 않은 사용자");
+        }
+        try {
+            // 전달받은 UserDto의 password 필드를 현재 비밀번호로 사용하여 검증
+            boolean isValid = userService.verifyPassword(userId, passwordRequest.getPassword());
+            return ResponseEntity.ok(isValid);
+        } catch (Exception e) {
+            // 에러 발생 시, 비밀번호 값이 null인지 여부 등 자세한 로그 기록 (비밀번호 원문은 민감 정보이므로 주의)
+            log.error("❌ 비밀번호 검증 실패: userId={}, 오류={}, passwordProvided={}",
+                    userId, e.getMessage(), passwordRequest.getPassword() != null ? "YES" : "NO");
+            return ResponseEntity.status(500).body("비밀번호 검증 중 오류가 발생했습니다.");
+        }
+    }
+
+    /**
      * ✅ 비밀번호 변경 API
+     * 클라이언트에서 현재 비밀번호와 새 비밀번호를 보내면, JWT 쿠키에서 userId를 추출하여 비밀번호를 변경합니다.
      */
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody UserDto passwordRequest, HttpServletRequest request) {
@@ -140,8 +167,11 @@ public class AuthApiController {
             return ResponseEntity.status(401).body("인증되지 않은 사용자");
         }
         try {
-            userService.updatePassword(userId,passwordRequest.getPassword(),passwordRequest.getNewPassword());
-            log.info("✅ 비밀번호 변경 완료: userId={}{}{}", userId,passwordRequest.getPassword(),passwordRequest.getNewPassword());
+            // passwordRequest.getPassword() -> 현재 비밀번호
+            // passwordRequest.getNewPassword() -> 새 비밀번호
+            userService.updatePassword(userId, passwordRequest.getPassword(), passwordRequest.getNewPassword());
+            log.info("✅ 비밀번호 변경 완료: userId={} (현재 비밀번호: {}, 새 비밀번호: {})",
+                    userId, passwordRequest.getPassword(), passwordRequest.getNewPassword());
             return ResponseEntity.ok("비밀번호 변경 성공");
         } catch (Exception e) {
             log.error("❌ 비밀번호 변경 실패: userId={}, 오류={}", userId, e.getMessage());
@@ -149,8 +179,10 @@ public class AuthApiController {
         }
     }
 
+
     /**
-     * ✅ JWT 쿠키에서 userId 추출하는 메서드 (중복 제거)
+     * ✅ JWT 쿠키에서 userId 추출 메서드
+     * 쿠키 이름 "accessToken"에서 토큰을 가져와 jwtUtil로 검증 후 userId를 추출합니다.
      */
     private Long extractUserIdFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();

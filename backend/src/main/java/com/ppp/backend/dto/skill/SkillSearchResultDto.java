@@ -1,6 +1,4 @@
-package com.ppp.backend.dto;
-
-import java.util.List;
+package com.ppp.backend.dto.skill;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,11 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SkillValidationDto {
-	private boolean isValid;
-
-	private List<String> wrongString;
+@Builder
+public class SkillSearchResultDto {
+	private Long id;
+	private String skill;
+	private String skillCategoryName;	
 }

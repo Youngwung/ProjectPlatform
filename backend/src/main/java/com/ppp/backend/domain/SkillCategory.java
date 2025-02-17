@@ -17,7 +17,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(toBuilder = true)
+@Builder
 public class SkillCategory {
 
     @Id

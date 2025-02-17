@@ -20,7 +20,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(toBuilder = true)
+@Builder
 public class Skill {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

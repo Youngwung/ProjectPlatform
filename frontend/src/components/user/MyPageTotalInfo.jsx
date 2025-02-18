@@ -25,6 +25,32 @@ const MyPageTotalInfo = () => {
     { id: 3, message: "새 포트폴리오가 등록되었습니다." },
     { id: 4, message: "포트폴리오 수정이 완료되었습니다." },
   ]);
+  
+  const handleSaveExperience = (newExperience) => {
+    // ✅ 1️⃣ 기존 user 상태에서 experience 업데이트
+    setUser((prevUser) => ({
+        ...prevUser,
+        experience: newExperience,
+    }));
+
+    // ✅ 2️⃣ 디버깅용 콘솔 로그 추가 (보내는 데이터 확인)
+    console.log("📌 서버로 전송할 데이터:", {
+        experience: newExperience, // ✅ id 제거
+    });
+
+    // ✅ 3️⃣ API 요청 실행 (id 제거)
+    authApi.updateUserExperience({ experience: newExperience }) 
+        .then(() => {
+            setAlertMessage("경력이 성공적으로 업데이트되었습니다.");
+            setAlertVariant("success");
+        })
+        .catch((error) => {
+            console.error("❌ 경력 업데이트 실패:", error);
+            setAlertMessage("경력 업데이트에 실패했습니다.");
+            setAlertVariant("danger");
+        });
+  };
+
 
   useEffect(() => {
     authApi.getAuthenticatedUser(1)
@@ -58,11 +84,13 @@ const MyPageTotalInfo = () => {
           />
         </Col>
       </Row>
-
+      {/* onSaveExperience is not a function */}
       {/* 경력 정보 */}
       <Row className="mb-4">
         <Col md={12}>
-          {user && <ExperienceCard experience={user.experience} />}
+          {user && 
+            <ExperienceCard experience={user.experience}
+                            onSaveExperience={handleSaveExperience} />}
         </Col>
       </Row>
 

@@ -67,6 +67,7 @@ const PasswordModal = ({ show, onHide, onPasswordChangeSuccess}) => {
       console.log("실행전");
       handleClose();
       console.log("핸들클로즈 실행");
+      alert("비밀번호가 성공적으로 변경되었습니다. 수고람쥐");
     } catch (error) {
       console.error("[DEBUG] handleChangePassword catch 블록 진입:", error);
       setErrorMsg("비밀번호 변경에 실패했습니다.");

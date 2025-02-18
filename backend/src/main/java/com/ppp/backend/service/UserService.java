@@ -245,4 +245,23 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
                 .links(linkService.getUserLinks(user.getId()))
                 .build();
     }
+
+    public UserDto updateUserExperience(Long userId, String experience) {
+        // 🔹 1. 사용자 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다. id=" + userId));
+
+        // 🔹 2. 기존 경험치 업데이트
+        log.info("✅ 기존 경험치 업데이트: userId={}, 기존 경험치={}, 새로운 경험치={}",
+                userId, user.getExperience(), experience);
+        user.setExperience(experience);
+
+        // 🔹 3. 저장 및 응답 반환
+        User updatedUser = userRepository.save(user);
+        log.info("✅ 경험치 업데이트 완료: userId={}, experience={}", userId, updatedUser.getExperience());
+
+        return convertToDto(updatedUser);
+    }
+
+
 }

@@ -132,7 +132,27 @@ public class AuthApiController {
             return ResponseEntity.status(500).body("사용자 정보 수정 중 오류가 발생했습니다.");
         }
     }
+    @PutMapping("/updatedExperience")
+    public ResponseEntity<?> updateExperience(
+            @RequestBody UserDto updatedUserExperience, // ✅ `id` 제거
+            HttpServletRequest request) {
 
+        log.info("🔄 사용자 경험치 업데이트 요청: experience={}", updatedUserExperience.getExperience());
+
+        // 🔹 1. JWT 쿠키에서 사용자 ID 추출
+        Long userId = extractUserIdFromCookie(request);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "인증되지 않은 사용자입니다."));
+        }
+
+        // 🔹 2. 경험치 업데이트
+        UserDto updatedUser = userService.updateUserExperience(userId, updatedUserExperience.getExperience()); // ✅ `UserDto` 대신 `experience` 값만 전달
+        log.info("✅ 경험치 업데이트 완료: userId={}, newExperience={}", userId, updatedUser.getExperience());
+
+        // 🔹 3. 업데이트된 사용자 정보 반환
+        return ResponseEntity.ok(updatedUser);
+    }
     /**
      * ✅ 비밀번호 검증 API
      * 클라이언트에서 현재 비밀번호를 전송하면, 해당 비밀번호가 맞는지 검증합니다.

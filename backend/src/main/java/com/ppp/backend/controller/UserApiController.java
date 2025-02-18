@@ -52,6 +52,4 @@ public class UserApiController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
-    // 만약 비밀번호 변경, 포트폴리오 관리 등 추가적인 기능이 필요하다면
-    // 별도의 엔드포인트를 추가할 수 있습니다.
 }

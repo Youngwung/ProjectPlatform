@@ -40,6 +40,7 @@ const MyPage = () => {
       </Row>
 
       {/* 모달들 */}
+      {/* TODO 각각의 컴포넌트의 함수를 불러와야함 */}
       <EditInfoModal show={showEditInfoModal} onHide={() => setShowEditInfoModal(false)} />
       <PasswordModal show={showPasswordModal} onHide={() => setShowPasswordModal(false)} />
       <DeleteConfirmModal show={showDeleteConfirmModal} onHide={() => setShowDeleteConfirmModal(false)} />

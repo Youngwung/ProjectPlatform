@@ -107,6 +107,7 @@ export default function SkillSearchComponent({ setSelectedSkill }) {
 									>
 										<button
 											className="btn pl-2 pr-0 flex w-full flex-wrap items-start justify-start"
+											type="button"
 											value={category.id}
 											onClick={() => handleSkillCategoryClick(category.id)}
 										>
@@ -129,6 +130,7 @@ export default function SkillSearchComponent({ setSelectedSkill }) {
 									<button
 										key={index}
 										value={skill.name}
+										type="button"
 										className="border rounded inline-block m-1 p-1"
 										onClick={handleSkillClick}
 									>
@@ -143,6 +145,7 @@ export default function SkillSearchComponent({ setSelectedSkill }) {
 									<button
 										key={index}
 										value={skill.name}
+										type="button"
 										className="border rounded inline-block m-1 p-1"
 										onClick={handleSkillClick}
 									>

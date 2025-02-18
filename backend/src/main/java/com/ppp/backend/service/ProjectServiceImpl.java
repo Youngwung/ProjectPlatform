@@ -307,9 +307,9 @@ public class ProjectServiceImpl extends
 	}
 
 	@Override
-	public PageResponseDTO<ProjectDTO> getList(PageRequestDTO PageRequestDTO) {
+	public PageResponseDTO<ProjectDTO> getList(PageRequestDTO pageRequestDTO) {
 		// JPA
-		Page<Project> result = projectRepo.searchString(PageRequestDTO);
+		Page<Project> result = projectRepo.searchString(pageRequestDTO);
 
 		// ! Project List => ProjectDTO List
 		List<ProjectDTO> dtoList = result.get().map(project -> {
@@ -341,9 +341,39 @@ public class ProjectServiceImpl extends
 		}).collect(Collectors.toList());
 
 		// 페이징 처리
-		PageResponseDTO<ProjectDTO> pageResponseDTO = new PageResponseDTO<>(dtoList, PageRequestDTO,
+		PageResponseDTO<ProjectDTO> pageResponseDTO = new PageResponseDTO<>(dtoList, pageRequestDTO,
 				result.getTotalElements());
 
+		return pageResponseDTO;
+	}
+
+	@Override
+	public PageResponseDTO<ProjectDTO> getSearchResult(PageRequestDTO pageRequestDTO) {
+		Page<Project> result = projectRepo.searchKeyword(pageRequestDTO);
+		// ! Project List => ProjectDTO List
+		List<ProjectDTO> dtoList = result.get().map(project -> {
+			ProjectDTO dto = fromEntity(project);
+
+			String skillString = getSkill(project.getId());
+			
+			dto.setSkills(skillString);
+
+			ProjectType projectType = projectTypeRepo.findByProjectId(project.getId()).orElse(null);
+
+			if (projectType == null) {
+				// 프로젝트 타입 기능 이전에 만들어진 프로젝트인 경우 all로 설정 후 객체 생성
+				dto.setType("all");
+			} else {
+				dto.setType(projectType.getType().toString());
+			}
+			
+			return dto;
+		}).collect(Collectors.toList());
+
+		// 페이징 처리
+		PageResponseDTO<ProjectDTO> pageResponseDTO = new PageResponseDTO<>(dtoList, pageRequestDTO,
+				result.getTotalElements());
+		
 		return pageResponseDTO;
 	}
 
@@ -390,7 +420,7 @@ public class ProjectServiceImpl extends
 	}
 
 	// Entity → DTO 변환
-	private ProjectDTO fromEntity(Project entity) {
+	public ProjectDTO fromEntity(Project entity) {
 		if (entity == null) {
 			return null;
 		}
@@ -424,5 +454,7 @@ public class ProjectServiceImpl extends
 			return false;
 		}
 	}
+
+	
 
 }

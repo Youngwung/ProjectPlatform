@@ -7,4 +7,6 @@ import com.ppp.backend.dto.PageRequestDTO;
 
 public interface ProjectSearch {
 	Page<Project> searchString(PageRequestDTO pageRequestDTO);
+
+	Page<Project> searchKeyword(PageRequestDTO pageRequestDTO);
 }

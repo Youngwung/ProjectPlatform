@@ -1,6 +1,11 @@
 package com.ppp.backend.service;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.ppp.backend.dto.PageRequestDTO;
@@ -10,7 +15,7 @@ import com.ppp.backend.dto.ProjectDTO;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
-// @SpringBootTest
+@SpringBootTest
 @Slf4j
 @ActiveProfiles("local")
 public class ProjectServiceTest {
@@ -82,6 +87,17 @@ public class ProjectServiceTest {
 		PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(1).build();
 		PageResponseDTO<ProjectDTO> result = projectService.getList(pageRequestDTO);
 		System.out.println(result);
+	}
+
+	@Test
+	public void getSearchResultTest() {
+		List<String> skills = Arrays.asList("java", "react", "python");
+		PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
+			.query("e")
+			.querySkills(skills)
+		.build();
+		PageResponseDTO<ProjectDTO> searchResult = projectService.getSearchResult(pageRequestDTO);
+		log.info("searchResult-----------{}", searchResult);
 	}
 
 }

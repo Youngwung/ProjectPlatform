@@ -19,6 +19,7 @@ import com.ppp.backend.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -29,8 +30,6 @@ public class ProjectController {
 
 	@GetMapping("/{projectId}")
 	public ProjectDTO get(@PathVariable("projectId") Long projectId) {
-		// 테스트 완료
-		// ? 로그에 한글이 깨지는 문제가 있음.
 		ProjectDTO projectDTO = projectService.get(projectId);
 		log.info("dto = {}", projectDTO);
 		return projectDTO;
@@ -42,6 +41,13 @@ public class ProjectController {
 		
 		return projectService.getList(pageRequestDTO);
 	}
+
+	@GetMapping("/search")
+	public PageResponseDTO<ProjectDTO> getMethodName(PageRequestDTO pageRequestDTO) {
+		log.info("Request = {}", pageRequestDTO);
+		return projectService.getSearchResult(pageRequestDTO);
+	}
+	
 
 	@PostMapping("/")
 	public Map<String, Long> register(@RequestBody ProjectDTO dto) {

@@ -14,6 +14,8 @@ public interface ProjectService {
 
 	void remove(Long jpNo);
 
-	PageResponseDTO<ProjectDTO> getList(PageRequestDTO PageRequestDTO);
+	PageResponseDTO<ProjectDTO> getList(PageRequestDTO pageRequestDTO);
+
+	PageResponseDTO<ProjectDTO> getSearchResult(PageRequestDTO pageRequestDTO);
 
 }

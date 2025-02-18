@@ -6,11 +6,9 @@ export default function ListPage() {
 
 	return (
 		<div>
+			
 			<div>
-				<SearchBar />
-			</div>
-			<div>
-				<ListComponent />
+				<ListComponent isSearch = {false}/>
 			</div>
 		</div>
 	)

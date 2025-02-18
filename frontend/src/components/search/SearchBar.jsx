@@ -1,14 +1,18 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
-import { getSkillSearchResult } from "../../api/skillApi";
+import useCustomMove from "../../hooks/useCustomMove";
 import SkillSearchComponent from "./SkillSearchComponent";
-export default function SearchBar() {
+export default function SearchBar({serverData}) {
+	const {page, size, moveToSearch} = useCustomMove();
 	const initState = {
+		page: page,
+		size: size,
 		query: "",
 		querySkills: [],
 	};
 	const [data, setData] = useState(initState);
+	
 	const handleChange = (e) => {
 		const { name, value } = e.target;
 		setData({
@@ -20,6 +24,9 @@ export default function SearchBar() {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		// 검색어를 이용한 검색 기능 구현
+		console.log("submit");
+		console.log(data);
+		moveToSearch(data);
 	};
 
 	const [skill, setSkill] = useState("");
@@ -44,7 +51,7 @@ export default function SearchBar() {
 	
 	return (
 		<div>
-			<Form onSubmit={handleSubmit}>
+			<Form>
 				<Row xs={12}>
 					<Col xs={6}>
 						<InputGroup className="d-flex justify-content-center w-full">
@@ -116,7 +123,7 @@ export default function SearchBar() {
 							</span>
 						))}
 					</span>
-					<Button type="submit" className="">
+					<Button type="submit" onClick={handleSubmit}>
 						검색
 					</Button>
 				</div>

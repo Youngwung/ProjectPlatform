@@ -124,3 +124,9 @@ CREATE TABLE bookmark_portfolio (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+CREATE TABLE project_type (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    type ENUM('all', 'skill', 'content') DEFAULT 'all',
+    project_id BIGINT NOT NULL
+);

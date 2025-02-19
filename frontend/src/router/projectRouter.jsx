@@ -6,6 +6,7 @@ const ProjectListPage = lazy(() => import("../pages/project/ListPage"));
 const ProjectReadPage = lazy(() => import("../pages/project/ReadPage"));
 const ProjectAddPage = lazy(() => import("../pages/project/AddPage"));
 const ProjectModifyPage = lazy(() => import("../pages/project/ModifyPage"));
+const ProjectSearchPage = lazy(() => import("../pages/project/SearchPage"));
 
 const projectRouter = () => {
 	return [
@@ -30,6 +31,10 @@ const projectRouter = () => {
 		{
 			path: "modify/:projectId",
 			element: <Suspense fallback={Loading}><ProjectModifyPage/></Suspense>
+		},
+		{
+			path: "search",
+			element: <Suspense fallback={Loading}><ProjectSearchPage/></Suspense>
 		}
 	];
 };

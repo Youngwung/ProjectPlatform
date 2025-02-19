@@ -52,5 +52,5 @@ export const getDuplicatedString = (skill) => {
 		}
 	});
 
-	return duplicateArray.join();
+	return duplicateArray.map(item => item.language).join(', ');
 };

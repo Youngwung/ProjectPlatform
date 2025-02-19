@@ -15,6 +15,7 @@ const initState = {
 	userId: 0,
 	title: "",
 	description: "",
+	type: "",
 	maxPeople: 0,
 	status: "",
 	public: false,

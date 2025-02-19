@@ -1,5 +1,7 @@
 package com.ppp.backend.service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,17 +10,22 @@ import org.springframework.stereotype.Service;
 
 import com.ppp.backend.domain.Project;
 import com.ppp.backend.domain.ProjectSkill;
+import com.ppp.backend.domain.ProjectType;
 import com.ppp.backend.domain.Skill;
 import com.ppp.backend.domain.SkillLevel;
+import com.ppp.backend.domain.User;
 import com.ppp.backend.dto.PageRequestDTO;
 import com.ppp.backend.dto.PageResponseDTO;
 import com.ppp.backend.dto.ProjectDTO;
 import com.ppp.backend.dto.skill.BaseSkillDto;
+import com.ppp.backend.enums.ProjectTypeEnum;
 import com.ppp.backend.repository.ProjectRepository;
 import com.ppp.backend.repository.ProjectSkillRepository;
+import com.ppp.backend.repository.ProjectTypeRepository;
 import com.ppp.backend.repository.SkillLevelRepository;
 import com.ppp.backend.repository.SkillRepository;
 import com.ppp.backend.repository.UserRepository;
+import com.ppp.backend.status.ProjectStatus;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -30,17 +37,20 @@ public class ProjectServiceImpl extends
 		AbstractSkillService<ProjectSkill, BaseSkillDto, ProjectSkillRepository, Project> implements ProjectService {
 	private final ProjectRepository projectRepo;
 	private final UserRepository userRepo;
+	private final ProjectTypeRepository projectTypeRepo;
 
 	// Lombok의 애너테이션으로는 부모클래스의 final field을 초기화할 수 없음
 	public ProjectServiceImpl(
-			ProjectRepository projectRepo, 
-			UserRepository userRepo, 
+			ProjectRepository projectRepo,
+			UserRepository userRepo,
 			SkillRepository skillRepo,
-			SkillLevelRepository skillLevelRepo, 
-			ProjectSkillRepository projectSkillRepo) {
+			SkillLevelRepository skillLevelRepo,
+			ProjectSkillRepository projectSkillRepo,
+			ProjectTypeRepository projectTypeRepo) {
 		super(projectSkillRepo, skillRepo, skillLevelRepo);
 		this.projectRepo = projectRepo;
 		this.userRepo = userRepo;
+		this.projectTypeRepo = projectTypeRepo;
 	}
 
 	@Override
@@ -50,19 +60,54 @@ public class ProjectServiceImpl extends
 		// AbstractSkillService의 메서드 호출
 		String skills = getSkill(projectId);
 		dto.setSkills(skills);
+		// 프로젝트 타입 가져오기
+		ProjectType projectType = projectTypeRepo.findByProjectId(projectId).orElse(null);
+		if (projectType == null) {
+			// 프로젝트 타입 기능 이전에 만들어진 프로젝트인 경우 all로 설정.
+			dto.setType("all");
+		} else {
+			dto.setType(projectType.getType().toString());
+		}
+
 		return dto;
 	}
 
 	@Override
 	public Long register(ProjectDTO dto) {
-		Project project = toEntity(dto, userRepo);
+		log.info("dto = {}", dto);
+		Project project = toEntity(dto);
 
 		// DB에 없는 스킬을 입력받은 경우 -1리턴
-		if (!existingSkill(dto.getSkills()))
-			return -1L;
+		if (!existingSkill(dto.getSkills())){
+			// 그냥 null로 저장
+			dto.setSkills(null);
+		}
 
+		// projectType 검사
+		boolean projectType = isProjectType(dto.getType());
+		// Enum으로 정의되지 않은 값인 경우 -2 리턴
+		if (!projectType) {
+			return -2L;
+		}
+		// 프로젝트 저장
 		Project result = projectRepo.save(project);
-		saveParentEntity(dto, project);
+		// skill이 null이 아닌 경우 스킬 저장
+		if (dto.getSkills() != null && !dto.getSkills().isEmpty()) {
+			saveParentEntity(dto, project);
+			// 스킬이 비어있으니 type을 content로 자동 변경
+			dto.setType("content");
+		}
+		// 프로젝트 타입 저장
+		
+		// 프로젝트 타입 객체 생성
+		ProjectType projectTypeEntity = ProjectType.builder()
+		.project(project)
+		.type(ProjectTypeEnum.valueOf(dto.getType()))
+		.build();
+
+		log.info("projectTypeEntity = {}", projectTypeEntity);
+
+		projectTypeRepo.save(projectTypeEntity);
 
 		// 등록된 프로젝트 번호 리턴
 		return result.getId();
@@ -126,7 +171,40 @@ public class ProjectServiceImpl extends
 
 		projectRepo.save(entity);
 
-		modifySkill(dto.getId(), dto, entity);
+		if (dto.getSkills() != null) {
+			// 스킬이 null이 아닌 경우에만 스킬 저장
+			// 스킬이 null일 수 있어 추가한 로직
+			modifySkill(dto.getId(), dto, entity);
+		}
+
+		// 게시글 유형 수정 로직 구현
+		// 1. 게시글 유형이 수정되었는 지 검사
+		// 프로젝트 타입 가져오기
+		ProjectType projectType = projectTypeRepo.findByProjectId(dto.getId()).orElse(null);
+		boolean isTypeModified = true;
+		if (projectType == null) {
+			// 프로젝트 타입 기능 이전에 만들어진 프로젝트인 경우 all로 설정 후 객체 생성
+			dto.setType("all");
+			projectType = ProjectType.builder()
+					.project(entity)
+					.type(ProjectTypeEnum.valueOf("all"))
+					.build();
+		} else {
+			dto.setType(projectType.getType().toString());
+		}
+		isTypeModified = ! (projectType.getType().toString().equals(dto.getType()));
+		// 2. 게시글 유형이 수정되었을 경우 기존 게시글 유형을 삭제하고 새로운 게시글 유형을 추가
+		if (isTypeModified) {
+			projectTypeRepo.delete(projectType);
+			ProjectType newProjectType = ProjectType.builder()
+					.project(entity)
+					.type(ProjectTypeEnum.valueOf(dto.getType()))
+					.build();
+			projectTypeRepo.save(newProjectType);
+		} else {
+			// 3. 게시글 유형이 수정되지 않았을 경우 아무것도 하지 않음
+			log.info("게시글 유형이 수정되지 않음");
+		}
 
 		// // 유효성 검사 리스트
 		// List<String> invalidList = new ArrayList<>();
@@ -229,9 +307,9 @@ public class ProjectServiceImpl extends
 	}
 
 	@Override
-	public PageResponseDTO<ProjectDTO> getList(PageRequestDTO PageRequestDTO) {
+	public PageResponseDTO<ProjectDTO> getList(PageRequestDTO pageRequestDTO) {
 		// JPA
-		Page<Project> result = projectRepo.searchString(PageRequestDTO);
+		Page<Project> result = projectRepo.searchString(pageRequestDTO);
 
 		// ! Project List => ProjectDTO List
 		List<ProjectDTO> dtoList = result.get().map(project -> {
@@ -249,13 +327,53 @@ public class ProjectServiceImpl extends
 			// // Map을 String으로 변환하는 메서드를 호출한 후 dto의 skills 필드를 초기화
 			// String skillString = skillDtoConverter.convertMapToSkillDto(skillMap);
 			dto.setSkills(skillString);
+
+			ProjectType projectType = projectTypeRepo.findByProjectId(project.getId()).orElse(null);
+
+			if (projectType == null) {
+				// 프로젝트 타입 기능 이전에 만들어진 프로젝트인 경우 all로 설정 후 객체 생성
+				dto.setType("all");
+			} else {
+				dto.setType(projectType.getType().toString());
+			}
+			
 			return dto;
 		}).collect(Collectors.toList());
 
 		// 페이징 처리
-		PageResponseDTO<ProjectDTO> pageResponseDTO = new PageResponseDTO<>(dtoList, PageRequestDTO,
+		PageResponseDTO<ProjectDTO> pageResponseDTO = new PageResponseDTO<>(dtoList, pageRequestDTO,
 				result.getTotalElements());
 
+		return pageResponseDTO;
+	}
+
+	@Override
+	public PageResponseDTO<ProjectDTO> getSearchResult(PageRequestDTO pageRequestDTO) {
+		Page<Project> result = projectRepo.searchKeyword(pageRequestDTO);
+		// ! Project List => ProjectDTO List
+		List<ProjectDTO> dtoList = result.get().map(project -> {
+			ProjectDTO dto = fromEntity(project);
+
+			String skillString = getSkill(project.getId());
+			
+			dto.setSkills(skillString);
+
+			ProjectType projectType = projectTypeRepo.findByProjectId(project.getId()).orElse(null);
+
+			if (projectType == null) {
+				// 프로젝트 타입 기능 이전에 만들어진 프로젝트인 경우 all로 설정 후 객체 생성
+				dto.setType("all");
+			} else {
+				dto.setType(projectType.getType().toString());
+			}
+			
+			return dto;
+		}).collect(Collectors.toList());
+
+		// 페이징 처리
+		PageResponseDTO<ProjectDTO> pageResponseDTO = new PageResponseDTO<>(dtoList, pageRequestDTO,
+				result.getTotalElements());
+		
 		return pageResponseDTO;
 	}
 
@@ -268,4 +386,75 @@ public class ProjectServiceImpl extends
 				.skillLevel(skillLevel)
 				.build();
 	}
+
+	// DTO → Entity 변환
+	private Project toEntity(ProjectDTO dto) {
+		if (dto == null) {
+			return null;
+		}
+
+		User user = userRepo.findById(dto.getUserId())
+				.orElseThrow(() -> new IllegalArgumentException("User not found with id: " + dto.getUserId()));
+
+		// 만약에 스테이터스가 null이면 default값
+		// update 시 status가 항상 null로 초기화 되는 문제 해결을 위한 코드
+		if (dto.getStatus() == null) {
+			dto.setStatus("모집_중");
+		}
+
+		Project entity = Project.builder()
+				.id(dto.getId())
+				.user(user) // User 객체를 직접 설정
+				.title(dto.getTitle())
+				.description(dto.getDescription())
+				.maxPeople(dto.getMaxPeople())
+				.status(ProjectStatus.valueOf(dto.getStatus()))
+				.isPublic(dto.isPublic())
+				.createdAt(
+						dto.getCreatedAt() == null ? Timestamp.valueOf(LocalDateTime.now()) : Timestamp.valueOf(dto.getCreatedAt()))
+				.updatedAt(
+						dto.getUpdatedAt() == null ? Timestamp.valueOf(LocalDateTime.now()) : Timestamp.valueOf(dto.getUpdatedAt()))
+				.build();
+
+		return entity;
+	}
+
+	// Entity → DTO 변환
+	public ProjectDTO fromEntity(Project entity) {
+		if (entity == null) {
+			return null;
+		}
+
+		ProjectDTO dto = ProjectDTO.builder()
+				.id(entity.getId())
+				.userId(entity.getUser().getId()) // User 객체에서 ID 추출
+				.title(entity.getTitle())
+				.description(entity.getDescription())
+				.maxPeople(entity.getMaxPeople())
+				.isPublic(entity.isPublic())
+				.status(entity.getStatus().toString())
+				.createdAt(entity.getCreatedAt().toLocalDateTime())
+				.updatedAt(entity.getUpdatedAt().toLocalDateTime())
+				.build();
+
+		// 만약에 스테이터스가 null이면 default값
+		// update 시 status가 항상 null로 초기화 되는 문제 해결을 위한 코드
+		if (dto.getStatus() == null) {
+			dto.setStatus("모집_중");
+		}
+
+		return dto;
+	}
+
+	public boolean isProjectType(String type) {
+		try {
+			ProjectTypeEnum.valueOf(type);
+			return true;
+		} catch (IllegalArgumentException e) {
+			return false;
+		}
+	}
+
+	
+
 }

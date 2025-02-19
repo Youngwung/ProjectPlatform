@@ -1,8 +1,6 @@
 import React from 'react';
 import { Card, Container, Row, Col } from 'react-bootstrap';
 import AlertBtn from '../components/alert/AlertBtn';
-import AlertPage from './AlertPage';
-
 const jobs = [
   { title: '프론트엔드 개발자', description: 'React 및 Vue.js 경험자를 모집합니다.', image: 'https://source.unsplash.com/300x200/?technology' },
   { title: '백엔드 개발자', description: 'Spring Boot 및 MySQL 경험자를 모집합니다.', image: 'https://source.unsplash.com/300x200/?startup' },
@@ -28,18 +26,6 @@ const seekers = [
 const Main = () => {
   return (
     <Container className="my-5">
-      <AlertPage/>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
       <AlertBtn/> {/* 📌 알람 버튼 추가 */}
       <section>
         <h2 className="my-4">구인 섹션</h2>

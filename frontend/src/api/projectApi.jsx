@@ -58,12 +58,16 @@ export const deleteOne = async (projectId) => {
 export const projectSearch = async (params) => {
 	const { page, size, query, querySkills } = params;
 	let searchParams = new URLSearchParams();
-	searchParams.append('page', page);
-	searchParams.append('size', size);
-	searchParams.append('query', query);
-	querySkills.forEach((skill) => {
-		searchParams.append("querySkills", skill);
-	});
+	searchParams.append("page", page);
+	searchParams.append("size", size);
+	searchParams.append("query", query);
+	if (querySkills) {
+		querySkills.forEach((skill) => {
+			searchParams.append("querySkills", skill);
+		});
+	} else {
+		searchParams.append("querySkills", '');
+	}
 	const res = await axiosInstance.get(`${prefix}/search?${searchParams}`);
 	// 비동기 통신에서 쿼리스트링을 사용하는 방법
 	// 1. pageParam의 page와 size를 빼둔 후 두번째 아규먼트로  {params:{page, size}} 로 전달.

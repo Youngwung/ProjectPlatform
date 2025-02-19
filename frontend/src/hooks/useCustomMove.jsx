@@ -68,9 +68,9 @@ export default function useCustomMove() {
 		} else {
 			queryStr = queryDefault;
 		}
-		// 함수를 호출할 때 마다 값이 변경됨
-		setRefresh(!refresh);
 		navigate({ pathname: "/project/list", search: queryStr });
+		// 함수를 호출할 때 마다 값이 변경됨
+		setRefresh((prev) => !prev);
 	};
 
 	const moveToModify = (projectId) => {
@@ -111,6 +111,8 @@ export default function useCustomMove() {
 			pathname: "/project/search",
 			search: queryStr.toString(),
 		});
+		// 함수를 호출할 때 마다 값이 변경됨
+		setRefresh((prev) => !prev);
 	};
 
 	// refresh 값 반환

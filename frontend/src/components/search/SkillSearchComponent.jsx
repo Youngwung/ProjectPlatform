@@ -3,7 +3,7 @@ import { Col, Form, InputGroup, ListGroup, Row } from "react-bootstrap";
 import { FaAngleRight } from "react-icons/fa";
 import { getSkillList, getSkillSearchResult } from "../../api/skillApi";
 
-export default function SkillSearchComponent({ setSelectedSkill }) {
+export default function SkillSearchComponent({ setSelectedSkill, querySkills }) {
 	const initSkillData = [
 		{
 			id: null,
@@ -34,9 +34,8 @@ export default function SkillSearchComponent({ setSelectedSkill }) {
 		});
 	}, []);
 
-	const handleSkillClick = (e) => {
+	const handleSkillClick = (value) => {
 		// 부모컴포넌트에 선택한 스킬 전달
-		const value = e.target.value;
 		console.log(value);
 		setSelectedSkill(value);
 	};
@@ -81,6 +80,14 @@ export default function SkillSearchComponent({ setSelectedSkill }) {
 	};
 	// 선택된 카테고리 하이라이팅을 위한 변수 선언
 	const [activeItem, setActiveItem] = useState(0);
+
+	// 선택된 스킬 하이라이팅을 위한 변수 선언
+	const [selectedSkills, setSelectedSkills] = useState(querySkills);
+	useEffect(() => {
+		console.log(querySkills)
+		setSelectedSkills(querySkills)
+	}, [querySkills])
+	
 
 	return (
 		<div>
@@ -129,10 +136,12 @@ export default function SkillSearchComponent({ setSelectedSkill }) {
 							  skillResult.map((skill, index) => (
 									<button
 										key={index}
-										value={skill.name}
+										value={skill.skill}
 										type="button"
-										className="border rounded inline-block m-1 p-1"
-										onClick={handleSkillClick}
+										className={`border rounded inline-block m-1 p-1
+												${selectedSkills.includes(skill.skill) ? `bg-blue-400 `: ``}
+											`}
+										onClick={() => handleSkillClick(skill.skill)}
 									>
 										<span className="text-gray-400">
 											{skill.skillCategoryName} {">"}{" "}
@@ -146,8 +155,10 @@ export default function SkillSearchComponent({ setSelectedSkill }) {
 										key={index}
 										value={skill.name}
 										type="button"
-										className="border rounded inline-block m-1 p-1"
-										onClick={handleSkillClick}
+										className={`border rounded inline-block m-1 p-1
+											${selectedSkills.includes(skill.name) ? `bg-blue-400 `: ``}
+											`}
+										onClick={() => handleSkillClick(skill.name)}
 									>
 										{skill.name}
 									</button>

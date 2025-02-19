@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import { getList, projectSearch } from "../../api/projectApi";
@@ -22,23 +22,32 @@ const initState = {
 	current: 0,
 };
 
-export default function ListComponent({ isSearch }) {
+const initQueryData = {
+	page: 1,
+	size: 12,
+	query: "",
+	querySkills: []
+}
+
+export default function ListComponent() {
 	const { page, size, moveToList, moveToSearch, moveToRead, refresh } =
 		useCustomMove();
-
+	const [queryData, setQueryData] = useState(initQueryData);
 	const [serverData, setServerData] = useState(initState);
-
 	const location = useLocation();
-	const params = new URLSearchParams(location.search);
-	const query = params.get("query");
-	// 렌더링 시 새 배열을 생성하여 useEffect가 무한 호출되는 문제를 수정하기 위해 useMemo를 사용
-	const querySkills = useMemo(
-		() => params.getAll("querySkills"),
-		[location.search]
-	);
+	const isSearchPage = location.pathname.includes('/search');
 
 	useEffect(() => {
-		if (isSearch && (query || querySkills.length > 0)) {
+		const params = new URLSearchParams(location.search);
+		const query = params.get("query");
+		const querySkills = params.getAll("querySkills");
+		setQueryData({
+			page: page,
+			size: size,
+			query: query,
+			querySkills: querySkills
+		})
+		if ((query || querySkills.length > 0)) {
 			// 검색 api 호출
 			console.log(querySkills);
 			projectSearch({ page, size, query, querySkills }).then((data) => {
@@ -52,14 +61,14 @@ export default function ListComponent({ isSearch }) {
 		}
 		// refresh 값이 변경되면 데이터를 새로 받아옴.
 		// refresh 임시 제거: 이미 데이터를 불러온 페이지 호출 시 이동하지 않는 현상 발생
-	}, [page, size, query, querySkills]);
+	}, [page, size, location.search]);
 
 	return (
 		<div>
 			<div>
 				<div>
 					<SearchBar 
-						serverData = {serverData}
+						queryData = {queryData}
 					/>
 				</div>
 				<div>
@@ -68,7 +77,10 @@ export default function ListComponent({ isSearch }) {
 							{serverData.dtoList.map((project, index) => (
 								<Col key={index}>
 									{project.public && (
-										<Card onClick={() => moveToRead(project.id)}>
+										<Card 
+											onClick={() => moveToRead(project.id)}
+											className="cursor-pointer"
+										>
 											<Card.Body>
 												<Card.Title>{project.title}</Card.Title>
 												{/* TODO: 유저 이름 출력 (현재 userId 출력) */}
@@ -87,8 +99,9 @@ export default function ListComponent({ isSearch }) {
 				</div>
 				<PageComponent
 					serverData={serverData}
+					queryData = {queryData}
 					movePage={
-						isSearch && (query || querySkills.length > 0)
+						isSearchPage
 							? moveToSearch
 							: moveToList
 					}

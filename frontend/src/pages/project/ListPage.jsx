@@ -1,6 +1,5 @@
 import React from 'react';
 import ListComponent from '../../components/project/ListComponent';
-import SearchBar from '../../components/search/SearchBar';
 
 export default function ListPage() {
 
@@ -8,7 +7,7 @@ export default function ListPage() {
 		<div>
 			
 			<div>
-				<ListComponent isSearch = {false}/>
+				<ListComponent />
 			</div>
 		</div>
 	)

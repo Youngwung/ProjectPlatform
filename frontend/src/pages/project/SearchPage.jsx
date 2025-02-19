@@ -6,7 +6,7 @@ export default function SearchPage() {
 	return (
 		<div>
 			<div>
-				<ListComponent isSearch = {true}/>
+				<ListComponent/>
 			</div>
 		</div>
 	);

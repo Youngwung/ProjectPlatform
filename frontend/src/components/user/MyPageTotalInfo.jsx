@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Alert } from "react-bootstrap";
 import authApi from "../../api/authApi";
-import { getUserBookmarkProjectList } from "../../api/bookmarkProjectApi";
+import { deleteBookmarkProjectOne,
+         getUserBookmarkProjectList,
+         deleteBookmarkPortfolioOne,
+         getUserBookmarkPortfolioList
+        } from "../../api/bookmarkProjectApi";
 
 import UserInfoCard from "./UserInfoCard";
 import DashboardCard from "./DashboardCard";
@@ -16,25 +20,71 @@ const MyPageTotalInfo = () => {
 
   // 프로젝트 & 포트폴리오 알림
   const [projectBookmarkList, setProjectBookmarkList] = useState([]);
-  const [portfolioBookmarkList, setPortfoiloProjectBookmarkList] = useState([]);
-  const [portfolioNotifications, setPortfolioNotifications] = useState([
-    { id: 3, message: "새 포트폴리오가 등록되었습니다." },
-    { id: 4, message: "포트폴리오 수정이 완료되었습니다." },
-  ]);
+  const [portfolioBookmarkList, setPortfoiloBookmarkList] = useState([]);
 
   // ✅ 북마크 프로젝트 목록 가져오는 함수
   const handleBookmarkProjectList = async () => {
     try {
       const data = await getUserBookmarkProjectList(); // API 호출
       console.log("✅ 북마크된 프로젝트 리스트:", data);
-      setProjectBookmarkList(data); // 상태 업데이트
+
+      // 📌 `projectTitle`을 기준으로 목록 업데이트
+      const formattedProjects = data.map((item) => ({
+        id: item.id,
+        title: item.projectTitle, // 프로젝트 제목으로 매핑
+      }));
+
+      setProjectBookmarkList(formattedProjects); // 상태 업데이트
     } catch (error) {
       console.error("❌ 북마크된 프로젝트 목록을 가져오는 데 실패했습니다:", error);
       setAlertMessage("북마크된 프로젝트를 불러오는데 실패했습니다.");
       setAlertVariant("danger");
     }
   };
+  const handleBookmarkPortfolioList = async () =>{
+    try {
+      const data = await getUserBookmarkPortfolioList();
+      console.log("✅ 북마크된 포폴 리스트:", data);
+      const formattedPortfolios = data.map((item) => ({
+        id: item.id,
+        title: item.portfolioTitle, // 프로젝트 제목으로 매핑
+      }));
+      setPortfoiloBookmarkList(formattedPortfolios)
+    } catch (error) {
+      console.error("❌ 북마크된 포폴 목록을 가져오는 데 실패했습니다:", error);
+      setAlertMessage("북마크된 포폴을 불러오는데 실패했습니다.");
+      setAlertVariant("danger");
+    }
 
+  }
+  const handleDeleteBookmarkProject = async (id) => {
+    try {
+      await deleteBookmarkProjectOne(id); // 서버에서 삭제 요청
+      setProjectBookmarkList((prevList) =>
+        prevList.filter((project) => project.id !== id) // UI에서 즉시 반영
+      );
+      setAlertMessage("북마크가 삭제되었습니다.");
+      setAlertVariant("success");
+    } catch (error) {
+      console.error("❌ 북마크 삭제 실패:", error);
+      setAlertMessage("북마크 삭제에 실패했습니다.");
+      setAlertVariant("danger");
+    }
+  };
+  const handleDeleteBookmarkPortfolio = async (id) => {
+    try {
+      await deleteBookmarkPortfolioOne(id); // 서버에서 삭제 요청
+      setPortfoiloBookmarkList((prevList) =>
+        prevList.filter((portfolio) => portfolio.id !== id) // UI에서 즉시 반영
+      );
+      setAlertMessage("북마크가 삭제되었습니다.");
+      setAlertVariant("success");
+    } catch (error) {
+      console.error("❌ 북마크 삭제 실패:", error);
+      setAlertMessage("북마크 삭제에 실패했습니다.");
+      setAlertVariant("danger");
+    }
+  };
   useEffect(() => {
     // ✅ 유저 정보 가져오기
     authApi.getAuthenticatedUser(1)
@@ -46,6 +96,7 @@ const MyPageTotalInfo = () => {
 
     // ✅ 북마크 프로젝트 목록 가져오기
     handleBookmarkProjectList();
+    handleBookmarkPortfolioList();
   }, []);
 
   return (
@@ -62,10 +113,10 @@ const MyPageTotalInfo = () => {
         <Col md={6}>{user && <UserInfoCard user={user} />}</Col>
         <Col md={6}>
           <DashboardCard
-            projectCount={3}
-            alarmCount={portfolioNotifications.length}
-            projectLabel="신청 프로젝트 목록"
-            alarmLabel="내 포트폴리오 목록"
+            projectList={projectBookmarkList} // ✅ 데이터 전달 (수정된 projectList)
+            onDeleteBookmarkProjectList={handleDeleteBookmarkProject}
+            portfolioList={portfolioBookmarkList}
+            onDeleteBookmarkPortfolioList={handleDeleteBookmarkPortfolio}
           />
         </Col>
       </Row>
@@ -102,8 +153,8 @@ const MyPageTotalInfo = () => {
       <Row>
         <Col md={12}>
           <NotificationCard
-            projectBookmarkList={projectBookmarkList} // ✅ 수정된 변수명
-            portfolioNotifications={portfolioNotifications}
+            projectBookmarkList={projectBookmarkList}
+            portfolioNotifications={[]}
           />
         </Col>
       </Row>

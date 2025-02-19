@@ -47,7 +47,9 @@ export const postBookmarkProjectAdd = async (bookmarkProjectObj) => {
 // 삭제 api를 호출하는 비동기 통신 메서드
 export const deleteBookmarkProjectOne = async (id) => {
 
-	const res = await axios.delete(`${projectPrefix}/${id}`)
+	const res = await axios.delete(`${projectPrefix}/${id}`,{
+		withCredentials: true // ✅ 쿠키 포함 설정
+	})
 
 	return res.data
 }
@@ -55,5 +57,27 @@ export const deleteBookmarkProjectOne = async (id) => {
 // 삭제 api를 호출하는 비동기 통신 메서드
 export const checkBookmarkProject = async (bookmarkParam) => {
 	const res = await axios.post(`${projectPrefix}/check`, bookmarkParam)
+	return res.data
+}
+
+export const getUserBookmarkPortfolioList = async () => {
+    try {
+        const res = await axios.get(`${portfolioPrefix}/user/list`, {
+            withCredentials: true // ✅ 쿠키 포함 설정
+        });
+        console.log(res);
+        return res.data;
+    } catch (error) {
+        console.log("유저의 전체 북마크 조회 실패", error);
+        throw error;
+    }
+};
+
+export const deleteBookmarkPortfolioOne = async (id) => {
+
+	const res = await axios.delete(`${portfolioPrefix}/${id}`,{
+		withCredentials: true // ✅ 쿠키 포함 설정
+	})
+
 	return res.data
 }

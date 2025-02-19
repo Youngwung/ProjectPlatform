@@ -3,6 +3,7 @@ package com.ppp.backend.service.bookmark;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -58,8 +59,27 @@ public class BookmarkProjectService {
 		return pageResponseDTO;
 	}
 
-	public Long delete(Long id) {
-		return null;
+	public boolean deleteByUser(Long id, Long userId) {
+		log.info("deleteByUser() - userId: {}, bookmarkId: {}", userId, id);
+
+		Optional<BookmarkProject> bookmarkOptional = bookmarkProjectRepo.findById(id);
+
+		if (bookmarkOptional.isEmpty()) {
+			log.warn("⚠️ 삭제할 북마크(ID: {})가 존재하지 않습니다.", id);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "삭제할 북마크가 존재하지 않습니다.");
+		}
+
+		BookmarkProject bookmark = bookmarkOptional.get();
+
+		// ✅ BookmarkProject 엔티티에 getUserId() 메서드가 있는지 확인 후 추가 필요
+		if (!bookmark.getUser().getId().equals(userId)) {
+			log.warn("⛔ 삭제 권한 없음 - userId: {}, bookmarkUserId: {}", userId, bookmark.getUser().getId());
+			return false; // 403 Forbidden 응답을 위해 false 반환
+		}
+
+		bookmarkProjectRepo.deleteById(id);
+		log.info("✅ 북마크 삭제 완료 - bookmarkId: {}", id);
+		return true;
 	}
 
 	/**

@@ -79,11 +79,34 @@ public class BookmarkProjectController {
 	}
 
 	@DeleteMapping("/{id}")
-	public Map<String, String> remove(@PathVariable("id") Long id) {
-		Long result = bookmarkProjectService.delete(id);
-		log.info("remove() delete = {}", result);
-		return Map.of("RESULT", "SUCCESS");
+	public ResponseEntity<Map<String, String>> remove(@PathVariable("id") Long id, HttpServletRequest request) {
+		// 요청 헤더에서 userId 추출
+		Long userId = authApiController.extractUserIdFromCookie(request);
+
+		if (userId == null) {
+			log.error("❌ 쿠키에서 userId를 가져오지 못했습니다.");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("ERROR", "로그인이 필요합니다."));
+		}
+
+		log.info("remove() - userId: {}, bookmarkId: {}", userId, id);
+
+		try {
+			// 북마크 삭제 서비스 호출
+			boolean isDeleted = bookmarkProjectService.deleteByUser(id, userId);
+
+			if (isDeleted) {
+				log.info("✅ 북마크 삭제 성공 - userId: {}, bookmarkId: {}", userId, id);
+				return ResponseEntity.ok(Map.of("RESULT", "SUCCESS"));
+			} else {
+				log.warn("⛔ 삭제 권한 없음 - userId: {}, bookmarkId: {}", userId, id);
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("ERROR", "해당 북마크를 삭제할 권한이 없습니다."));
+			}
+		} catch (Exception e) {
+			log.error("❌ 북마크 삭제 중 오류 발생", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("ERROR", "삭제 중 오류가 발생했습니다."));
+		}
 	}
+
 
 	@PostMapping("/check")
 	public ResponseEntity<Long> getMethodName(@RequestBody BookmarkProjectDto	dto) {

@@ -5,7 +5,7 @@ import authApi from "../../api/authApi"
 import {useNavigate} from "react-router-dom";
 
 
-
+//TODO link입력폼 없애고조회할때 유저의 링크를 받아오기
 const CreatePortfolio = () => {
     const navigate = useNavigate();
     const [title, setTitle] = useState("");

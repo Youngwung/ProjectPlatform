@@ -1,37 +1,26 @@
 package com.ppp.backend.service;
 
-import com.ppp.backend.domain.Provider;
-import com.ppp.backend.domain.User;
+import com.ppp.backend.domain.*;
+import com.ppp.backend.dto.LinkDto;
 import com.ppp.backend.dto.UserDto;
 import com.ppp.backend.repository.ProviderRepository;
 import com.ppp.backend.repository.UserRepository;
-
-import lombok.RequiredArgsConstructor;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import com.ppp.backend.domain.Provider;
-import com.ppp.backend.domain.Skill;
-import com.ppp.backend.domain.SkillLevel;
-import com.ppp.backend.domain.User;
-import com.ppp.backend.domain.UserSkill;
-import com.ppp.backend.dto.UserDto;
-import com.ppp.backend.repository.ProviderRepository;
 import com.ppp.backend.repository.SkillLevelRepository;
 import com.ppp.backend.repository.SkillRepository;
-import com.ppp.backend.repository.UserRepository;
 import com.ppp.backend.repository.UserSkillRepository;
-
+import com.ppp.backend.util.JwtUtil;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -41,6 +30,8 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
     private final UserRepository userRepository;
     private final ProviderRepository providerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final LinkService linkService;
+    private final JwtUtil jwtUtil;
 
     public UserService(
             UserSkillRepository repository,
@@ -48,170 +39,229 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
             SkillLevelRepository skillLevelRepo,
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            ProviderRepository providerRepository) {
+            ProviderRepository providerRepository,
+            LinkService linkService,
+            JwtUtil jwtUtil) {
         super(repository, skillRepo, skillLevelRepo);
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.providerRepository = providerRepository;
-    }
-
-    // TOOOOOOODo login boolean형으로 바꾸기 그리고 패스워드 엔코딩 해슁 매칭 확인해서 로그인까지
-
-    public boolean login(String email, String password) {
-        // 1️⃣ 이메일로 사용자 조회
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        // 2️⃣ 사용자 존재 여부 확인
-        if (optionalUser.isEmpty()) {
-            return false; // 로그인 실패 (이메일 없음)
-        }
-        User user = optionalUser.get();
-        // 3️⃣ 비밀번호 검증 (암호화된 비밀번호 비교)
-        return passwordEncoder.matches(password, user.getPassword()); // 성공
-    }
-
-    public List<UserDto> getAllUsers() {
-        List<UserDto> dtos = userRepository.findAll().stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-
-        // dto에 스킬을 초기화하는 로직 추가
-        dtos.forEach(dto -> {
-            dto.setSkills(getSkill(dto.getId()));
-        });
-        return dtos;
-    }
-
-    /**
-     * 사용자 정보를 생성하는 메서드입니다.
-     * 
-     * @param userDto 클라이언트로부터 전달받은 사용자 정보(DTO)
-     * @return 저장된 사용자 정보를 DTO로 반환
-     */
-
-    // 소셜로그인하면 거기서 요청할수있는 데이터 를 가져와서 만들어줬음 바로
-    // 마이페이지로 리다이렉트 바로시켜주고
-    // 기본데이터를 입력해야만 사이트 이용하게 했음.
-
-    public UserDto createUser(UserDto userDto) {
-        Provider provider = providerRepository.findById(userDto.getProviderId()).orElseThrow();
-        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
-        User user = User.builder()
-                .name(userDto.getName())
-                .email(userDto.getEmail())
-                .password(encodedPassword)
-                .phoneNumber(userDto.getPhoneNumber())
-                .experience(userDto.getExperience())
-                .password(encodedPassword)
-                .provider(provider)
-                .build();
-        // ------------------ 스킬 관련 로직 구현 부분
-        // 스킬 유효성 검사
-        boolean existingSkill = existingSkill(userDto.getSkills());
-        if (!existingSkill) {
-            // DB에 존재하지 않는 기술일 때 null 리턴
-            return null;
-        }
-
-        // 변환한 User 엔티티를 데이터베이스에 저장합니다.
-
-        log.info("user data={}", user);
-        User savedUser = userRepository.save(user);
-
-        // 유저 스킬 저장 메서드 호출
-        saveParentEntity(userDto, savedUser);
-        // 저장된 User 엔티티를 다시 DTO로 변환하여 반환합니다.
-        return convertToDto(savedUser);
-    }
-
-    /**
-     * 사용자 ID로 사용자 정보를 조회하는 메서드입니다.
-     * 
-     * @param id 사용자 ID
-     * @return 조회된 사용자 정보를 DTO로 반환
-     */
-    public UserDto getUserById(Long id) {
-        // ID로 User 엔티티를 조회합니다. 존재하지 않으면 예외를 발생시킵니다.
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-
-        // ----------- 스킬 관련 로직 추가
-        String skill = getSkill(id);
-        UserDto dto = convertToDto(user);
-        dto.setSkills(skill);
-        return dto;
-    }
-
-    public Boolean isNotNullUserEmail(String email) {
-        return userRepository.existsByEmail(email);
-    }
-
-    /**
-     * 사용자 정보를 업데이트하는 메서드입니다.
-     * 
-     * @param userDto 업데이트할 정보가 담긴 DTO (ID가 반드시 포함되어야 합니다.)
-     * @return 업데이트된 사용자 정보를 DTO로 반환
-     */
-    public UserDto updateUser(UserDto userDto) {
-        User existingUser = userRepository.findById(userDto.getId())
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userDto.getId()));
-        existingUser.setName(userDto.getName());
-        existingUser.setEmail(userDto.getEmail());
-        existingUser.setPhoneNumber(userDto.getPhoneNumber());
-        existingUser.setExperience(userDto.getExperience());
-
-        User updatedUser = userRepository.save(existingUser);
-
-        // 유저 스킬 업데이트 메서드 호출
-        modifySkill(userDto.getId(), userDto, existingUser);
-        return convertToDto(updatedUser);
-    }
-
-    /**
-     * 사용자 정보를 삭제하는 메서드입니다.
-     * 
-     * @param id 삭제할 사용자의 ID
-     */
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
-    }
-
-    /**
-     * User 엔티티를 UserDto로 변환하는 헬퍼 메서드입니다.
-     * 
-     * @param user 변환할 User 엔티티
-     * @return 변환된 UserDto
-     */
-    private UserDto convertToDto(User user) {
-        return UserDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .password(user.getPassword())
-                .email(user.getEmail())
-                .phoneNumber(user.getPhoneNumber())
-                .experience(user.getExperience())
-                // TODO skills 연동 필요
-                .skills(null)
-                .build();
+        this.linkService = linkService;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
     UserSkill createSkillInstance(Long id, User parentEntity, Skill skill, SkillLevel skillLevel) {
         return UserSkill.builder()
                 .id(id)
+                .user(parentEntity)
                 .skill(skill)
                 .skillLevel(skillLevel)
-                .user(parentEntity)
                 .build();
     }
-    public String findUserNameByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .map(User::getName) // ✅ User 객체에서 name 필드만 가져옴
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+    /** ✅ 회원 가입 */
+    public UserDto createUser(UserDto userDto) {
+        log.info("📝 회원 가입 요청: {}", userDto.getEmail());
+
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        }
+
+        // ✅ 비밀번호 검증 (최소 6자)
+        if (userDto.getPassword() == null || userDto.getPassword().length() < 6) {
+            throw new IllegalArgumentException("비밀번호는 최소 6자 이상이어야 합니다.");
+        }
+
+        // ✅ 비밀번호 암호화 후 저장
+        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
+
+        Provider provider = providerRepository.findById(userDto.getProviderId())
+                .orElseThrow(() -> new RuntimeException("Provider를 찾을 수 없습니다."));
+
+        User user = User.builder()
+                .name(userDto.getName())
+                .email(userDto.getEmail())
+                .password(encodedPassword)
+                .phoneNumber(userDto.getPhoneNumber())
+                .experience(userDto.getExperience())
+                .provider(provider)
+                .build();
+
+        log.info("✅ 사용자 생성 완료: {}", user);
+        User savedUser = userRepository.save(user);
+
+        return convertToDto(savedUser);
     }
 
-    public User findByEmail(String email) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        return userOptional.orElse(null); // 사용자가 없으면 null 반환
+    public ResponseEntity<Map<String, Object>> login(String email, String password) {
+        log.info("🔑 로그인 시도: {}", email);
+
+        // ✅ 이메일 검증
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "존재하지 않는 이메일입니다."));
+        }
+
+        User user = optionalUser.get();
+
+        // ✅ 비밀번호 검증
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "비밀번호가 올바르지 않습니다."));
+        }
+
+        // ✅ JWT 발급 (예외 처리 추가)
+        String token;
+        try {
+            token = jwtUtil.generateToken(user.getId(), user.getEmail());
+        } catch (Exception e) {
+            log.error("🚨 JWT 생성 실패: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "JWT 생성 중 오류가 발생했습니다."));
+        }
+
+        // ✅ 응답 데이터 구성
+        Map<String, Object> response = Map.of(
+                "message", "로그인 성공",
+                "accessToken", token,
+                "userId", user.getId(),
+                "email", user.getEmail()
+        );
+
+        return ResponseEntity.ok(response);
     }
+
+
+    /** ✅ 이메일 존재 여부 확인 */
+    public boolean isEmailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    /**
+     * ✅ 전체 사용자 조회
+     */
+    public List<UserDto> getAllUsers() {
+        log.info("📋 전체 사용자 목록 조회");
+
+        return userRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    public UserDto getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다. id=" + id)); // ✅ 404 처리
+
+        UserDto dto = convertToDto(user);
+        dto.setProviderName(user.getProvider().getName());
+        dto.setPassword(user.getPassword());
+        // ✅ 사용자의 링크 조회 후 DTO에 세팅
+        List<LinkDto> userLinks = linkService.getUserLinks(user.getId());
+        dto.setLinks(userLinks);
+
+        return dto;
+    }
+
+
+
+    /** ✅ 사용자 정보 수정 (전화번호, 링크, 기술 스택 등) */
+    public UserDto updateUserInfo(Long userId, UserDto updatedUser) {
+        log.info("🔄 사용자 정보 수정 요청: userId={}, updatedUser={}", userId, updatedUser);
+
+        if (userId == null) {
+            throw new IllegalArgumentException("사용자 ID가 필요합니다.");
+        }
+
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
+
+        log.info("✅ 기존 사용자 정보 확인: {}", existingUser);
+
+        existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
+        existingUser.setExperience(updatedUser.getExperience());
+
+        if (updatedUser.getLinks() == null) {
+            updatedUser.setLinks(linkService.getUserLinks(userId)); // 기존 링크 유지
+        } else {
+            linkService.updateUserLinks(userId, updatedUser.getLinks());
+        }
+        log.info("📌 업데이트 요청된 링크 목록: {}", updatedUser.getLinks());
+
+        User savedUser = userRepository.save(existingUser);
+        log.info("✅ 사용자 정보 수정 완료: {}", savedUser);
+
+        return convertToDto(savedUser);
+    }
+    public boolean verifyPassword(Long userId, String password) {
+        if (password == null || password.trim().isEmpty()) {
+            throw new IllegalArgumentException("전달된 비밀번호 값이 null이거나 비어있습니다.");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다. id=" + userId));
+        log.info("{},{}",password,user.getPassword());
+        return passwordEncoder.matches(password, user.getPassword());
+    }
+
+
+
+    /** ✅ 사용자 비밀번호 변경 */
+    public void updatePassword(Long userId, String nowPassword, String newPassword) {
+        log.info("🔑 비밀번호 변경 요청: userId={}", userId);
+
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            throw new IllegalArgumentException("새 비밀번호는 비워둘 수 없습니다.");
+        }
+
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. userId=" + userId));
+
+        if (!passwordEncoder.matches(nowPassword, existingUser.getPassword())) {
+            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        existingUser.setPassword(encodedPassword);
+        userRepository.save(existingUser);
+
+        log.info("✅ 비밀번호 변경 완료: userId={}", userId);
+    }
+
+    /** ✅ 사용자 삭제 */
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    /** ✅ User → UserDto 변환 */
+    private UserDto convertToDto(User user) {
+        return UserDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .experience(user.getExperience())
+                .links(linkService.getUserLinks(user.getId()))
+                .build();
+    }
+
+    public UserDto updateUserExperience(Long userId, String experience) {
+        // 🔹 1. 사용자 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다. id=" + userId));
+
+        // 🔹 2. 기존 경험치 업데이트
+        log.info("✅ 기존 경험치 업데이트: userId={}, 기존 경험치={}, 새로운 경험치={}",
+                userId, user.getExperience(), experience);
+        user.setExperience(experience);
+
+        // 🔹 3. 저장 및 응답 반환
+        User updatedUser = userRepository.save(user);
+        log.info("✅ 경험치 업데이트 완료: userId={}, experience={}", userId, updatedUser.getExperience());
+
+        return convertToDto(updatedUser);
+    }
+
+
 }

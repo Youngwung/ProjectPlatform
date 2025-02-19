@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.ppp.backend.dto.UserDto;
 import com.ppp.backend.service.UserService;
@@ -28,9 +29,15 @@ public class UserApiController {
 
     @GetMapping("/list/{id}")
     public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
-        UserDto userDto = userService.getUserById(id);
-        return ResponseEntity.ok(userDto);
+        try {
+            UserDto userDto = userService.getUserById(id);
+            return ResponseEntity.ok(userDto);
+        } catch (ResponseStatusException e) {
+            log.error("유저 조회 실패: {}", e.getMessage());
+            return ResponseEntity.status(e.getStatusCode()).body(null);
+        }
     }
+
 
     @PostMapping("/create")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
@@ -40,19 +47,9 @@ public class UserApiController {
         return ResponseEntity.ok(userDtoCreated);
     }
 
-    @PutMapping("/list/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
-        // URL의 id와 DTO의 id가 일치하도록 설정합니다.
-        userDto.setId(id);
-        UserDto updatedUser = userService.updateUser(userDto);
-        return ResponseEntity.ok(updatedUser);
-    }
-
     @DeleteMapping("/list/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
-    // 만약 비밀번호 변경, 포트폴리오 관리 등 추가적인 기능이 필요하다면
-    // 별도의 엔드포인트를 추가할 수 있습니다.
 }

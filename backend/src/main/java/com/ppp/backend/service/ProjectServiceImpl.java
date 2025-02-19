@@ -268,5 +268,4 @@ public class ProjectServiceImpl extends
 				.skillLevel(skillLevel)
 				.build();
 	}
-
 }

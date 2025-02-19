@@ -1,7 +1,7 @@
 import React,{useRef} from 'react'
 import { Form, Button, Card,Container,Row,Col,InputGroup} from 'react-bootstrap'
 import userApi from '../api/userApi'
-
+import authApi from '../api/authApi'
 
 //TODO 아이디 찾기 오류 발생하여 수정해야함
 
@@ -38,7 +38,7 @@ const Signup = () => {
             return;
         }
         try {
-            const response = await userApi.checkEmail(email);
+            const response = await authApi.checkEmail(email);
             if (response) {
                 alert('중복된 이메일입니다.');
             } else {
@@ -58,25 +58,25 @@ const Signup = () => {
                         <Form onSubmit={handleSubmit}>
                             <Form.Group controlId="name">
                                 <Form.Label>이름</Form.Label>
-                                <Form.Control type="text" placeholder="이름을 입력해주세요" />
+                                <Form.Control type="text" placeholder="이름을 입력해주세요" required/>
                             </Form.Group>
 
                             <Form.Group controlId="email">
                                 <Form.Label>이메일</Form.Label>
                                 <InputGroup>
-                                    <Form.Control type="email" placeholder="이메일을 입11력해주세요" ref={emailRef}/>
+                                    <Form.Control type="email" placeholder="이메일을 입11력해주세요" ref={emailRef} required/>
                                     <Button variant="secondary" onClick={handleDuplicate}>중복확인</Button>
                                 </InputGroup>
                             </Form.Group>
 
                             <Form.Group controlId="password">
                                 <Form.Label>비밀번호</Form.Label>
-                                <Form.Control type="password" placeholder="비밀번호를 입력해주세요" />
+                                <Form.Control type="password" placeholder="비밀번호를 입력해주세요" required/>
                             </Form.Group>
 
                             <Form.Group controlId="confirmPassword">
                                 <Form.Label>비밀번호 확인</Form.Label>
-                                <Form.Control type="password" placeholder="비밀번호를 확인해주세요" />
+                                <Form.Control type="password" placeholder="비밀번호를 확인해주세요" required/>
                             </Form.Group>
 
                             <Form.Group controlId="phoneNumber">
@@ -84,10 +84,14 @@ const Signup = () => {
                                 <Form.Control type="text" placeholder="전화번호를 입력해주세요" />
                             </Form.Group>
                             
-                            <Form.Group controlId='experience'>
+                            <Form.Group controlId="experience">
                                 <Form.Label>경력</Form.Label>
-                                <Form.Control type='text' placeholder='경력을 입력해주세요' />
-                            </Form.Group>
+                                <Form.Control 
+                                    as="textarea"
+                                    rows={10}
+                                    placeholder="경력을 입력해주세요 미입력가능" 
+                                />
+                                </Form.Group>
                             <Form.Group controlId='skills'>
                                 <Form.Label>기술 스택</Form.Label>
                                 <Form.Control type='text' placeholder='스킬을 입력해주세요' />

@@ -8,8 +8,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -24,28 +28,55 @@ public class AuthApiController {
      * ✅ 로그인 API
      */
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserDto loginRequest, HttpServletResponse response) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody UserDto loginRequest, HttpServletResponse response) {
         log.info("🔑 로그인 요청: {}", loginRequest.getEmail());
 
-        String username = userService.findUserNameByEmail(loginRequest.getEmail());
-        if (username == null || !userService.login(loginRequest.getEmail(), loginRequest.getPassword())) {
-            return ResponseEntity.status(401).body("❌ 로그인 실패: 이메일 또는 비밀번호가 잘못되었습니다.");
+        // ✅ 로그인 검증 수행
+        ResponseEntity<Map<String, Object>> loginResponse = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
+
+        // 로그인 실패 시 클라이언트에 실패 응답 반환
+        if (loginResponse.getStatusCode() != HttpStatus.OK) {
+            return loginResponse;
         }
 
-        // ✅ JWT 생성 (userId & email 포함)
-        Long userId = userService.findByEmail(loginRequest.getEmail()).getId();
-        String jwt = jwtUtil.generateToken(userId, loginRequest.getEmail());
+        // ✅ 로그인 성공 시 JWT 발급 및 쿠키 설정
+        Map<String, Object> responseBody = loginResponse.getBody();
+        String jwt = (String) responseBody.get("accessToken");
+        Long userId = (Long) responseBody.get("userId");
 
-        // ✅ JWT를 HttpOnly 쿠키로 설정
         Cookie jwtCookie = new Cookie("accessToken", jwt);
         jwtCookie.setHttpOnly(true);
-        jwtCookie.setSecure(false);
+        jwtCookie.setSecure(false); // 개발 환경에서는 false, 운영 환경에서는 true 설정 필요
         jwtCookie.setPath("/");
         jwtCookie.setMaxAge(60 * 60 * 24); // 1일 유지
         response.addCookie(jwtCookie);
-        log.info("✅ 로그인 성공: {} (JWT 발급 완료)", username);
 
-        return ResponseEntity.ok("로그인 성공");
+        log.info("✅ 로그인 성공: userId={}, email={}", userId, loginRequest.getEmail());
+        return ResponseEntity.ok(responseBody);
+    }
+
+    /*
+     * ✅ 이메일 중복 확인 API
+     */
+    @PostMapping("/check-email")
+    public ResponseEntity<Map<String, Object>> checkEmail(@RequestBody UserDto userDto) {
+        log.info("📧 이메일 중복 확인 요청: {}", userDto.getEmail());
+
+        // ✅ 이메일이 null이거나 공백인지 확인
+        if (userDto.getEmail() == null || userDto.getEmail().trim().isEmpty()) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", true);
+            errorResponse.put("message", "이메일이 비어있습니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
+        boolean exists = userService.isEmailExists(userDto.getEmail());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("exists", exists);
+        response.put("message", exists ? "이미 사용 중인 이메일입니다." : "사용 가능한 이메일입니다.");
+
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -64,32 +95,133 @@ public class AuthApiController {
 
         return ResponseEntity.ok("로그아웃 성공");
     }
-
+    
     /**
      * ✅ 현재 로그인된 사용자 정보 반환
      */
     @GetMapping("/getAuthenticatedUser")
     public ResponseEntity<?> getAuthenticatedUser(HttpServletRequest request) {
-        // ✅ 쿠키에서 JWT 가져오기
+        Long userId = extractUserIdFromCookie(request);
+        if (userId == null) {
+            return ResponseEntity.status(401).body("인증되지 않은 사용자");
+        }
+
+        UserDto userDto = userService.getUserById(userId);
+        log.info("🔎 사용자 정보 조회 성공: userId={}, name={}, dto={}", userDto.getId(), userDto.getName(), userDto);
+
+        return ResponseEntity.ok(userDto);
+    }
+    /**
+     * ✅ 사용자 정보 수정 API
+     */
+    @PutMapping("/updateuser")
+    public ResponseEntity<?> updateUserInfo(@RequestBody UserDto updatedUser, HttpServletRequest request) {
+        System.out.println("업데이트 유저정보" + updatedUser);
+        Long userId = extractUserIdFromCookie(request);
+        if (userId == null) {
+            return ResponseEntity.status(401).body("인증되지 않은 사용자");
+        }
+        try {
+            updatedUser.setProviderId(4L); // TODO: 프로바이더 관련 로직 적용
+            UserDto updatedUserInfo = userService.updateUserInfo(userId, updatedUser);
+            log.info("✅ 사용자 정보 수정 완료: userId={}, {}", userId, updatedUser);
+            return ResponseEntity.ok(updatedUserInfo);
+        } catch (Exception e) {
+            log.error("❌ 사용자 정보 수정 실패: userId={}, 오류={}", userId, e.getMessage());
+            return ResponseEntity.status(500).body("사용자 정보 수정 중 오류가 발생했습니다.");
+        }
+    }
+    @PutMapping("/updatedExperience")
+    public ResponseEntity<?> updateExperience(
+            @RequestBody UserDto updatedUserExperience, // ✅ `id` 제거
+            HttpServletRequest request) {
+
+        log.info("🔄 사용자 경험치 업데이트 요청: experience={}", updatedUserExperience.getExperience());
+
+        // 🔹 1. JWT 쿠키에서 사용자 ID 추출
+        Long userId = extractUserIdFromCookie(request);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "인증되지 않은 사용자입니다."));
+        }
+
+        // 🔹 2. 경험치 업데이트
+        UserDto updatedUser = userService.updateUserExperience(userId, updatedUserExperience.getExperience()); // ✅ `UserDto` 대신 `experience` 값만 전달
+        log.info("✅ 경험치 업데이트 완료: userId={}, newExperience={}", userId, updatedUser.getExperience());
+
+        // 🔹 3. 업데이트된 사용자 정보 반환
+        return ResponseEntity.ok(updatedUser);
+    }
+    /**
+     * ✅ 비밀번호 검증 API
+     * 클라이언트에서 현재 비밀번호를 전송하면, 해당 비밀번호가 맞는지 검증합니다.
+     */
+    @PostMapping("/verify-password")
+    public ResponseEntity<?> verifyPassword(@RequestBody UserDto passwordRequest, HttpServletRequest request) {
+        // JWT 쿠키에서 userId 추출
+        Long userId = extractUserIdFromCookie(request);
+        if (userId == null) {
+            return ResponseEntity.status(401).body("인증되지 않은 사용자");
+        }
+        try {
+            // 전달받은 UserDto의 password 필드를 현재 비밀번호로 사용하여 검증
+            boolean isValid = userService.verifyPassword(userId, passwordRequest.getPassword());
+            return ResponseEntity.ok(isValid);
+        } catch (Exception e) {
+            // 에러 발생 시, 비밀번호 값이 null인지 여부 등 자세한 로그 기록 (비밀번호 원문은 민감 정보이므로 주의)
+            log.error("❌ 비밀번호 검증 실패: userId={}, 오류={}, passwordProvided={}",
+                    userId, e.getMessage(), passwordRequest.getPassword() != null ? "YES" : "NO");
+            return ResponseEntity.status(500).body("비밀번호 검증 중 오류가 발생했습니다.");
+        }
+    }
+
+    /**
+     * ✅ 비밀번호 변경 API
+     * 클라이언트에서 현재 비밀번호와 새 비밀번호를 보내면, JWT 쿠키에서 userId를 추출하여 비밀번호를 변경합니다.
+     */
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody UserDto passwordRequest, HttpServletRequest request) {
+        Long userId = extractUserIdFromCookie(request);
+        if (userId == null) {
+            return ResponseEntity.status(401).body("인증되지 않은 사용자");
+        }
+        try {
+            // passwordRequest.getPassword() -> 현재 비밀번호
+            // passwordRequest.getNewPassword() -> 새 비밀번호
+            userService.updatePassword(userId, passwordRequest.getPassword(), passwordRequest.getNewPassword());
+            log.info("✅ 비밀번호 변경 완료: userId={} (현재 비밀번호: {}, 새 비밀번호: {})",
+                    userId, passwordRequest.getPassword(), passwordRequest.getNewPassword());
+            return ResponseEntity.ok("비밀번호 변경 성공");
+        } catch (Exception e) {
+            log.error("❌ 비밀번호 변경 실패: userId={}, 오류={}", userId, e.getMessage());
+            return ResponseEntity.status(500).body("비밀번호 변경 중 오류가 발생했습니다.");
+        }
+    }
+
+
+    /**
+     * ✅ JWT 쿠키에서 userId 추출 메서드
+     * 쿠키 이름 "accessToken"에서 토큰을 가져와 jwtUtil로 검증 후 userId를 추출합니다.
+     */
+    public Long extractUserIdFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("accessToken".equals(cookie.getName())) {
                     String token = cookie.getValue();
-                    if (jwtUtil.validateToken(token)) {
-                        Long userId = jwtUtil.extractUserId(token);
-                        String email = jwtUtil.extractUsername(token);
-                        log.info("🔎 사용자 정보 조회 성공: userId={}, email={}", userId, email);
-
-                        // ✅ 사용자 정보 조회
-                        UserDto userDto = userService.getUserById(userId);
-                        return ResponseEntity.ok(userDto);
+                    try {
+                        if (jwtUtil.validateToken(token)) {
+                            return jwtUtil.extractUserId(token);
+                        }
+                    } catch (Exception e) {
+                        log.warn("🚨 JWT 검증 실패: {}", e.getMessage());
+                        return null;
                     }
                 }
             }
         }
-
-        log.warn("🚨 인증된 사용자 없음 (쿠키에 유효한 JWT 없음)");
-        return ResponseEntity.status(401).body("인증되지 않은 사용자");
+        log.warn("🚨 인증되지 않은 사용자 요청 (JWT 없음)");
+        return null;
     }
+
 }

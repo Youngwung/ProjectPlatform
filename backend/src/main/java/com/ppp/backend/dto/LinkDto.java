@@ -1,7 +1,9 @@
 package com.ppp.backend.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -11,6 +13,8 @@ import java.sql.Timestamp;
 @Setter
 @Builder
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class LinkDto {
     private Long id;
     private Long userId;

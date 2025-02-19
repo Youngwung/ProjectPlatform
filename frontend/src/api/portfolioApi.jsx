@@ -15,12 +15,13 @@ const portfolioApi = {
   getOne: async (id) => {
     try {
       const response = await axiosInstance.get(`/list/${id}`);
-      return response.data;
+      return { ...response.data }; // 기본 상태와 병합하여 반환
     } catch (error) {
       console.error("❌ 프로젝트 조회 실패:", error);
       throw error;
     }
   },
+  
 
   // 전체 프로젝트 조회
   getAllProjects: async () => {

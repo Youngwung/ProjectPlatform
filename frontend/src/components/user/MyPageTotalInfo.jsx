@@ -31,6 +31,7 @@ const MyPageTotalInfo = () => {
       // 📌 `projectTitle`을 기준으로 목록 업데이트
       const formattedProjects = data.map((item) => ({
         id: item.id,
+        projectId : item.projectId,
         title: item.projectTitle, // 프로젝트 제목으로 매핑
       }));
 
@@ -47,6 +48,7 @@ const MyPageTotalInfo = () => {
       console.log("✅ 북마크된 포폴 리스트:", data);
       const formattedPortfolios = data.map((item) => ({
         id: item.id,
+        portfolioId: item.portfolioId,
         title: item.portfolioTitle, // 프로젝트 제목으로 매핑
       }));
       setPortfoiloBookmarkList(formattedPortfolios)
@@ -113,9 +115,9 @@ const MyPageTotalInfo = () => {
         <Col md={6}>{user && <UserInfoCard user={user} />}</Col>
         <Col md={6}>
           <DashboardCard
-            projectList={projectBookmarkList} // ✅ 데이터 전달 (수정된 projectList)
+            bookmarkProjectList={projectBookmarkList} // ✅ 데이터 전달 (수정된 projectList)
             onDeleteBookmarkProjectList={handleDeleteBookmarkProject}
-            portfolioList={portfolioBookmarkList}
+            bookmarkPortfolioList={portfolioBookmarkList}
             onDeleteBookmarkPortfolioList={handleDeleteBookmarkPortfolio}
           />
         </Col>

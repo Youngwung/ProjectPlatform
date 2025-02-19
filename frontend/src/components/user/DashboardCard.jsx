@@ -4,10 +4,10 @@ import { FaClipboardList } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 /**
- * @param {array} projectList - 신청한 프로젝트 목록
- * @param {array} portfolioList - 내 포트폴리오 목록
+ * @param {array} bookmarkProjectList - 신청한 프로젝트 목록
+ * @param {array} bookmarkPortfolioList - 내 포트폴리오 목록
  */
-const DashboardCard = ({ projectList = [], portfolioList = [],onDeleteBookmarkProjectList,onDeleteBookmarkPortfolioList}) => {
+const DashboardCard = ({ bookmarkProjectList = [], bookmarkPortfolioList = [],onDeleteBookmarkProjectList,onDeleteBookmarkPortfolioList}) => {
   const [activeTab, setActiveTab] = useState("projects");
   const navigate = useNavigate()
   return (
@@ -24,27 +24,27 @@ const DashboardCard = ({ projectList = [], portfolioList = [],onDeleteBookmarkPr
                  title={
                         <>
                            북마크 프로젝트 목록{" "}
-                           <Badge bg="primary">{projectList.length}</Badge>
+                           <Badge bg="primary">{bookmarkProjectList.length}</Badge>
                         </>
                     }
             >
-              {projectList.length === 0 ? (
+              {bookmarkProjectList.length === 0 ? (
                 <p>북마크한 프로젝트가 없습니다.</p>
               ) : (
                 <ListGroup>
-                  {projectList.map((project) => (
+                  {bookmarkProjectList.map((bookmark) => (
                     <ListGroup.Item 
-                      key={project.id} 
+                      key={bookmark.id} 
                       className="d-flex justify-content-between"
                       style={{ cursor: "pointer" }}
-                      onClick={()=> navigate(`/project/read/${project.id}`)}
+                      onClick={()=> navigate(`/project/read/${bookmark.projectId}`)}
                     >
-                      <span>{project.title}</span>
+                      <span>{bookmark.title}</span>
                       <Button 
                         variant="danger" 
                         size="sm" 
                         onClick={(e) => {
-                          onDeleteBookmarkProjectList(project.id)
+                          onDeleteBookmarkProjectList(bookmark.id)
                           e.stopPropagation()
                           }}
                       >
@@ -60,27 +60,27 @@ const DashboardCard = ({ projectList = [], portfolioList = [],onDeleteBookmarkPr
                 title={
                     <>
                         북마크 포트폴리오 목록{" "}
-                        <Badge bg="primary">{portfolioList.length}</Badge>
+                        <Badge bg="primary">{bookmarkPortfolioList.length}</Badge>
                     </>
                 }
             >
-              {portfolioList.length === 0 ? (
+              {bookmarkPortfolioList.length === 0 ? (
                 <p>북마크한 포트폴리오가 없습니다.</p>
               ) : (
                 <ListGroup>
-                  {portfolioList.map((portfolio) => (
+                  {bookmarkPortfolioList.map((bookmark) => (
                     <ListGroup.Item
-                      key={portfolio.id}
+                      key={bookmark.id}
                       className="d-flex justify-content-between"
-                      onClick={()=> navigate(`/portfolio/list/${portfolio.id}`)}
+                      onClick={()=> navigate(`/portfolio/list/${bookmark.id}`)}
                       style={{ cursor: "pointer" }}
                     >
-                      <span>{portfolio.title}</span>
+                      <span>{bookmark.title}</span>
                       <Button 
                         variant="danger"
                         size="sm" 
                         onClick={(e) => {
-                          onDeleteBookmarkPortfolioList(portfolio.id)
+                          onDeleteBookmarkPortfolioList(bookmark.id)
                           e.stopPropagation()
                           }}
                         >

@@ -43,12 +43,6 @@ public class BookmarkProjectServiceTest {
 	}
 
 	// @Test
-	public void deleteTest() {
-		Long result = bookmarkProjectService.delete(3L);
-		log.info("result = {}", result);
-	}
-
-	// @Test
 	// @Transactional
 	public void getListTest() {
 		PageResponseDTO<BookmarkProjectDto> list = bookmarkProjectService.getList(PageRequestDTO.builder().build());

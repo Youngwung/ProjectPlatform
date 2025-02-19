@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.ppp.backend.domain.Project;
 import com.ppp.backend.domain.User;
@@ -23,7 +24,6 @@ import com.ppp.backend.repository.bookmark.BookmarkProjectRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -124,7 +124,7 @@ public class BookmarkProjectService {
 		List<BookmarkProject> bookmarkProjects = bookmarkProjectRepo.findByUserId(userId);
 
 		if (bookmarkProjects.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자의 북마크 프로젝트가 없습니다. userId=" + userId);
+			return List.of();
 		}
 
 		return bookmarkProjects.stream()

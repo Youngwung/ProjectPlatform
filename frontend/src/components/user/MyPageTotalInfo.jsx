@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Alert } from "react-bootstrap";
 import authApi from "../../api/authApi";
+import { getUserBookmarkProjectList } from "../../api/bookmarkProjectApi";
 
 import UserInfoCard from "./UserInfoCard";
 import DashboardCard from "./DashboardCard";
@@ -14,51 +15,37 @@ const MyPageTotalInfo = () => {
   const [alertVariant, setAlertVariant] = useState("success");
 
   // 프로젝트 & 포트폴리오 알림
-  const [projectNotifications, setProjectNotifications] = useState([
-    //TODO api로 요청
-    { id: 1, message: "프로젝트 A가 승인되었습니다." },
-    { id: 2, message: "새 프로젝트 신청이 접수되었습니다." },
-  ]);
-
+  const [projectBookmarkList, setProjectBookmarkList] = useState([]);
+  const [portfolioBookmarkList, setPortfoiloProjectBookmarkList] = useState([]);
   const [portfolioNotifications, setPortfolioNotifications] = useState([
-    //TODO api로 요청
     { id: 3, message: "새 포트폴리오가 등록되었습니다." },
     { id: 4, message: "포트폴리오 수정이 완료되었습니다." },
   ]);
-  
-  const handleSaveExperience = (newExperience) => {
-    // ✅ 1️⃣ 기존 user 상태에서 experience 업데이트
-    setUser((prevUser) => ({
-        ...prevUser,
-        experience: newExperience,
-    }));
 
-    // ✅ 2️⃣ 디버깅용 콘솔 로그 추가 (보내는 데이터 확인)
-    console.log("📌 서버로 전송할 데이터:", {
-        experience: newExperience, // ✅ id 제거
-    });
-
-    // ✅ 3️⃣ API 요청 실행 (id 제거)
-    authApi.updateUserExperience({ experience: newExperience }) 
-        .then(() => {
-            setAlertMessage("경력이 성공적으로 업데이트되었습니다.");
-            setAlertVariant("success");
-        })
-        .catch((error) => {
-            console.error("❌ 경력 업데이트 실패:", error);
-            setAlertMessage("경력 업데이트에 실패했습니다.");
-            setAlertVariant("danger");
-        });
+  // ✅ 북마크 프로젝트 목록 가져오는 함수
+  const handleBookmarkProjectList = async () => {
+    try {
+      const data = await getUserBookmarkProjectList(); // API 호출
+      console.log("✅ 북마크된 프로젝트 리스트:", data);
+      setProjectBookmarkList(data); // 상태 업데이트
+    } catch (error) {
+      console.error("❌ 북마크된 프로젝트 목록을 가져오는 데 실패했습니다:", error);
+      setAlertMessage("북마크된 프로젝트를 불러오는데 실패했습니다.");
+      setAlertVariant("danger");
+    }
   };
 
-
   useEffect(() => {
+    // ✅ 유저 정보 가져오기
     authApi.getAuthenticatedUser(1)
       .then((data) => {
         console.log("✅ 부모 컴포넌트에서 받은 user 값:", data);
         setUser(data);
       })
       .catch(() => setAlertMessage("유저 정보를 불러오는데 실패했습니다."));
+
+    // ✅ 북마크 프로젝트 목록 가져오기
+    handleBookmarkProjectList();
   }, []);
 
   return (
@@ -72,9 +59,7 @@ const MyPageTotalInfo = () => {
 
       {/* 유저 정보 & 대시보드 */}
       <Row className="mb-4">
-        <Col md={6}>
-          {user && <UserInfoCard user={user} />}
-        </Col>
+        <Col md={6}>{user && <UserInfoCard user={user} />}</Col>
         <Col md={6}>
           <DashboardCard
             projectCount={3}
@@ -84,13 +69,32 @@ const MyPageTotalInfo = () => {
           />
         </Col>
       </Row>
-      {/* onSaveExperience is not a function */}
+
       {/* 경력 정보 */}
       <Row className="mb-4">
         <Col md={12}>
-          {user && 
-            <ExperienceCard experience={user.experience}
-                            onSaveExperience={handleSaveExperience} />}
+          {user && (
+            <ExperienceCard
+              experience={user.experience}
+              onSaveExperience={(newExperience) => {
+                setUser((prevUser) => ({
+                  ...prevUser,
+                  experience: newExperience,
+                }));
+
+                authApi.updateUserExperience({ experience: newExperience })
+                  .then(() => {
+                    setAlertMessage("경력이 성공적으로 업데이트되었습니다.");
+                    setAlertVariant("success");
+                  })
+                  .catch((error) => {
+                    console.error("❌ 경력 업데이트 실패:", error);
+                    setAlertMessage("경력 업데이트에 실패했습니다.");
+                    setAlertVariant("danger");
+                  });
+              }}
+            />
+          )}
         </Col>
       </Row>
 
@@ -98,7 +102,7 @@ const MyPageTotalInfo = () => {
       <Row>
         <Col md={12}>
           <NotificationCard
-            projectNotifications={projectNotifications}
+            projectBookmarkList={projectBookmarkList} // ✅ 수정된 변수명
             portfolioNotifications={portfolioNotifications}
           />
         </Col>

@@ -98,7 +98,7 @@ public class BookmarkPortfolioService{
 			.id(entity.getId())
 			.portfolioId(entity.getPortfolio().getId())
 			.userId(entity.getUser().getId())
-			.createAt(entity.getCreatedAt().toLocalDateTime())
+			.createdAt(entity.getCreatedAt().toLocalDateTime())
 			.updatedAt(entity.getUpdatedAt().toLocalDateTime())
 		.build();
 	}

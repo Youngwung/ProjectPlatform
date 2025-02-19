@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.ppp.backend.domain.Project;
@@ -21,6 +22,7 @@ import com.ppp.backend.repository.bookmark.BookmarkProjectRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -57,11 +59,7 @@ public class BookmarkProjectService {
 	}
 
 	public Long delete(Long id) {
-		BookmarkProject result = bookmarkProjectRepo.findById(id).orElseThrow();
-		bookmarkProjectRepo.deleteById(id);
-
-		// 삭제된 아이디 리턴
-		return result.getId();
+		return null;
 	}
 
 	/**
@@ -98,8 +96,29 @@ public class BookmarkProjectService {
 			.id(entity.getId())
 			.projectId(entity.getProject().getId())
 			.userId(entity.getUser().getId())
-			.createAt(entity.getCreatedAt().toLocalDateTime())
+			.createdAt(entity.getCreatedAt().toLocalDateTime())
 			.updatedAt(entity.getUpdatedAt().toLocalDateTime())
 		.build();
 	}
+	public List<BookmarkProjectDto> getUserBookmarkList(Long userId) {
+		List<BookmarkProject> bookmarkProjects = bookmarkProjectRepo.findByUserId(userId);
+
+		if (bookmarkProjects.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자의 북마크 프로젝트가 없습니다. userId=" + userId);
+		}
+
+		return bookmarkProjects.stream()
+				.map(bookmark -> new BookmarkProjectDto(
+						bookmark.getId(),                        // 북마크 ID
+						bookmark.getUser().getId(),              // 사용자 ID
+						bookmark.getCreatedAt().toLocalDateTime(),                 // 생성일
+						bookmark.getUpdatedAt().toLocalDateTime(),                  // 수정일
+						bookmark.getProject().getId(),           // 프로젝트 ID
+						bookmark.getProject().getTitle()        // 프로젝트 제목
+				))
+				.collect(Collectors.toList());
+	}
+
+
+
 }

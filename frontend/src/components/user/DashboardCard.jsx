@@ -7,14 +7,13 @@ import { FaClipboardList} from "react-icons/fa";
  * @param {array} portfolioList - 내 포트폴리오 목록
  */
 const DashboardCard = ({ projectList = [], portfolioList = [] }) => {
-  // 현재 선택된 탭 (기본값: 프로젝트 목록)
   const [activeTab, setActiveTab] = useState("projects");
 
   return (
     <Card className="shadow-lg border-0 rounded-4 modern-card position-relative h-100">
       <Card.Body className="p-4 d-flex flex-column">
         <h5 className="fw-bold text-secondary mb-3">
-          <FaClipboardList className="me-2" /> 대시보드
+          <FaClipboardList className="me-2" /> 북마크
         </h5>
 
         {/* 스크롤이 가능한 콘텐츠 영역 */}

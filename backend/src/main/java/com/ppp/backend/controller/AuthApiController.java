@@ -111,7 +111,6 @@ public class AuthApiController {
 
         return ResponseEntity.ok(userDto);
     }
-
     /**
      * ✅ 사용자 정보 수정 API
      */
@@ -204,7 +203,7 @@ public class AuthApiController {
      * ✅ JWT 쿠키에서 userId 추출 메서드
      * 쿠키 이름 "accessToken"에서 토큰을 가져와 jwtUtil로 검증 후 userId를 추출합니다.
      */
-    private Long extractUserIdFromCookie(HttpServletRequest request) {
+    public Long extractUserIdFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {

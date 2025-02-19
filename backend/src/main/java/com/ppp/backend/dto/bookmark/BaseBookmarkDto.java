@@ -16,7 +16,7 @@ public abstract class BaseBookmarkDto {
 
 	private Long userId;
 
-	private LocalDateTime createAt;
+	private LocalDateTime createdAt;
 
 	private LocalDateTime updatedAt;
 }

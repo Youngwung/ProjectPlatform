@@ -20,7 +20,6 @@ public class UserApiController {
     // TODO: 응답 데이터 객체 말고 단순한 데이터로 변경
 
     private final UserService userService;
-
     @GetMapping("/list")
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> userList = userService.getAllUsers();

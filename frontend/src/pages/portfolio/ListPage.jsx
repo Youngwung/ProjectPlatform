@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Card, Col, Container, Row, Spinner, Alert} from "react-bootstrap";
-import { useOutletContext, useNavigate } from "react-router-dom";
-import { Pagination } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Alert, Card, Col, Container, Pagination, Row, Spinner } from "react-bootstrap";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import portfolioApi from "../../api/portfolioApi";
+import SkillTagComponent from "../../components/skill/SkillTagComponent";
 
 const ListPage = () => {
   const navigate = useNavigate();
@@ -61,6 +61,7 @@ const ListPage = () => {
         setError("데이터를 불러오는 중 오류가 발생했습니다.");
       } finally {
         setLoading(false);
+        console.log(portfolios);
       }
     };
 
@@ -110,7 +111,7 @@ const ListPage = () => {
                 </Card.Text>
                 <Card.Text>{portfolio.description}</Card.Text>
                 <Card.Text>
-                  <strong>기술스택:</strong> {portfolio.skills}
+                  <SkillTagComponent skills={portfolio.skills} />
                 </Card.Text>
                 <Card.Text>
                   {/* TODO 링크 user.id 로 link정보 가져오는 api호출 */}

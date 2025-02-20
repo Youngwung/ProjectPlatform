@@ -9,20 +9,6 @@ export const API_SERVER_HOST = 'http://localhost:8080'
 const projectPrefix = `${API_SERVER_HOST}/api/bookmark/project`
 const portfolioPrefix = `${API_SERVER_HOST}/api/bookmark/portfolio`
 
-export const getUserBookmarkProjectList = async () => {
-    try {
-        const res = await axios.get(`${projectPrefix}/user/list`, {
-            withCredentials: true // ✅ 쿠키 포함 설정
-        });
-        console.log(res);
-        return res.data;
-    } catch (error) {
-        console.log("유저의 전체 북마크 조회 실패", error);
-        throw error;
-    }
-};
-
-	
 // 페이징 처리된 글 목록을 가져오는 비동기 통신 메서드
 export const getBookmarkProjectList = async (pageParam) => {
 	
@@ -81,3 +67,18 @@ export const deleteBookmarkPortfolioOne = async (id) => {
 
 	return res.data
 }
+
+export const getUserBookmarkProjectList = async () => {
+    try {
+        const res = await axios.get(`${projectPrefix}/user/list`, {
+            withCredentials: true // ✅ 쿠키 포함 설정
+        });
+        console.log(res);
+        return res.data;
+    } catch (error) {
+        console.log("유저의 전체 북마크 조회 실패", error);
+        throw error;
+    }
+};
+
+	

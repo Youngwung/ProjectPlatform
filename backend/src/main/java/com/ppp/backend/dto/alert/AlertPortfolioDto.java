@@ -1,18 +1,20 @@
-package com.ppp.backend.dto;
+package com.ppp.backend.dto.alert;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.sql.Timestamp;
 
 @Getter
+@Setter
 @Builder
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class AlertPortfolioDto {
     private Long id;
     private Long portfolioId;
-    private Long skillId;
     private String status;
     private String content;
     private Timestamp createdAt;
-    private Timestamp updatedAt;
+    private boolean isRead;
 }

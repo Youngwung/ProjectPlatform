@@ -124,7 +124,12 @@ public class BookmarkProjectService {
 		List<BookmarkProject> bookmarkProjects = bookmarkProjectRepo.findByUserId(userId);
 
 		if (bookmarkProjects.isEmpty()) {
+<<<<<<< Updated upstream
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자의 북마크 프로젝트가 없습니다. userId=" + userId);
+=======
+			log.warn("북마크된 프젝이 없음 userid={} bookmarkproject={}", userId,bookmarkProjects);
+			return List.of();
+>>>>>>> Stashed changes
 		}
 
 		return bookmarkProjects.stream()

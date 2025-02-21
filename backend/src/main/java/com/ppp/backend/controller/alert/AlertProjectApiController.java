@@ -37,7 +37,18 @@ public class AlertProjectApiController {
         List<AlertProjectDto> unreadAlerts = alertProjectService.getUnreadProjectAlerts(request);
         return ResponseEntity.ok(unreadAlerts);
     }
+    @GetMapping("/{alertId}")
+    public ResponseEntity<AlertProjectDto> getProjectAlertById(@PathVariable Long alertId,HttpServletRequest request) {
+        log.info("✅ [GET] /api/alert/project/{} - 특정 프로젝트 알림 조회 요청", alertId);
+        AlertProjectDto alert = alertProjectService.getProjectAlertById(alertId,request);
 
+        if (alert == null) {
+            log.warn("🚨 [GET] 프로젝트 알림 조회 실패 - ID: {}", alertId);
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(alert);
+    }
     /**
      * 🔹 새로운 프로젝트 알림 생성 (DTO 기반)
      */
@@ -55,6 +66,11 @@ public class AlertProjectApiController {
     public ResponseEntity<Void> markProjectAlertAsRead(@PathVariable Long alertId) {
         log.info("✅ [PUT] /api/alert/project/{}/read - 알림 읽음 처리 요청", alertId);
         alertProjectService.markProjectAlertAsRead(alertId);
+        return ResponseEntity.ok().build();
+    }
+    @PutMapping("/all/read")
+    public ResponseEntity<Void> markAllProjectAlertsAsRead(HttpServletRequest request) {
+        alertProjectService.markAllProjectAlertsAsRead(request);
         return ResponseEntity.ok().build();
     }
 

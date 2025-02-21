@@ -6,6 +6,7 @@ import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import AlertPage from "../pages/AlertPage";
 import MyPageTotalInfo from "../components/user/MyPageTotalInfo";
+import AlertDetail from "../components/alert/AlertDetail";
 
 const Loading = () => <div>Loading....</div>; // JSX 요소로 변경
 const Layout = lazy(() => import("../layout/Layout"));
@@ -79,7 +80,23 @@ const root = createBrowserRouter([
                 <AlertPage/>
               </Suspense>
             )
-          }
+          },
+          {
+            path: "alert/project/:alertId",
+            element: (
+              <Suspense fallback={<Loading />}>
+                <AlertDetail isProject={true} />
+              </Suspense>
+            ),
+          },
+          {
+            path: "alert/portfolio/:alertId",
+            element: (
+              <Suspense fallback={<Loading />}>
+                <AlertDetail isProject={false} />
+              </Suspense>
+            ),
+          },
         ],
       },
       {

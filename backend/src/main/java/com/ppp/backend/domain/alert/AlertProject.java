@@ -28,17 +28,18 @@ public class AlertProject {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING) // ✅ Enum 값을 DB에 문자열로 저장
+    @Column(nullable = false)
     private Status status;
 
     @Column(length = 1000)
     private String content;
 
-    @CreationTimestamp // 🔥 생성 시 자동 저장 (CURRENT_TIMESTAMP)
-    @Column(updatable = false) // 생성 이후 변경되지 않도록 설정
+    @CreationTimestamp
+    @Column(updatable = false)
     private Timestamp createdAt;
 
-    @UpdateTimestamp // 🔥 업데이트 시 자동 변경 (ON UPDATE CURRENT_TIMESTAMP)
+    @UpdateTimestamp
     private Timestamp updatedAt;
 
     @Builder.Default
@@ -46,12 +47,12 @@ public class AlertProject {
     private boolean isRead = false;
 
     public enum Status {
-        초대, 접수, 불합격, 합격
+        신청,        // APPLIED
+        검토중,      // UNDER_REVIEW
+        합격,        // APPROVED
+        불합격       // REJECTED
     }
 
-    /**
-     * 알림을 읽음 처리하는 메서드
-     */
     public void markAsRead() {
         this.isRead = true;
     }

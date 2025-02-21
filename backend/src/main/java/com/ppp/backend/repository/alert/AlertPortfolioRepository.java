@@ -1,8 +1,11 @@
 package com.ppp.backend.repository.alert;
 
 import com.ppp.backend.domain.alert.AlertPortfolio;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,4 +24,9 @@ public interface AlertPortfolioRepository extends JpaRepository<AlertPortfolio, 
      */
     @Query("SELECT a FROM AlertPortfolio a WHERE a.user.id = :userId AND a.isRead = false ORDER BY a.createdAt DESC")
     List<AlertPortfolio> findByUserIdAndIsRead(Long userId, boolean isRead);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE AlertPortfolio a SET a.isRead = true WHERE a.portfolio.user.id = :userId")
+    int markAllAsReadByUserId(@Param("userId") Long userId);
 }

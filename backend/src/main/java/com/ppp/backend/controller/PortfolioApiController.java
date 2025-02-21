@@ -1,7 +1,5 @@
 package com.ppp.backend.controller;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,9 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ppp.backend.dto.PageRequestDTO;
+import com.ppp.backend.dto.PageResponseDTO;
 import com.ppp.backend.dto.PortfolioDto;
 import com.ppp.backend.security.CustomUserDetails;
 import com.ppp.backend.service.PortfolioService;
@@ -34,18 +33,12 @@ public class PortfolioApiController {
 
     // **1. 전체 프로젝트 조회 (GET)**
     @GetMapping("/list")
-    public ResponseEntity<List<PortfolioDto>> getAllPortfolios() {
-        List<PortfolioDto> projectList = portfolioService.getAllPortfolios();
+    public ResponseEntity<PageResponseDTO<PortfolioDto>> getAllPortfolios() {
+        PageResponseDTO<PortfolioDto> projectList = portfolioService.getAllPortfolios(PageRequestDTO.builder().build());
         log.info("프로젝트 전체조회 요청: {}", projectList);
         return ResponseEntity.ok(projectList);
     }
-    // **2. 검색어 기반 프로젝트 조회 (GET)**
-    @GetMapping("/search")
-    public List<PortfolioDto> searchPortfolios(@RequestParam String searchTerm) {
-        log.info("프로젝트 검색 요청: {}", searchTerm);
-        return portfolioService.searchPortfolios(searchTerm);
-    }
-
+    
     // **3. 프로젝트 상세 조회 (GET)**
     @GetMapping("/list/{id}")
     public PortfolioDto getPortfolioById(@PathVariable(name = "id") Long id) {
@@ -92,4 +85,11 @@ public class PortfolioApiController {
         portfolioService.deletePortfolio(id);
         return ResponseEntity.ok("프로젝트가 성공적으로 삭제되었습니다.");
     }
+
+    @GetMapping("/search")
+    public PageResponseDTO<PortfolioDto> getSearchResult(PageRequestDTO pageRequestDTO) {
+        log.info("Request = {}", pageRequestDTO);
+        return portfolioService.getSearchResult(pageRequestDTO);
+    }
+    
 }

@@ -56,12 +56,14 @@ export const deleteOne = async (projectId) => {
 
 // 검색 api를 호출하는 비동기 통신 메서드
 export const projectSearch = async (params) => {
-	const { page, size, query, querySkills } = params;
+	const { page, size, query, querySkills, type } = params;
 	let searchParams = new URLSearchParams();
 	searchParams.append("page", page);
 	searchParams.append("size", size);
 	searchParams.append("query", query);
-	if (querySkills) {
+	searchParams.append("type", type);
+	console.log(querySkills);
+	if (querySkills && querySkills.length > 0) {
 		querySkills.forEach((skill) => {
 			searchParams.append("querySkills", skill);
 		});

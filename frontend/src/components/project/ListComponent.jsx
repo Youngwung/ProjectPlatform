@@ -26,7 +26,8 @@ const initQueryData = {
 	page: 1,
 	size: 12,
 	query: "",
-	querySkills: []
+	querySkills: [],
+	type: "all"
 }
 
 export default function ListComponent() {
@@ -41,16 +42,18 @@ export default function ListComponent() {
 		const params = new URLSearchParams(location.search);
 		const query = params.get("query");
 		const querySkills = params.getAll("querySkills");
+		const type = params.get("type");
 		setQueryData({
 			page: page,
 			size: size,
 			query: query,
-			querySkills: querySkills
+			querySkills: querySkills,
+			type: type
 		})
 		if ((query || querySkills.length > 0)) {
 			// 검색 api 호출
 			console.log(querySkills);
-			projectSearch({ page, size, query, querySkills }).then((data) => {
+			projectSearch({ page, size, query, querySkills, type }).then((data) => {
 				setServerData(data);
 			});
 		} else {

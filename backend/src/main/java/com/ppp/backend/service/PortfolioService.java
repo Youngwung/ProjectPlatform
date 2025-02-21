@@ -3,6 +3,7 @@ package com.ppp.backend.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.ppp.backend.domain.Portfolio;
@@ -10,6 +11,8 @@ import com.ppp.backend.domain.Skill;
 import com.ppp.backend.domain.SkillLevel;
 import com.ppp.backend.domain.User;
 import com.ppp.backend.domain.UserSkill;
+import com.ppp.backend.dto.PageRequestDTO;
+import com.ppp.backend.dto.PageResponseDTO;
 import com.ppp.backend.dto.PortfolioDto;
 import com.ppp.backend.repository.PortfolioRepository;
 import com.ppp.backend.repository.SkillLevelRepository;
@@ -39,16 +42,19 @@ public class PortfolioService extends AbstractSkillService<UserSkill, PortfolioD
         }
 
         // **1. 전체 프로젝트 조회**
-        public List<PortfolioDto> getAllPortfolios() {
-                List<PortfolioDto> dtoList = portfolioRepository.findAll().stream()
-                                .map((entity) -> {
-                                        PortfolioDto dto = convertToDto(entity);
-                                        dto.setSkills(getSkill(entity.getId()));
-                                        return dto;
-                                })
-                                .collect(Collectors.toList());
+        public PageResponseDTO<PortfolioDto> getAllPortfolios(PageRequestDTO pageRequestDTO) {
+                Page<Portfolio> result = portfolioRepository.searchString(PageRequestDTO.builder().build());
+                List<PortfolioDto> dtoList = result.get().map((portfolio) -> {
+                        PortfolioDto dto = convertToDto(portfolio);
+                        String skillString = getSkill(portfolio.getId());
+                        dto.setSkills(skillString);
+                        return dto;
+                }).collect(Collectors.toList());
 
-                return dtoList;
+                PageResponseDTO<PortfolioDto> pageResponseDTO = new PageResponseDTO<>(dtoList, pageRequestDTO,
+                                result.getTotalElements());
+
+                return pageResponseDTO;
         }
 
         // **2. 검색어로 프로젝트 조회**
@@ -102,6 +108,24 @@ public class PortfolioService extends AbstractSkillService<UserSkill, PortfolioD
                         throw new IllegalArgumentException("해당 ID의 프로젝트를 찾을 수 없습니다.");
                 }
                 portfolioRepository.deleteById(id);
+        }
+
+        public PageResponseDTO<PortfolioDto> getSearchResult(PageRequestDTO pageRequestDTO) {
+                Page<Portfolio> result = portfolioRepository.searchKeyword(pageRequestDTO);
+                // ! Portfolio List => PortfolioDTO List
+                List<PortfolioDto> dtoList = result.get().map(portfolio -> {
+                        PortfolioDto dto = convertToDto(portfolio);
+                        String skillString = getSkill(portfolio.getId());
+                        dto.setSkills(skillString);
+
+                        return dto;
+                }).collect(Collectors.toList());
+
+                // 페이징 처리
+                PageResponseDTO<PortfolioDto> pageResponseDTO = new PageResponseDTO<>(dtoList, pageRequestDTO,
+                                result.getTotalElements());
+
+                return pageResponseDTO;
         }
 
         // **Entity -> DTO 변환**

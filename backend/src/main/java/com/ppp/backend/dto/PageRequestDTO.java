@@ -23,4 +23,6 @@ public class PageRequestDTO {
 
 	private List<String> querySkills;
 
+	private String type;
+
 }

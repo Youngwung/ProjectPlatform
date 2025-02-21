@@ -22,7 +22,7 @@ const getString = (param, defaultValue) => {
 	return param;
 };
 
-export default function useCustomMove() {
+export default function useCustomPortfolioMove() {
 	const navigate = useNavigate();
 	// 주소창의 쿼리스트링을 변수로 할당하는 함수: useSearchParams()
 	const [queryParams] = useSearchParams();
@@ -32,7 +32,6 @@ export default function useCustomMove() {
 	const size = getNum(queryParams.get("size"), 12);
 	const searchQuery = getString(queryParams.get("query"), "");
 	const searchSkills = getString(queryParams.getAll("querySkills"), []);
-	const searchType = getString(queryParams.get("type"), "");
 
 	// 변수로 저장되어있는 값을 주소창에서 사용할 수 있는 형태로 변환
 	// ? page=1&size=12
@@ -40,7 +39,6 @@ export default function useCustomMove() {
 		page,
 		size,
 		query: searchQuery,
-		type: searchType
 	});
 	searchSkills.forEach((skill) => {
 		queryDefaultParam.append("querySkills", skill);
@@ -70,7 +68,7 @@ export default function useCustomMove() {
 		} else {
 			queryStr = queryDefault;
 		}
-		navigate({ pathname: "/project/list", search: queryStr });
+		navigate({ pathname: "/portfolio/list", search: queryStr });
 		// 함수를 호출할 때 마다 값이 변경됨
 		setRefresh((prev) => !prev);
 	};
@@ -85,24 +83,22 @@ export default function useCustomMove() {
 
 	const moveToRead = (projectId) => {
 		navigate({
-			pathname: `../read/${projectId}`,
+			pathname: `../list/${projectId}`,
 			search: queryDefault,
 		});
 	};
 
-	const moveToSearch = (params) => {
+	const moveToPortfolioSearch = (params) => {
 		let queryStr = new URLSearchParams();
 		if (params) {
 			const pageNum = getNum(params.page, 1);
 			const sizeNum = getNum(params.size, 12);
 			const searchQueryString = getString(params.query, "");
 			const searchSkills = params.querySkills || [];
-			const searchType = params.type || "all";
 			queryStr = new URLSearchParams({
 				page: pageNum,
 				size: sizeNum,
 				query: searchQueryString,
-				type: searchType
 			});
 			searchSkills.forEach((skill) => {
 				queryStr.append("querySkills", skill);
@@ -112,7 +108,7 @@ export default function useCustomMove() {
 		}
 		console.log(queryStr.toString());
 		navigate({
-			pathname: "/project/search",
+			pathname: "/portfolio/search",
 			search: queryStr.toString(),
 		});
 		// 함수를 호출할 때 마다 값이 변경됨
@@ -124,7 +120,7 @@ export default function useCustomMove() {
 		moveToList,
 		moveToModify,
 		moveToRead,
-		moveToSearch,
+		moveToPortfolioSearch,
 		page,
 		size,
 		refresh,

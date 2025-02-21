@@ -53,18 +53,6 @@ export default function AddComponent() {
 		});
 	};
 
-	// TODO: userId를 가져오는 로직 추가
-	const [userId, setUserId] = useState(0);
-	useEffect(() => {
-		setUserId(localStorage.getItem("userId"));
-		if (userId) {
-			setProject({ ...initState, userId: userId });
-		} else {
-			// 원래는 아무 기능을 하지 않아야 하지만 개발 당시 로그인 기능을 구현하지 않았으므로 강제로 userId = 1을 주입
-			setProject({ ...initState, userId: 1 });
-		}
-	}, [userId]);
-
 	// 통합 유효성 검사 state 선언
 	const [validation, setValidation] = useState({
 		skill: false,

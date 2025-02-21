@@ -3,10 +3,6 @@ package com.ppp.backend.controller.bookmark;
 import java.util.List;
 import java.util.Map;
 
-import com.ppp.backend.controller.AuthApiController;
-import com.ppp.backend.domain.bookmark.BookmarkPortfolio;
-import com.ppp.backend.dto.bookmark.BookmarkProjectDto;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,16 +11,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.ppp.backend.controller.AuthApiController;
 import com.ppp.backend.dto.PageRequestDTO;
 import com.ppp.backend.dto.PageResponseDTO;
 import com.ppp.backend.dto.bookmark.BookmarkPortfolioDto;
 import com.ppp.backend.service.bookmark.BookmarkPortfolioService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.server.ResponseStatusException;
 
 
 @RestController
@@ -73,7 +72,14 @@ public class BookmarkPortfolioController {
 		}
 	}
 	@PostMapping("/")
-	public Map<String, Long> register(@RequestBody BookmarkPortfolioDto dto) {
+	public Map<String, Long> register(HttpServletRequest request, @RequestBody BookmarkPortfolioDto dto) {
+		Long userId = authApiController.extractUserIdFromCookie(request);
+		if (userId == null) {
+			log.error("❌ 쿠키에서 userId를 가져오지 못했습니다.");
+			return Map.of("bookmarkPortfolioId", -1L);
+		}
+		log.info("userBookmarkPortfoliosList() userId = {}", userId);
+		dto.setUserId(userId);
 		log.info("register() dto = {}", dto);
 		Long bookmarkPortfolioId = bookmarkPortfolioService.create(dto);
 		return Map.of("bookmarkPortfolioId", bookmarkPortfolioId);
@@ -109,7 +115,17 @@ public class BookmarkPortfolioController {
 	}
 
 	@PostMapping("/check")
-	public ResponseEntity<Long> getMethodName(@RequestBody BookmarkPortfolioDto	dto) {
+	public ResponseEntity<Long> checkPortfolioBookmark(HttpServletRequest request, @RequestParam(name = "portfolioId") Long	portfolioId) {
+		// 요청 헤더에서 userId 추출
+		Long userId = authApiController.extractUserIdFromCookie(request);
+
+		if (userId == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+		}
+		BookmarkPortfolioDto dto = BookmarkPortfolioDto.builder()
+			.portfolioId(portfolioId)
+			.userId(userId)
+		.build();
 		Long result = bookmarkPortfolioService.checkBookmark(dto);
 		return ResponseEntity.ok(result);
 	}

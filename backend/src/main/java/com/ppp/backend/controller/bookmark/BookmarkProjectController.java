@@ -3,8 +3,6 @@ package com.ppp.backend.controller.bookmark;
 import java.util.List;
 import java.util.Map;
 
-import com.ppp.backend.controller.AuthApiController;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,16 +11,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.ppp.backend.controller.AuthApiController;
 import com.ppp.backend.dto.PageRequestDTO;
 import com.ppp.backend.dto.PageResponseDTO;
 import com.ppp.backend.dto.bookmark.BookmarkProjectDto;
 import com.ppp.backend.service.bookmark.BookmarkProjectService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.server.ResponseStatusException;
 
 
 @RestController
@@ -72,7 +73,15 @@ public class BookmarkProjectController {
 
 
 	@PostMapping("/")
-	public Map<String, Long> register(@RequestBody BookmarkProjectDto dto) {
+	public Map<String, Long> register(HttpServletRequest request, @RequestBody BookmarkProjectDto dto) {
+		// 요청 헤더에서 userId 추출
+		Long userId = authApiController.extractUserIdFromCookie(request);
+
+		if (userId == null) {
+			log.error("❌ 쿠키에서 userId를 가져오지 못했습니다.");
+			return Map.of("ERROR", -1L);
+		}
+		dto.setUserId(userId);
 		log.info("register() dto = {}", dto);
 		Long bookmarkProjectId = bookmarkProjectService.create(dto);
 		return Map.of("bookmarkProjectId", bookmarkProjectId);
@@ -109,7 +118,18 @@ public class BookmarkProjectController {
 
 
 	@PostMapping("/check")
-	public ResponseEntity<Long> getMethodName(@RequestBody BookmarkProjectDto	dto) {
+	public ResponseEntity<Long> checkPortfolioBookmark(HttpServletRequest request, @RequestParam(name = "projectId") Long	projectId) {
+		// 요청 헤더에서 userId 추출
+		Long userId = authApiController.extractUserIdFromCookie(request);
+
+		if (userId == null) {
+			log.error("❌ 쿠키에서 userId를 가져오지 못했습니다.");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(-1L);
+		}
+		BookmarkProjectDto dto = BookmarkProjectDto.builder()
+			.projectId(projectId)
+			.userId(userId)
+		.build();
 		Long result = bookmarkProjectService.checkBookmark(dto);
 		return ResponseEntity.ok(result);
 	}

@@ -1,19 +1,26 @@
 package com.ppp.backend.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.ppp.backend.dto.UserDto;
 import com.ppp.backend.service.UserService;
 import com.ppp.backend.util.JwtUtil;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -108,7 +115,7 @@ public class AuthApiController {
 
         UserDto userDto = userService.getUserById(userId);
         log.info("🔎 사용자 정보 조회 성공: userId={}, name={}, dto={}", userDto.getId(), userDto.getName(), userDto);
-
+        //TODO: 해당 메서드가 useDto를 반환하는 문제: true or false를 반환하도록 수정해야 할 듯
         return ResponseEntity.ok(userDto);
     }
     /**

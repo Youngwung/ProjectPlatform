@@ -34,13 +34,12 @@ const MyPage = () => {
         </Col>
 
         {/* Outlet을 통해 동적 콘텐츠 변경 */}
-        <Col md={9} lg={10}>
+        <Col xs={12} md={9} lg={10}>
           <Outlet />
         </Col>
       </Row>
 
       {/* 모달들 */}
-      {/* TODO 각각의 컴포넌트의 함수를 불러와야함 */}
       <EditInfoModal show={showEditInfoModal} onHide={() => setShowEditInfoModal(false)} />
       <PasswordModal show={showPasswordModal} onHide={() => setShowPasswordModal(false)} />
       <DeleteConfirmModal show={showDeleteConfirmModal} onHide={() => setShowDeleteConfirmModal(false)} />

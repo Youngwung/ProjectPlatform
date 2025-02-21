@@ -124,9 +124,10 @@ public class BookmarkProjectService {
 		List<BookmarkProject> bookmarkProjects = bookmarkProjectRepo.findByUserId(userId);
 
 		if (bookmarkProjects.isEmpty()) {
+			log.warn("북마크된 프젝이 없음 userid={} bookmarkproject={}", userId,bookmarkProjects);
 			return List.of();
+			
 		}
-
 		return bookmarkProjects.stream()
 				.map(bookmark -> new BookmarkProjectDto(
 						bookmark.getId(),                        // 북마크 ID

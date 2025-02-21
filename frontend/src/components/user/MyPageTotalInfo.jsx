@@ -6,11 +6,11 @@ import { deleteBookmarkProjectOne,
          deleteBookmarkPortfolioOne,
          getUserBookmarkPortfolioList
         } from "../../api/bookmarkProjectApi";
-
+import alertApi from "../../api/alertApi";
 import UserInfoCard from "./UserInfoCard";
 import DashboardCard from "./DashboardCard";
 import ExperienceCard from "./ExperienceCard";
-import NotificationCard from "./NotificationCard";
+import AlertCard from "./AlertCard";
 
 const MyPageTotalInfo = () => {
   // 사용자 정보 상태
@@ -18,9 +18,13 @@ const MyPageTotalInfo = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertVariant, setAlertVariant] = useState("success");
 
-  // 프로젝트 & 포트폴리오 알림
+  // 프로젝트 & 포트폴리오 북마크
   const [projectBookmarkList, setProjectBookmarkList] = useState([]);
   const [portfolioBookmarkList, setPortfoiloBookmarkList] = useState([]);
+
+  // 프로젝트 & 포트폴리오 알림
+  const [projectAlerts, setProjectAlerts] = useState([]);
+  const [portfolioAlerts, setPortfolioAlerts] = useState([]);
 
   // ✅ 북마크 프로젝트 목록 가져오는 함수
   const handleBookmarkProjectList = async () => {
@@ -87,6 +91,48 @@ const MyPageTotalInfo = () => {
       setAlertVariant("danger");
     }
   };
+  // ✅ 프로젝트 알림 목록 가져오는 함수
+const handleProjectAlerts = async () => {
+  try {
+    const data = await alertApi.getUnreadProjectAlerts();
+    console.log("✅ 프로젝트 알림 리스트:", data);
+
+    // 🔥 'content' 필드만 표시하도록 변경
+    const formattedAlerts = data.slice(0, 10).map(alert => ({
+      id: alert.id,
+      content: alert.content, // ✅ 'message' 대신 'content' 사용
+      status: alert.status, // 상태 추가 (예: "초대", "접수", "합격" 등)
+      createdAt: new Date(alert.createdAt).toLocaleString(), // ✅ 날짜 포맷팅
+      isRead: alert.isRead,
+    }));
+
+    setProjectAlerts(formattedAlerts);
+  } catch (error) {
+    console.error("❌ 프로젝트 알림을 가져오는 데 실패:", error);
+  }
+};
+
+// ✅ 포트폴리오 알림 목록 가져오는 함수
+const handlePortfolioAlerts = async () => {
+  try {
+    const data = await alertApi.getUnreadPortfolioAlerts();
+    console.log("✅ 포트폴리오 알림 리스트:", data);
+
+    // 🔥 'content' 필드만 표시하도록 변경
+    const formattedAlerts = data.slice(0, 10).map(alert => ({
+      id: alert.id,
+      content: alert.content, // ✅ 'message' 대신 'content' 사용
+      status: alert.status, // 상태 추가
+      createdAt: new Date(alert.createdAt).toLocaleString(), // ✅ 날짜 포맷팅
+      isRead: alert.isRead,
+    }));
+
+    setPortfolioAlerts(formattedAlerts);
+  } catch (error) {
+    console.error("❌ 포트폴리오 알림을 가져오는 데 실패:", error);
+  }
+};
+
   useEffect(() => {
     // ✅ 유저 정보 가져오기
     authApi.getAuthenticatedUser(1)
@@ -99,6 +145,10 @@ const MyPageTotalInfo = () => {
     // ✅ 북마크 프로젝트 목록 가져오기
     handleBookmarkProjectList();
     handleBookmarkPortfolioList();
+
+    // ✅ 알림 목록 가져오기
+    handleProjectAlerts();
+    handlePortfolioAlerts();
   }, []);
 
   return (
@@ -154,9 +204,9 @@ const MyPageTotalInfo = () => {
       {/* 알림 정보 */}
       <Row>
         <Col md={12}>
-          <NotificationCard
-            projectBookmarkList={projectBookmarkList}
-            portfolioNotifications={[]}
+          <AlertCard
+            projectAlerts={projectAlerts}
+            portfolioAlerts={portfolioAlerts}
           />
         </Col>
       </Row>

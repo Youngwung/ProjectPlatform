@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Alert, Button, Card, Container, Spinner } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import portfolioApi from "../../api/portfolioApi";
+import BookmarkPortfolioBtn from "../../components/bookmark/BookmarkPortfolioBtn";
 import SkillTagComponent from "../../components/skill/SkillTagComponent";
 import SkillTagGuideComponent from "../../components/skill/SkillTagGuideComponent";
 
@@ -103,6 +104,9 @@ const PortfolioDetail = () => {
 					alt="포트폴리오 이미지"
 				/>
 				<Card.Body>
+					<BookmarkPortfolioBtn 
+						portfolioId={portfolio.id}
+					/>
 					<Card.Title>{portfolio.title || "제목 없음"}</Card.Title>
 					<Card.Text>{portfolio.description || "설명이 없습니다."}</Card.Text>
 					<Card.Text>

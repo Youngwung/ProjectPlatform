@@ -16,6 +16,7 @@ import com.ppp.backend.dto.PageResponseDTO;
 import com.ppp.backend.dto.ProjectDTO;
 import com.ppp.backend.service.ProjectService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ProjectController {
 
 	private final ProjectService projectService;
+	private final AuthApiController authApiController;
 
 	@GetMapping("/{projectId}")
 	public ProjectDTO get(@PathVariable("projectId") Long projectId) {
@@ -50,7 +52,7 @@ public class ProjectController {
 	
 
 	@PostMapping("/")
-	public Map<String, Long> register(@RequestBody ProjectDTO dto) {
+	public Map<String, Long> register(HttpServletRequest request, @RequestBody ProjectDTO dto) {
 		/*
 		 * 포스트맨 등록 기능 JSON데이터 
 {
@@ -59,6 +61,13 @@ public class ProjectController {
     "userId": "1"
 }
 		 */
+		Long userId = authApiController.extractUserIdFromCookie(request);
+
+		if (userId == null) {
+			log.error("❌ 쿠키에서 userId를 가져오지 못했습니다.");
+			return Map.of("projectId", -1L);
+		}
+		dto.setUserId(userId);
 		log.info("dto = {}", dto);
 
 		Long projectId = projectService.register(dto);
@@ -68,7 +77,7 @@ public class ProjectController {
 	}
 
 	@PutMapping("/{projectId}")
-	public Map<String, String> modify(@PathVariable("projectId") Long projectId, @RequestBody ProjectDTO dto) {
+	public Map<String, String> modify(HttpServletRequest request, @PathVariable("projectId") Long projectId, @RequestBody ProjectDTO dto) {
 		/*
 		 * 포스트맨 수정 기능 JSON데이터 
 {
@@ -77,7 +86,15 @@ public class ProjectController {
     "userId": "1"
 }
 		 */
+		Long userId = authApiController.extractUserIdFromCookie(request);
+
 		// 경로변수와 번호를 동기화
+		if (userId == null) {
+			log.error("❌ 쿠키에서 userId를 가져오지 못했습니다.");
+			return Map.of("projectId", "FAIL");
+		}
+		dto.setUserId(userId);
+		log.info("dto = {}", dto);
 		dto.setId(projectId);
 
 		projectService.modify(dto);
@@ -86,7 +103,14 @@ public class ProjectController {
 	}
 
 	@DeleteMapping("/{projectId}")
-	public Map<String, String> remove(@PathVariable("projectId") Long projectId) {
+	public Map<String, String> remove(HttpServletRequest request, @PathVariable("projectId") Long projectId) {
+		Long userId = authApiController.extractUserIdFromCookie(request);
+
+		// 경로변수와 번호를 동기화
+		if (userId == null) {
+			log.error("❌ 쿠키에서 userId를 가져오지 못했습니다.");
+			return Map.of("projectId", "FAIL");
+		}
 		projectService.remove(projectId);
 		return Map.of("RESULT", "SUCCESS");
 	}

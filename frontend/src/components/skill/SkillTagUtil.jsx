@@ -1,7 +1,7 @@
 // 스킬 태그 스타일링 기능 구현을 위한 유틸리티 파일
 
 export const validateSkillsString = (skillsString) => {
-	const regex = /#([a-zA-Z]+):(초급|중급|고급)(, #[a-zA-Z]+:(초급|중급|고급))*/;
+	const regex = /^(#([a-zA-Z]+):(초급|중급|고급)(, #[a-zA-Z]+:(초급|중급|고급))*)*$/;
 	return regex.test(skillsString);
 };
 

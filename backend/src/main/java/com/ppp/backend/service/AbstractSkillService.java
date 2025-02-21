@@ -133,33 +133,41 @@ public abstract class AbstractSkillService<T extends BaseSkill, D extends BaseSk
 
 		// 새로운 스킬 맵에 남아있는 스킬들은 새로 추가될 스킬들
 		if (!dtoSkillMap.isEmpty()) {
+			
 			dtoSkillMap.forEach((skillName, skillLevel) -> {
+				log.info("InsertSkillName = {}", skillName);
+				log.info("InsertSkillLevel = {}", skillLevel);
 				Skill newSkill = skillRepo.findByNameIgnoreCase(skillName);
 				SkillLevel newLevel = skillLevelRepo.findByNameIgnoreCase(skillLevel);
 
 				// update가 아니라 insert이므로 번호를 안 넣어줘도 됨.
 				T insertSkill = createSkillInstance(null, parentEntity, newSkill, newLevel);
-				updateList.add(insertSkill);
+				repository.save(insertSkill);
 			});
 		}
-
+		
 		// log.info("removeList = {}", removeList);
 		// log.info("updateList = {}", updateList);
 		// 제거 리스트에 있는 객체를 제거
-		removeList.forEach(remove -> {
-			repository.delete(remove);
-		});
+		
 		// 업데이트 리스트에 있는 객체를 추가
 		// 기존 엔터티의 값을 수정
 		existingSkills.forEach(existingSkill -> {
 			updateList.forEach(updateSkill -> {
-				if (existingSkill.equals(updateSkill)) {
+				if (existingSkill.getSkill().equals(updateSkill.getSkill())) {
+					log.info("--------------------setter실행------------------------");
 					existingSkill.setSkill(updateSkill.getSkill());
 					existingSkill.setSkillLevel(updateSkill.getSkillLevel());
 				}
 			});
 		});
 		repository.saveAll(existingSkills);
+		log.info("updateList = {}", updateList);
+		log.info("existingSkills = {}", existingSkills);
+		log.info("removeList = {}", removeList);
+		removeList.forEach(remove -> {
+			repository.delete(remove);
+		});
 	}
 
 	@Override

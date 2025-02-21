@@ -1,26 +1,32 @@
 package com.ppp.backend.service;
 
-import com.ppp.backend.domain.*;
-import com.ppp.backend.dto.LinkDto;
-import com.ppp.backend.dto.UserDto;
-import com.ppp.backend.repository.ProviderRepository;
-import com.ppp.backend.repository.UserRepository;
-import com.ppp.backend.repository.SkillLevelRepository;
-import com.ppp.backend.repository.SkillRepository;
-import com.ppp.backend.repository.UserSkillRepository;
-import com.ppp.backend.util.JwtUtil;
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.ppp.backend.domain.Provider;
+import com.ppp.backend.domain.Skill;
+import com.ppp.backend.domain.SkillLevel;
+import com.ppp.backend.domain.User;
+import com.ppp.backend.domain.UserSkill;
+import com.ppp.backend.dto.LinkDto;
+import com.ppp.backend.dto.UserDto;
+import com.ppp.backend.repository.ProviderRepository;
+import com.ppp.backend.repository.SkillLevelRepository;
+import com.ppp.backend.repository.SkillRepository;
+import com.ppp.backend.repository.UserRepository;
+import com.ppp.backend.repository.UserSkillRepository;
+import com.ppp.backend.util.JwtUtil;
+
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
@@ -127,12 +133,10 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
                 "message", "로그인 성공",
                 "accessToken", token,
                 "userId", user.getId(),
-                "email", user.getEmail()
-        );
+                "email", user.getEmail());
 
         return ResponseEntity.ok(response);
     }
-
 
     /** ✅ 이메일 존재 여부 확인 */
     public boolean isEmailExists(String email) {
@@ -152,7 +156,9 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
 
     public UserDto getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다. id=" + id)); // ✅ 404 처리
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다. id=" + id)); // ✅
+                                                                                                                   // 404
+                                                                                                                   // 처리
 
         UserDto dto = convertToDto(user);
         dto.setProviderName(user.getProvider().getName());
@@ -163,8 +169,6 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
 
         return dto;
     }
-
-
 
     /** ✅ 사용자 정보 수정 (전화번호, 링크, 기술 스택 등) */
     public UserDto updateUserInfo(Long userId, UserDto updatedUser) {
@@ -179,21 +183,36 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
 
         log.info("✅ 기존 사용자 정보 확인: {}", existingUser);
 
-        existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
-        existingUser.setExperience(updatedUser.getExperience());
+        if (updatedUser.getPhoneNumber() == null) {
+            existingUser.setPhoneNumber(existingUser.getPhoneNumber());
+        } else {
+            existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
+        }
+
+        if (updatedUser.getExperience() == null) {
+            existingUser.setExperience(existingUser.getExperience());
+        } else {
+            existingUser.setExperience(updatedUser.getExperience());
+        }
 
         if (updatedUser.getLinks() == null) {
             updatedUser.setLinks(linkService.getUserLinks(userId)); // 기존 링크 유지
         } else {
             linkService.updateUserLinks(userId, updatedUser.getLinks());
         }
-        log.info("📌 업데이트 요청된 링크 목록: {}", updatedUser.getLinks());
 
+
+        if (updatedUser.getSkills() != null) {
+            modifySkill(userId, updatedUser, existingUser);
+        }
+        log.info("📌 업데이트 요청된 링크 목록: {}", updatedUser.getLinks());
+        
         User savedUser = userRepository.save(existingUser);
         log.info("✅ 사용자 정보 수정 완료: {}", savedUser);
 
         return convertToDto(savedUser);
     }
+
     public boolean verifyPassword(Long userId, String password) {
         if (password == null || password.trim().isEmpty()) {
             throw new IllegalArgumentException("전달된 비밀번호 값이 null이거나 비어있습니다.");
@@ -201,11 +220,9 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다. id=" + userId));
-        log.info("{},{}",password,user.getPassword());
+        log.info("{},{}", password, user.getPassword());
         return passwordEncoder.matches(password, user.getPassword());
     }
-
-
 
     /** ✅ 사용자 비밀번호 변경 */
     public void updatePassword(Long userId, String nowPassword, String newPassword) {
@@ -262,6 +279,5 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
 
         return convertToDto(updatedUser);
     }
-
 
 }

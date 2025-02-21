@@ -1,17 +1,23 @@
 package com.ppp.backend.dto;
 
-import lombok.Builder;
+import java.sql.Timestamp;
+
+import com.ppp.backend.dto.skill.BaseSkillDto;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.sql.Timestamp;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@Builder(toBuilder = true)
+@SuperBuilder
 @ToString
-public class PortfolioDto {
+@NoArgsConstructor
+@AllArgsConstructor
+public class PortfolioDto extends BaseSkillDto {
     private Long id;
     private Long userId;
     private String title;

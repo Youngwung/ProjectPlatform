@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Nav, Navbar, NavDropdown,OverlayTrigger,Tooltip } from 'react-bootstrap';
-import { Link,useNavigate} from 'react-router-dom';
-import { FaUser} from "react-icons/fa"; // 🔹 react-icons에서 가져옴
+import React, { useEffect, useState } from 'react';
+import { Container, Nav, Navbar, NavDropdown, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { FaUser } from "react-icons/fa"; // 🔹 react-icons에서 가져옴
+import { Link, useNavigate } from 'react-router-dom';
 import AuthApi from '../api/authApi';
 
 const Top = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userName, setUsername] = useState('21332112');
+  const [userName, setUsername] = useState('');
 
   const navigate = useNavigate();
   

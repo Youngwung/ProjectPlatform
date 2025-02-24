@@ -32,6 +32,10 @@ public class AlertProject {
     @Column(nullable = false)
     private Status status;
 
+    @Enumerated(EnumType.STRING) // ✅ Enum 값을 DB에 문자열로 저장
+    @Column(nullable = false)
+    private Type type;
+
     @Column(length = 1000)
     private String content;
 
@@ -51,6 +55,11 @@ public class AlertProject {
         검토중,      // 신청자에게 신청이 접수된 상태
         합격,        // 신청 또는 초대 수락
         불합격       // 신청 또는 초대 거절
+    }
+
+    public enum Type {
+        참가알림,
+        초대알림
     }
     public void markAsRead() {
         this.isRead = true;

@@ -1,7 +1,9 @@
 package com.ppp.backend.controller;
 
+import java.util.List;
 import java.util.Map;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -71,11 +73,11 @@ public class ProjectController {
 	public Map<String, String> modify(@PathVariable("projectId") Long projectId, @RequestBody ProjectDTO dto) {
 		/*
 		 * 포스트맨 수정 기능 JSON데이터 
-{
-    "title": "restControllerModifyTest",
-    "description": "restControllerModifyTest description",
-    "userId": "1"
-}
+		{
+			"title": "restControllerModifyTest",
+			"description": "restControllerModifyTest description",
+			"userId": "1"
+		}
 		 */
 		// 경로변수와 번호를 동기화
 		dto.setId(projectId);
@@ -89,5 +91,11 @@ public class ProjectController {
 	public Map<String, String> remove(@PathVariable("projectId") Long projectId) {
 		projectService.remove(projectId);
 		return Map.of("RESULT", "SUCCESS");
+	}
+
+	@GetMapping("/my")
+	public List<ProjectDTO> getMyProjects(HttpServletRequest request) {
+		log.info("✅ [GET] /api/project/my - 내 프로젝트 조회 요청");
+		return projectService.getMyProjects(request);
 	}
 }

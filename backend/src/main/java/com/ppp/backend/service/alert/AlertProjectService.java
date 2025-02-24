@@ -40,8 +40,9 @@ public class AlertProjectService {
         Long userId = extractUserIdOrThrow(request);
         log.info("✅ [getUserProjectAlerts] 유저 ID: {}", userId);
 
+        //
         return alertProjectRepository.findByUserId(userId).stream()
-                .map(this::convertToDto)
+                .map(alert -> convertToDto(alert, userId))
                 .collect(Collectors.toList());
     }
 
@@ -53,7 +54,7 @@ public class AlertProjectService {
         log.info("✅ [getUnreadProjectAlerts] 유저 ID: {}", userId);
 
         return alertProjectRepository.findByUserIdAndIsRead(userId, false).stream()
-                .map(this::convertToDto)
+                .map(alert -> convertToDto(alert, userId))
                 .collect(Collectors.toList());
     }
 
@@ -79,7 +80,7 @@ public class AlertProjectService {
         AlertProject savedAlert = alertProjectRepository.save(alertProject);
         log.info("✅ [createProjectAlert] 알림 저장 완료 - ID: {}", savedAlert.getId());
 
-        return convertToDto(savedAlert);
+        return convertToDto(savedAlert, null);
     }
 
     /**
@@ -122,6 +123,8 @@ public class AlertProjectService {
                     return new EntityNotFoundException("해당 프로젝트 알림을 찾을 수 없습니다. ID: " + alertId);
                 });
 
+
+        //TODO 보낸사람과 받는사람이 프로젝트 생성자와 로그인한 사용자로 고정되어있음 그래서 isMyProject로 확인해야함
         // 보낸 사람: 프로젝트 생성자
         String senderName = alertProject.getProject().getUser().getName();
 
@@ -130,7 +133,7 @@ public class AlertProjectService {
                 .map(User::getName)
                 .orElse("알 수 없음");
 
-        AlertProjectDto alertProjectDto = convertToDto(alertProject);
+        AlertProjectDto alertProjectDto = convertToDto(alertProject,userId);
         alertProjectDto.setSenderName(senderName);
         alertProjectDto.setReceiverName(receiverName);
 
@@ -142,7 +145,7 @@ public class AlertProjectService {
     /**
      * 🔹 AlertProject 엔티티 → AlertProjectDto 변환
      */
-    private AlertProjectDto convertToDto(AlertProject alertProject) {
+    private AlertProjectDto convertToDto(AlertProject alertProject, Long loginUserId) {
         // ✅ 프로젝트 타입 조회
         String projectType = projectTypeRepository.findByProjectId(alertProject.getProject().getId())
                 .map(projectTypeEntity -> projectTypeEntity.getType().name()) // Enum → String 변환
@@ -160,7 +163,7 @@ public class AlertProjectService {
                 .createdAt(alertProject.getProject().getCreatedAt().toLocalDateTime())
                 .updatedAt(alertProject.getProject().getUpdatedAt().toLocalDateTime())
                 .build();
-
+        boolean isMyProject = loginUserId.equals(alertProject.getProject().getUser().getId());
         return AlertProjectDto.builder()
                 .id(alertProject.getId())
                 .senderName(alertProject.getProject().getUser().getName())
@@ -168,12 +171,12 @@ public class AlertProjectService {
                 .project(projectDTO) // ✅ ProjectDTO로 변환하여 저장
                 .status(alertProject.getStatus().name())
                 .content(alertProject.getContent())
+                .type(alertProject.getType().name())
                 .createdAt(alertProject.getCreatedAt())
                 .isRead(alertProject.isRead())
+                .isMyProject(isMyProject)
                 .build();
     }
-
-
 
     /**
      * 🔹 유저 ID를 쿠키에서 추출 (없으면 예외 발생)
@@ -220,6 +223,7 @@ public class AlertProjectService {
                 .project(project)
                 .user(projectOwner) // 알림 수신자가 프로젝트 생성자
                 .status(AlertProject.Status.신청)
+                .type(AlertProject.Type.참가알림)
                 .content(applicant.getName() + " 님이 프로젝트 [" + project.getTitle() + "]에 신청했습니다.")
                 .isRead(false)
                 .build();
@@ -231,6 +235,7 @@ public class AlertProjectService {
                 .project(project)
                 .user(applicant) // 알림 수신자가 신청자
                 .status(AlertProject.Status.검토중)
+                .type(AlertProject.Type.참가알림)
                 .content("프로젝트 [" + project.getTitle() + "]에 신청하였습니다. 검토 중입니다.")
                 .isRead(false)
                 .build();
@@ -260,6 +265,11 @@ public class AlertProjectService {
         // 4. 초대받는 사용자(invitee) 조회
         User invitee = userRepository.findById(inviteeId)
                 .orElseThrow(() -> new EntityNotFoundException("초대받는 사용자를 찾을 수 없습니다. ID: " + inviteeId));
+        // 4-1. 초대받는 사용자가 프로젝트 소유자(즉, 자신)인 경우 예외 처리
+//        if (inviteeId.equals(project.getUser().getId())) {
+//            log.info("해당 프로젝트는 본인이 생성한 프로젝트이므로 초대를 보낼 수 없습니다.");
+//            throw new IllegalArgumentException("자신의 프로젝트에는 초대를 보낼 수 없습니다.");
+//        }
 
         // 5. 초대받은 사용자에게 보낼 알림 생성 (상태: 신청)
         String contentForInvitee = project.getUser().getName() + " 님이 프로젝트 [" + project.getTitle() + "]에 초대했습니다.";
@@ -267,6 +277,7 @@ public class AlertProjectService {
                 .project(project)
                 .user(invitee)
                 .status(AlertProject.Status.신청) // 초대의 경우 '신청' 상태 사용
+                .type(AlertProject.Type.초대알림)
                 .content(contentForInvitee)
                 .isRead(false)
                 .build();
@@ -279,6 +290,7 @@ public class AlertProjectService {
                 .project(project)
                 .user(project.getUser()) // 초대 요청자, 즉 프로젝트 소유자
                 .status(AlertProject.Status.신청)
+                .type(AlertProject.Type.초대알림)
                 .content(contentForInviter)
                 .isRead(false)
                 .build();
@@ -399,6 +411,7 @@ public class AlertProjectService {
                 .project(project)
                 .user(applicant)
                 .status(newStatus)
+                .type(AlertProject.Type.참가알림)
                 .content(contentForApplicant)
                 .isRead(false)
                 .build();
@@ -411,6 +424,7 @@ public class AlertProjectService {
                 .project(project)
                 .user(project.getUser()) // 프로젝트 소유자
                 .status(newStatus)
+                .type(AlertProject.Type.참가알림)
                 .content(contentForOwner)
                 .isRead(false)
                 .build();

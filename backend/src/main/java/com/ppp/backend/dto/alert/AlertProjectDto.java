@@ -20,8 +20,10 @@ public class AlertProjectDto {
     private ProjectDTO project;
     private String status;
     private String content;
+    private String type;
     private Timestamp createdAt;
-
     @JsonProperty("isRead")
     private boolean isRead;
+    private boolean isMyProject;
+    //TODO 필요한 유저 데이터만 담아서 쏴주기....
 }

@@ -110,6 +110,7 @@ const alertApi = {
     const apiUrl = isProject ? AlertProjectApiUrl : AlertPortfolioApiUrl;
     try {
       const response = await axios.get(`${apiUrl}/${alertId}`, { withCredentials: true });
+      console.log(`🟢 알림(${alertId}) 조회 결과:`, response.data);
       return response.data;
     } catch (error) {
       console.error(`🚨 알림(${alertId}) 조회 실패:`, error);

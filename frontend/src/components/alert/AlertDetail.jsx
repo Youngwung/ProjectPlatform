@@ -69,12 +69,12 @@ const AlertDetail = ({ isProject }) => {
                 onClick={handleMarkAsRead}
                 disabled={alert.isRead}
                 >
-                {alert.isRead ? <HiOutlineMailOpen size={20} /> : "📨 안 읽음"}
+                {alert.isRead ? <HiOutlineMailOpen size={20} /> : <HiOutlineMail size={20} />}
                 </Button>
             </Col>
         </Row>
-          <hr />
-            <h6 className="fw-bold">{alert.content}</h6>
+          <hr/>
+            <h6 className="fw-bold py-4 fs-2">{alert.content}</h6>
           <hr />
           {isProject && alert.project ? (
             <>

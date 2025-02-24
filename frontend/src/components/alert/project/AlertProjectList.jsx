@@ -18,7 +18,7 @@ const AlertProjectList = () => {
       // 🔹 초기 읽음 상태 설정
       const initialReadStatus = {};
       data.forEach((alert) => {
-        initialReadStatus[alert.id] = alert.read;
+        initialReadStatus[alert.id] = alert.isRead;
       });
       setReadStatus(initialReadStatus);
     };

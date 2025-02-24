@@ -47,12 +47,11 @@ public class AlertProject {
     private boolean isRead = false;
 
     public enum Status {
-        신청,        // APPLIED
-        검토중,      // UNDER_REVIEW
-        합격,        // APPROVED
-        불합격       // REJECTED
+        신청,        // 프로젝트 신청 or 초대
+        검토중,      // 신청자에게 신청이 접수된 상태
+        합격,        // 신청 또는 초대 수락
+        불합격       // 신청 또는 초대 거절
     }
-
     public void markAsRead() {
         this.isRead = true;
     }

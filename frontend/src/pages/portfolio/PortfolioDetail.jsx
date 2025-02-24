@@ -144,3 +144,4 @@ const PortfolioDetail = () => {
 };
 
 export default PortfolioDetail;
+//TODO 포트폴리오 상세페이지에서 초대 버튼 만들기 초대 버튼은 프로젝트 초대 버튼 초대 버튼을 누를때는 selectbar에서 초대할 프로젝트를 선택할수있게 만들기. 내가 만든 프로젝트는 내가초대가 안되게 만들어야하기도함

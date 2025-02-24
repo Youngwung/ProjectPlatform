@@ -6,6 +6,7 @@ import useCustomString from "../../hooks/useCustomString";
 import BookmarkProjectBtn from "../bookmark/BookmarkProjectBtn";
 import SkillTagComponent from "../skill/SkillTagComponent";
 import SkillTagGuideComponent from "../skill/SkillTagGuideComponent";
+import alertApi from "../../api/alertApi";
 
 // 조회 기능을 구현하기 위한 컴포넌트
 
@@ -36,16 +37,15 @@ const getStatusVariant = (status) => {
 			return "light";
 	}
 };
-
 export default function ReadComponent({ projectId }) {
 	const [project, setProject] = useState(initState);
-
+	
 	// 커스텀 훅에서 리스트 페이지로 이동하는 함수 가져옴
 	const {moveToList, moveToModify} = useCustomMove();
-
+	
 	// 커스텀 훅에서 스테이터스의 _를 공백으로 바꿔주는 함수 가져옴
 	const {statusToString} = useCustomString();
-
+	
 	useEffect(() => {
 		getOne(projectId).then((data) => {
 			setProject(data);
@@ -55,6 +55,17 @@ export default function ReadComponent({ projectId }) {
 	}, [projectId]);
 	
 	console.log(project);
+	const handleApply = async () => {
+		try {
+		  // alertApi의 applyProject 함수를 호출
+		  await alertApi.applyProject(projectId);
+		  alert("프로젝트 참가 신청이 완료되었습니다.");
+		  // 필요시, 참가 신청 후 페이지 새로고침이나 상태 업데이트 처리
+		} catch (error) {
+		  console.error("참가 신청 처리 중 오류 발생:", error);
+		  alert("참가 신청에 실패했습니다. 다시 시도해주세요.");
+		}
+	};
 	return (
 		<div>
 			<Container className="mt-4">
@@ -105,6 +116,11 @@ export default function ReadComponent({ projectId }) {
 							</Col>
 							<Col>
 								<Button variant="primary" onClick={() => moveToModify(projectId)}>수정</Button>
+							</Col>
+							<Col>
+								<Button variant="success" onClick={handleApply}>
+									참가 신청
+								</Button>
 							</Col>
 						</Row>
 						<Row className="mt-2 text-muted">

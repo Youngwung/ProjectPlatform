@@ -1,6 +1,7 @@
 package com.ppp.backend.service.alert;
 
 import com.ppp.backend.controller.AuthApiController;
+import com.ppp.backend.domain.Project;
 import com.ppp.backend.domain.User;
 import com.ppp.backend.domain.alert.AlertProject;
 import com.ppp.backend.dto.ProjectDTO;
@@ -196,5 +197,224 @@ public class AlertProjectService {
 
         int updatedCount = alertProjectRepository.markAllAsReadByUserId(userId);
         log.info("✅ [markAllProjectAlertsAsRead] 총 {}개의 프로젝트 알림 읽음 처리 완료", updatedCount);
+    }
+
+    public void applyProject(Long projectId, HttpServletRequest request) {
+        // 1. 현재 신청자의 ID 추출 (쿠키나 토큰을 통해)
+        Long applicantUserId = extractUserIdOrThrow(request);
+        log.info("✅ [applyProject] 신청자 ID: {}, 프로젝트 ID: {}", applicantUserId, projectId);
+
+        // 2. 프로젝트 정보 조회
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("프로젝트가 존재하지 않습니다. ID: " + projectId));
+
+        // 3. 신청자 정보 조회
+        User applicant = userRepository.findById(applicantUserId)
+                .orElseThrow(() -> new EntityNotFoundException("신청자를 찾을 수 없습니다. ID: " + applicantUserId));
+
+        // 4. 프로젝트 소유자 정보 (프로젝트 생성자)
+        User projectOwner = project.getUser();
+
+        // 5. 프로젝트 소유자에게 보내는 알림 생성 (상태: 신청)
+        AlertProject alertForOwner = AlertProject.builder()
+                .project(project)
+                .user(projectOwner) // 알림 수신자가 프로젝트 생성자
+                .status(AlertProject.Status.신청)
+                .content(applicant.getName() + " 님이 프로젝트 [" + project.getTitle() + "]에 신청했습니다.")
+                .isRead(false)
+                .build();
+        alertProjectRepository.save(alertForOwner);
+        log.info("✅ [applyProject] 프로젝트 소유자(ID: {})에게 신청 알림 생성 완료", projectOwner.getId());
+
+        // 6. 신청자에게 보내는 알림 생성 (상태: 검토중)
+        AlertProject alertForApplicant = AlertProject.builder()
+                .project(project)
+                .user(applicant) // 알림 수신자가 신청자
+                .status(AlertProject.Status.검토중)
+                .content("프로젝트 [" + project.getTitle() + "]에 신청하였습니다. 검토 중입니다.")
+                .isRead(false)
+                .build();
+        alertProjectRepository.save(alertForApplicant);
+        log.info("✅ [applyProject] 신청자(ID: {})에게 검토중 알림 생성 완료", applicantUserId);
+    }
+
+    /**
+     * 프로젝트 초대: 프로젝트 소유자가 특정 사용자를 초대하면,
+     * 초대받은 사용자에게 초대 알림과 초대자에게 전송 확인 알림 생성
+     */
+    public void inviteToProject(Long projectId, Long inviteeId, HttpServletRequest request) {
+        // 1. 현재 요청 사용자의 ID 추출 (초대 요청자: inviter)
+        Long inviterId = extractUserIdOrThrow(request);
+        log.info("✅ [inviteToProject] 초대 요청자 ID: {}, 프로젝트 ID: {}", inviterId, projectId);
+
+        // 2. 프로젝트 조회
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("프로젝트가 존재하지 않습니다. ID: " + projectId));
+
+        // 3. 초대 요청자가 프로젝트 소유자인지 검증
+        if (!project.getUser().getId().equals(inviterId)) {
+            log.error("🚨 [inviteToProject] 초대 요청 실패 - 요청자가 프로젝트 소유자가 아닙니다. 요청자 ID: {}", inviterId);
+            throw new IllegalStateException("프로젝트의 소유자만 초대를 보낼 수 있습니다.");
+        }
+
+        // 4. 초대받는 사용자(invitee) 조회
+        User invitee = userRepository.findById(inviteeId)
+                .orElseThrow(() -> new EntityNotFoundException("초대받는 사용자를 찾을 수 없습니다. ID: " + inviteeId));
+
+        // 5. 초대받은 사용자에게 보낼 알림 생성 (상태: 신청)
+        String contentForInvitee = project.getUser().getName() + " 님이 프로젝트 [" + project.getTitle() + "]에 초대했습니다.";
+        AlertProject alertForInvitee = AlertProject.builder()
+                .project(project)
+                .user(invitee)
+                .status(AlertProject.Status.신청) // 초대의 경우 '신청' 상태 사용
+                .content(contentForInvitee)
+                .isRead(false)
+                .build();
+        alertProjectRepository.save(alertForInvitee);
+        log.info("✅ [inviteToProject] 초대 알림 생성 완료 - 초대받은 사용자 ID: {}", inviteeId);
+
+        // 6. 초대를 보낸 사용자(프로젝트 소유자)에게 전송 확인 알림 생성
+        String contentForInviter = "프로젝트 [" + project.getTitle() + "] 초대가 " + invitee.getName() + " 님에게 전송되었습니다.";
+        AlertProject alertForInviter = AlertProject.builder()
+                .project(project)
+                .user(project.getUser()) // 초대 요청자, 즉 프로젝트 소유자
+                .status(AlertProject.Status.신청)
+                .content(contentForInviter)
+                .isRead(false)
+                .build();
+        alertProjectRepository.save(alertForInviter);
+        log.info("✅ [inviteToProject] 초대 전송 확인 알림 생성 완료 - 초대자(ID: {})에게", inviterId);
+    }
+    /**
+     * 초대 응답 처리: 초대받은 사용자가 수락/거절한 결과를
+     * 프로젝트 소유자와 초대받은 사용자 모두에게 알림으로 전달
+     *
+     * @param projectId   프로젝트 ID
+     * @param inviteId    초대 알림 ID (초대 시 생성된 알림의 ID)
+     * @param accepted    true이면 수락, false이면 거절
+     * @param request     HttpServletRequest (쿠키/토큰으로 사용자 ID 추출)
+     */
+    public void handleInviteResponse(Long projectId, Long inviteId, boolean accepted, HttpServletRequest request) {
+        // 1. 현재 요청 사용자의 ID 추출 (응답자: 초대받은 사용자)
+        Long inviteeId = extractUserIdOrThrow(request);
+        log.info("✅ [handleInviteResponse] 초대 알림 ID: {}, 응답자 ID: {}, 수락 여부: {}", inviteId, inviteeId, accepted);
+
+        // 2. 초대 알림(inviteAlert) 조회
+        AlertProject inviteAlert = alertProjectRepository.findById(inviteId)
+                .orElseThrow(() -> new EntityNotFoundException("초대 알림을 찾을 수 없습니다. ID: " + inviteId));
+
+        // 3. 프로젝트 ID 일치 검증
+        if (!inviteAlert.getProject().getId().equals(projectId)) {
+            log.error("🚨 [handleInviteResponse] 프로젝트 정보 불일치");
+            throw new IllegalStateException("프로젝트 정보가 일치하지 않습니다.");
+        }
+
+        // 4. 초대 응답 권한 검증: 초대 알림에 기록된 사용자가 현재 요청 사용자와 일치하는지 확인
+        if (!inviteAlert.getUser().getId().equals(inviteeId)) {
+            log.error("🚨 [handleInviteResponse] 초대 응답 권한 없음");
+            throw new IllegalStateException("초대 응답 권한이 없습니다.");
+        }
+
+        // 5. 프로젝트 소유자 정보 조회 (응답 결과를 받을 대상)
+        User projectOwner = inviteAlert.getProject().getUser();
+
+        // 6. 기존 초대 알림을 읽음 처리 (선택 사항)
+        inviteAlert.markAsRead();
+
+        // 7. 응답에 따른 새로운 알림 생성 (프로젝트 소유자에게 전달)
+        AlertProject.Status newStatus = accepted ? AlertProject.Status.합격 : AlertProject.Status.불합격;
+        String contentForOwner = accepted
+                ? inviteAlert.getUser().getName() + " 님이 프로젝트 [" + inviteAlert.getProject().getTitle() + "] 초대를 수락했습니다."
+                : inviteAlert.getUser().getName() + " 님이 프로젝트 [" + inviteAlert.getProject().getTitle() + "] 초대를 거절했습니다.";
+        AlertProject responseAlertForOwner = AlertProject.builder()
+                .project(inviteAlert.getProject())
+                .user(projectOwner)
+                .status(newStatus)
+                .content(contentForOwner)
+                .isRead(false)
+                .build();
+        alertProjectRepository.save(responseAlertForOwner);
+        log.info("✅ [handleInviteResponse] 프로젝트 소유자에게 응답 알림 생성 완료: {}", newStatus);
+
+        // 8. 응답 결과를 초대받은 사용자에게도 알림 생성 (자신의 응답 확인)
+        String contentForInvitee = "프로젝트 [" + inviteAlert.getProject().getTitle() + "] 초대를 " + (accepted ? "수락" : "거절") + "하였습니다.";
+        AlertProject responseAlertForInvitee = AlertProject.builder()
+                .project(inviteAlert.getProject())
+                .user(inviteAlert.getUser())  // 초대받은 사용자
+                .status(newStatus)
+                .content(contentForInvitee)
+                .isRead(false)
+                .build();
+        alertProjectRepository.save(responseAlertForInvitee);
+        log.info("✅ [handleInviteResponse] 초대받은 사용자에게 응답 확인 알림 생성 완료");
+    }
+    /**
+     * 프로젝트 신청 응답 처리: 프로젝트 소유자가 신청자에 대한 응답(수락/거절)을 처리하고,
+     * 양쪽(신청자와 소유자) 모두에게 결과 알림을 전송
+     *
+     * @param projectId    프로젝트 ID
+     * @param applicantId  신청자 ID
+     * @param accepted     true이면 수락, false이면 거절
+     * @param request      HttpServletRequest (쿠키/토큰으로 사용자 ID 추출)
+     */
+    public void handleApplication(Long projectId, Long applicantId, boolean accepted, HttpServletRequest request) {
+        // 1. 현재 요청 사용자의 ID 추출 (응답 처리자: 프로젝트 소유자)
+        Long ownerId = extractUserIdOrThrow(request);
+        log.info("✅ [handleApplication] 프로젝트 ID: {}, 신청자 ID: {}, 응답자(소유자) ID: {}, 수락 여부: {}",
+                projectId, applicantId, ownerId, accepted);
+
+        // 2. 프로젝트 조회
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("프로젝트를 찾을 수 없습니다. ID: " + projectId));
+
+        // 3. 요청 사용자가 프로젝트 소유자인지 검증
+        if (!project.getUser().getId().equals(ownerId)) {
+            log.error("🚨 [handleApplication] 권한 없음 - 프로젝트 소유자만 신청 응답을 할 수 있습니다.");
+            throw new IllegalStateException("프로젝트 소유자만 신청 응답을 할 수 있습니다.");
+        }
+
+        // 4. 신청자 정보 조회
+        User applicant = userRepository.findById(applicantId)
+                .orElseThrow(() -> new EntityNotFoundException("신청자를 찾을 수 없습니다. ID: " + applicantId));
+
+        // 5. 기존 신청 알림(상태: 검토중) 조회
+        Optional<AlertProject> optionalAlert = alertProjectRepository.findByProjectIdAndUserIdAndStatus(
+                projectId, applicantId, AlertProject.Status.검토중);
+        if (optionalAlert.isEmpty()) {
+            log.error("🚨 [handleApplication] 해당 신청 알림을 찾을 수 없습니다. 프로젝트 ID: {}, 신청자 ID: {}",
+                    projectId, applicantId);
+            throw new EntityNotFoundException("해당 신청 알림을 찾을 수 없습니다.");
+        }
+        AlertProject existingAlert = optionalAlert.get();
+
+        // 6. 기존 신청 알림을 읽음 처리 (선택 사항)
+        existingAlert.markAsRead();
+
+        // 7. 응답에 따른 새로운 알림 생성 (신청자에게 전달)
+        AlertProject.Status newStatus = accepted ? AlertProject.Status.합격 : AlertProject.Status.불합격;
+        String contentForApplicant = accepted
+                ? "프로젝트 [" + project.getTitle() + "] 참가 신청이 수락되었습니다."
+                : "프로젝트 [" + project.getTitle() + "] 참가 신청이 거절되었습니다.";
+        AlertProject responseAlertForApplicant = AlertProject.builder()
+                .project(project)
+                .user(applicant)
+                .status(newStatus)
+                .content(contentForApplicant)
+                .isRead(false)
+                .build();
+        alertProjectRepository.save(responseAlertForApplicant);
+        log.info("✅ [handleApplication] 신청자(ID: {})에게 응답 알림 생성 완료: {}", applicantId, newStatus);
+
+        // 8. 응답 결과를 프로젝트 소유자(응답 처리자)에게도 알림 생성 (자신의 응답 확인)
+        String contentForOwner = "신청자 " + applicant.getName() + " 의 참가 신청에 대해 " + (accepted ? "수락" : "거절") + " 응답을 전송하였습니다.";
+        AlertProject responseAlertForOwner = AlertProject.builder()
+                .project(project)
+                .user(project.getUser()) // 프로젝트 소유자
+                .status(newStatus)
+                .content(contentForOwner)
+                .isRead(false)
+                .build();
+        alertProjectRepository.save(responseAlertForOwner);
+        log.info("✅ [handleApplication] 프로젝트 소유자에게 응답 확인 알림 생성 완료");
     }
 }

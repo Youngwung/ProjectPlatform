@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AlertProjectRepository extends JpaRepository<AlertProject, Long> {
@@ -27,6 +28,8 @@ public interface AlertProjectRepository extends JpaRepository<AlertProject, Long
 
     @Modifying
     @Transactional
-    @Query("UPDATE AlertPortfolio a SET a.isRead = true WHERE a.portfolio.user.id = :userId")
+    @Query("UPDATE AlertProject a SET a.isRead = true WHERE a.user.id = :userId")
     int markAllAsReadByUserId(@Param("userId") Long userId);
+
+    Optional<AlertProject> findByProjectIdAndUserIdAndStatus(Long projectId, Long applicantId, AlertProject.Status status);
 }

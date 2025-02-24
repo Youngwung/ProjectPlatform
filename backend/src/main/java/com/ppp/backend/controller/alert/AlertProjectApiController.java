@@ -83,4 +83,46 @@ public class AlertProjectApiController {
         alertProjectService.deleteProjectAlert(alertId);
         return ResponseEntity.ok().build();
     }
+
+    // 🔸 프로젝트 참가 신청 API
+    @PostMapping("/{projectId}/apply")
+    public ResponseEntity<Void> applyProject(@PathVariable Long projectId, HttpServletRequest request) {
+        alertProjectService.applyProject(projectId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    // 🔸 프로젝트 초대 API
+    @PostMapping("/{projectId}/invite/{inviteeId}")
+    public ResponseEntity<Void> inviteToProject(@PathVariable Long projectId, @PathVariable Long inviteeId, HttpServletRequest request) {
+        alertProjectService.inviteToProject(projectId, inviteeId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    // 🔸 프로젝트 초대 수락 API
+    @PostMapping("/{projectId}/invite/{inviteId}/accept")
+    public ResponseEntity<Void> acceptInvite(@PathVariable Long projectId, @PathVariable Long inviteId, HttpServletRequest request) {
+        alertProjectService.handleInviteResponse(projectId, inviteId, true, request);
+        return ResponseEntity.ok().build();
+    }
+
+    // 🔸 프로젝트 초대 거절 API
+    @PostMapping("/{projectId}/invite/{inviteId}/reject")
+    public ResponseEntity<Void> rejectInvite(@PathVariable Long projectId, @PathVariable Long inviteId, HttpServletRequest request) {
+        alertProjectService.handleInviteResponse(projectId, inviteId, false, request);
+        return ResponseEntity.ok().build();
+    }
+
+    // 🔸 프로젝트 참가 신청 수락 API
+    @PostMapping("/{projectId}/application/{applicantId}/accept")
+    public ResponseEntity<Void> acceptApplication(@PathVariable Long projectId, @PathVariable Long applicantId, HttpServletRequest request) {
+        alertProjectService.handleApplication(projectId, applicantId, true, request);
+        return ResponseEntity.ok().build();
+    }
+
+    // 🔸 프로젝트 참가 신청 거절 API
+    @PostMapping("/{projectId}/application/{applicantId}/reject")
+    public ResponseEntity<Void> rejectApplication(@PathVariable Long projectId, @PathVariable Long applicantId, HttpServletRequest request) {
+        alertProjectService.handleApplication(projectId, applicantId, false, request);
+        return ResponseEntity.ok().build();
+    }
 }

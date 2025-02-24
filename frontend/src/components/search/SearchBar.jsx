@@ -24,7 +24,7 @@ export default function SearchBar({ queryData }) {
 
 	const handleOnSkillDelete = (skillToDelete) => {
 		setData((prevData) => ({
-		...prevData,
+			...prevData,
 			querySkills: prevData.querySkills.filter(
 				(skill) => skill !== skillToDelete
 			),
@@ -133,19 +133,21 @@ export default function SearchBar({ queryData }) {
 				<div className="flex flex-wrap gap-2"></div>
 				<div className="flex w-full justify-between align-items-center border">
 					<Row xs={12} className="w-full">
-						<Col xs={3}>
-							<Form.Select
-								name="type"
-								aria-label="Default select example"
-								value={data.type}
-								onChange={handleChange}
-							>
-								<option value="all">모두 설정됨 (기본값)</option>
-								<option value="content">주제만 설정됨</option>
-								<option value="skill">사용 기술 스택만 설정됨</option>
-							</Form.Select>
-						</Col>
-						<Col xs={9}>
+						{inProjectPage && (
+							<Col xs={3}>
+								<Form.Select
+									name="type"
+									aria-label="Default select example"
+									value={data.type}
+									onChange={handleChange}
+								>
+									<option value="all">모두 설정됨 (기본값)</option>
+									<option value="content">주제만 설정됨</option>
+									<option value="skill">사용 기술 스택만 설정됨</option>
+								</Form.Select>
+							</Col>
+						)}
+						<Col>
 							<InputGroup className="h-10 d-flex justify-content-center">
 								<Form.Control
 									name="query"

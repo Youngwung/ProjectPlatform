@@ -77,6 +77,9 @@ spring:
             user-name-attribute: id
 ---
 spring:
+  output:
+    ansi:
+      enabled: ALWAYS
   config:
     activate:
       on-profile: local

@@ -36,8 +36,10 @@ const Login = () => {
 
   // 소셜 로그인 구현을 위한 코드
   const handleLogin = (provider) => {
-    // navigate(`http://localhost:8080/oauth2/authorization/${provider}`);
-    window.location.href = `http://localhost:8080/oauth2/authorization/${provider}`;
+		const oauth2URL = `http://localhost:8080/oauth2/authorization/${provider}`;
+		console.log(oauth2URL);
+		
+    window.location.href = oauth2URL;
   }
 
 	return (

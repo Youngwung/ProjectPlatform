@@ -83,6 +83,7 @@ spring:
   config:
     activate:
       on-profile: local
+    import: optional:file./.env
   servlet:
     multipart:
       max-file-size: 10MB
@@ -124,14 +125,13 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
-            scope:
-              - email
+            scope: email, profile
           naver:
             client-id: ${NAVER_CLIENT_ID}
             client-secret: ${NAVER_CLIENT_SECRET}
             client-name: Naver
             authorization-grant-type: authorization_code
-            redirect-uri: "http://localhost:8080/login/oauth2/code/{registrationId}"
+            redirect-uri: "http://localhost:8080/login/oauth2/code/naver"
             scope:
               - email
               - name
@@ -140,9 +140,10 @@ spring:
             client-secret: ${KAKAO_CLIENT_SECRET}
             client-name: Kakao
             authorization-grant-type: authorization_code
-            redirect-uri: "http://localhost:8080/login/oauth2/code/{registrationId}"
+            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            client-authentication-method: client_secret_post
             scope:
-              - nickname
+              - profile_nickname
         provider:
           naver:
             authorization-uri: https://nid.naver.com/oauth2.0/authorize

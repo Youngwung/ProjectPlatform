@@ -1,5 +1,4 @@
-import Cookies from 'js-cookie';
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 import React, { useEffect, useRef, useState } from "react";
 import {
 	Button,
@@ -10,7 +9,7 @@ import {
 	InputGroup,
 	Row,
 } from "react-bootstrap";
-import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from "react-router-dom";
 import authApi from "../api/authApi";
 import userApi from "../api/userApi";
 
@@ -19,11 +18,13 @@ import userApi from "../api/userApi";
 const handleSubmit = async (e) => {
 	e.preventDefault();
 	const email = e.target.email.value;
+	// TODO: 패스워드 정규식 처리 필요, 현재 서버에서 8자 이상 받기로 설정되어있음
 	const password = e.target.password.value;
 	const confirmPassword = e.target.confirmPassword.value;
 	const name = e.target.name.value;
 	const phoneNumber = e.target.phoneNumber.value;
 	const experience = e.target.experience.value;
+	// TODO: 토큰에서 ProviderName 전달하는 로직으로 변경
 	const providerId = "4";
 	if (password !== confirmPassword) {
 		alert("비밀번호가 일치하지 않습니다.");
@@ -36,6 +37,7 @@ const handleSubmit = async (e) => {
 			name,
 			phoneNumber,
 			experience,
+			// TODO: 토큰에서 ProviderName 전달하는 로직으로 변경
 			providerId,
 		});
 		console.log(response);
@@ -45,35 +47,36 @@ const handleSubmit = async (e) => {
 		alert("회원가입 중 오류가 발생했습니다.");
 	}
 };
+
 const Signup = () => {
-    const navigate = useNavigate();
+	const [queryParams] = useSearchParams();
 
 	// 소셜 로그인 구현 부분
 	const [userInfo, setUserInfo] = useState({
 		email: "",
 		name: "",
-		providerId: null,
+		providerName: "",
 	});
 
-    useEffect(() => {
-        const tempToken = Cookies.get('TEMP_TOKEN');
-        if (tempToken) {
-            const decoded = jwtDecode(tempToken);
-            setUserInfo({
-                ...userInfo,
-                email: decoded.sub,
-                name: decoded.name,
-                providerId: decoded.providerId
-            });
-        } else {
-            // 
-            navigate('/login');
-        }
-    }, [])
-    
+	useEffect(() => {
+		const tempToken= queryParams.get("token", "");
+		console.log(tempToken);
+		if (tempToken) {
+			const decoded = jwtDecode(tempToken);
+			console.log(decoded);
+			setUserInfo({
+				...userInfo,
+				email: decoded.sub,
+				name: decoded.name,
+				providerName: decoded.providerName,
+			});
+		}
+	}, []);
+
 	const emailRef = useRef();
 
 	const handleDuplicate = async () => {
+		// TODO 중복되지 않은 이메일도 중복되었다고 뜸
 		const email = emailRef.current.value;
 		if (!email) {
 			alert("이메일을 입력해주세요.");
@@ -101,25 +104,54 @@ const Signup = () => {
 							<Form onSubmit={handleSubmit}>
 								<Form.Group controlId="name">
 									<Form.Label>이름</Form.Label>
-									<Form.Control
+									{userInfo.name ? 
+									(
+										<Form.Control
+										type="text"
+										className="bg-slate-300"
+										placeholder="이름을 입력해주세요"
+										value={userInfo.name}
+										readOnly={true}
+										/>
+									) 
+									: 
+									(
+										<Form.Control
 										type="text"
 										placeholder="이름을 입력해주세요"
 										required
-									/>
+										/>
+									)}
+									
 								</Form.Group>
 
 								<Form.Group controlId="email">
 									<Form.Label>이메일</Form.Label>
 									<InputGroup>
-										<Form.Control
+										{userInfo.email ? (
+											<Form.Control
 											type="email"
-											placeholder="이메일을 입11력해주세요"
+											placeholder="이메일을 입력해주세요"
 											ref={emailRef}
+											value={userInfo.email}
+											className="bg-slate-300"
+											readOnly={true}
 											required
 										/>
+										) 
+										: 
+										(
+											<Form.Control
+												type="email"
+												placeholder="이메일을 입력해주세요"
+												ref={emailRef}
+												required
+											/>	
+										)}
 										<Button variant="secondary" onClick={handleDuplicate}>
 											중복확인
 										</Button>
+										
 									</InputGroup>
 								</Form.Group>
 

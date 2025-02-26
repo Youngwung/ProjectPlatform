@@ -10,7 +10,7 @@ const AlertDetail = ({ isProject }) => {
   const [alert, setAlert] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // alert 상세 정보만 API로 가져옴 (백엔드에서 isMyProject가 세팅되어 있음)
+  // 백엔드에서 AlertDetail 정보를 받아옴 (senderUserDto, receiverUserDto, alertOwnerUserDto 포함)
   useEffect(() => {
     const fetchAlertDetail = async () => {
       if (!alertId) return;
@@ -29,27 +29,25 @@ const AlertDetail = ({ isProject }) => {
     setAlert((prev) => ({ ...prev, isRead: true }));
   };
 
-  // isMyProject에 따라 신청/초대 API를 분기하여 호출
+  // 신청/초대 응답 API 호출
   const handleAccept = async () => {
     if (!alert || !alert.project) return;
-    if (alert.isMyProject) {
-      // 내프로젝트인 경우 → 참가 신청 알림 API 호출
-      await alertApi.acceptApplication(alert.project.id, alert.applicantId);
+    if (alert.type === "참가알림") {
+      await alertApi.acceptApplication(alert.project.id, alert.senderUserDto.id);
       console.log("신청 수락 처리 완료");
-    } else {
-      // 내프로젝트가 아닌 경우 → 초대 알림 API 호출
-      await alertApi.acceptInvite(alert.project.id, alert.inviteId);
+    } else if (alert.type === "초대알림") {
+      await alertApi.acceptInvite(alert.project.id, alert.receiverUserDto.id);
       console.log("초대 수락 처리 완료");
     }
   };
 
   const handleReject = async () => {
     if (!alert || !alert.project) return;
-    if (alert.isMyProject) {
-      await alertApi.rejectApplication(alert.project.id, alert.applicantId);
+    if (alert.type === "참가알림") {
+      await alertApi.rejectApplication(alert.project.id, alert.senderUserDto.id);
       console.log("신청 거절 처리 완료");
-    } else {
-      await alertApi.rejectInvite(alert.project.id, alert.inviteId);
+    } else if (alert.type === "초대알림") {
+      await alertApi.rejectInvite(alert.project.id, alert.receiverUserDto.id);
       console.log("초대 거절 처리 완료");
     }
   };
@@ -81,21 +79,34 @@ const AlertDetail = ({ isProject }) => {
         </Card.Header>
 
         <Card.Body className="p-4">
+          {/* 기본 알림 정보 */}
           <Row className="mb-3">
             <Col md={8}>
-              <h6 className="fw-bold">보낸 사람: {alert.senderName || "알 수 없음"}</h6>
-              <h6 className="fw-bold">받는 사람: {alert.receiverName || "알 수 없음"}</h6>
-              <p className="text-muted">{new Date(alert.createdAt).toLocaleString()}</p>
+              <h6 className="fw-bold">
+                보낸 사람: {alert.senderUserDto?.name || "알 수 없음"}
+              </h6>
+              <h6 className="fw-bold">
+                받는 사람: {alert.receiverUserDto?.name || "알 수 없음"}
+              </h6>
+              <p className="text-muted">
+                {new Date(alert.createdAt).toLocaleString()}
+              </p>
             </Col>
             <Col md={4} className="text-end">
-              <Badge bg="info" className="px-3 py-2">{alert.status}</Badge>
+              <Badge bg="info" className="px-3 py-2">
+                {alert.status}
+              </Badge>
               <Button
                 variant="outline-secondary"
                 size="sm"
                 onClick={handleMarkAsRead}
                 disabled={alert.isRead}
               >
-                {alert.isRead ? <HiOutlineMailOpen size={20} /> : <HiOutlineMail size={20} />}
+                {alert.isRead ? (
+                  <HiOutlineMailOpen size={20} />
+                ) : (
+                  <HiOutlineMail size={20} />
+                )}
               </Button>
             </Col>
           </Row>
@@ -103,52 +114,85 @@ const AlertDetail = ({ isProject }) => {
           <h6 className="fw-bold py-4 fs-2">{alert.content}</h6>
           <hr />
 
-          {/* 조건별 UI 분기 */}
+          {/* 정보 영역: 신청자 정보 또는 프로젝트 정보 */}
           {isProject && alert.project && (
             <>
-              {alert.isMyProject ? (
-                // 내프로젝트인 경우 (내 프로젝트에 대한 알림)
+              {alert.myProject ? (
                 alert.type === "참가알림" ? (
-                  // 참가 알림: 다른 유저가 내 프로젝트에 참가 신청 → 신청자 정보 표시
                   <>
                     <h6 className="fw-bold">👤 신청자 정보</h6>
                     <p>
-                      <strong>이름:</strong> {alert.applicant?.name || "알 수 없음"} <br />
-                      <strong>이메일:</strong> {alert.applicant?.email || "알 수 없음"}
-                      {/* TODO 기술스택 등등 */}
+                      <strong>이름:</strong> {alert.senderUserDto?.name || "알 수 없음"} <br />
+                      <strong>이메일:</strong> {alert.senderUserDto?.email || "알 수 없음"} <br />
+                      <strong>경험치:</strong> {alert.senderUserDto?.experience || "알 수 없음"} <br />
+                      <strong>링크:</strong>{" "}
+                      {alert.senderUserDto?.links && alert.senderUserDto.links.length > 0 ? (
+                        alert.senderUserDto.links.map((link, index) => (
+                          <span key={link.id}>
+                            <a href={link.url} target="_blank" rel="noreferrer">
+                              {link.description || link.url}
+                            </a>
+                            {index < alert.senderUserDto.links.length - 1 ? ", " : ""}
+                          </span>
+                        ))
+                      ) : (
+                        "링크 정보 없음"
+                      )}
                     </p>
                   </>
                 ) : (
-                  // 초대 알림: 내 프로젝트에 대해 내가 다른 유저를 초대 → 추가 정보 없이 content만 표시
                   <p className="text-muted">추가 신청자 정보가 없습니다.</p>
                 )
               ) : (
-                // 내프로젝트가 아닌 경우
-                alert.type === "초대알림" ? (
-                  // 초대 알림: 내가 다른 유저에게 프로젝트 초대를 보낸 경우 → 프로젝트 정보 표시
+                alert.type === "초대알림" && (
                   <>
                     <h6 className="fw-bold">📂 프로젝트 정보</h6>
                     <p>
-                      <strong>프로젝트명:</strong> {alert.project.title} <br />
-                      <strong>설명:</strong> {alert.project.description}
+                      <strong>프로젝트명:</strong> {alert.project?.title || "알 수 없음"} <br />
+                      <strong>설명:</strong> {alert.project?.description || "알 수 없음"} <br />
+                      <strong>최대 인원:</strong> {alert.project?.maxPeople || "알 수 없음"} <br />
+                      <strong>상태:</strong> {alert.project?.status || "알 수 없음"}
                     </p>
                   </>
-                ) : null
-              )}
-
-              {(alert.inviteId || alert.applicantId) && (
-                <div className="text-center mt-4">
-                  <Button variant="success" className="px-4" onClick={handleAccept}>
-                    {alert.isMyProject && alert.type === "참가알림" ? "신청 수락" : "초대 수락"}
-                  </Button>
-                  <Button variant="danger" className="ms-3 px-4" onClick={handleReject}>
-                    {alert.isMyProject && alert.type === "참가알림" ? "신청 거절" : "초대 거절"}
-                  </Button>
-                </div>
+                )
               )}
             </>
           )}
+          
+          { 
+            // 원본 알림(step === 1)이고 내가 소유한 프로젝트/포트폴리오인 경우에만 버튼 표시
+            alert.step === 1 && alert.myProject ? (
+              isProject && alert.type === "참가알림" ? (
+                <div className="text-center mt-4">
+                  <Button variant="success" className="px-4" onClick={handleAccept}>
+                    신청 수락
+                  </Button>
+                  <Button variant="danger" className="ms-3 px-4" onClick={handleReject}>
+                    신청 거절
+                  </Button>
+                </div>
+              ) : !isProject && alert.type === "초대알림" ? (
+                <div className="text-center mt-4">
+                  <Button variant="success" className="px-4" onClick={handleAccept}>
+                    초대 수락
+                  </Button>
+                  <Button variant="danger" className="ms-3 px-4" onClick={handleReject}>
+                    초대 거절
+                  </Button>
+                </div>
+              ) : null
+            ) : alert.step === 2 ? (
+              // 응답 후 업데이트된 기존 알림(step 2): 버튼 대신 상태를 Badge로 표시
+              <div className="text-center mt-4">
+                <Badge bg="info" className="px-3 py-2">
+                  {alert.status}
+                </Badge>
+              </div>
+            ) : null
+          }
 
+
+          {/* 내비게이션 버튼: 중복되지 않게 한 번만 표시 */}
           <div className="text-center mt-4">
             <Button variant="success" className="px-4" onClick={() => navigate("/mypage/alert")}>
               🔙 뒤로 가기
@@ -156,7 +200,9 @@ const AlertDetail = ({ isProject }) => {
             <Button
               variant="primary"
               className="ms-3 px-4"
-              onClick={() => navigate(isProject ? `/project/${alert.project?.id}` : `/portfolio/${alert.portfolio?.id}`)}
+              onClick={() =>
+                navigate(isProject ? `/project/read/${alert.project?.id}` : `/portfolio/${alert.portfolio?.id}`)
+              }
             >
               🔍 바로가기
             </Button>

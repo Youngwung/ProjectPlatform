@@ -56,6 +56,13 @@ const AlertBtn = () => {
   useEffect(() => {
     handleProjectAlerts();
     handlePortfolioAlerts();
+    const intervalId = setInterval(() => {
+      handleProjectAlerts();
+      handlePortfolioAlerts();
+    }, 30000); // 30,000ms = 30초
+
+    // 컴포넌트 언마운트 시 interval 클리어
+    return () => clearInterval(intervalId);
   }, []);
 
   // 알림 클릭 시: 읽음 처리 후 상세 페이지로 이동

@@ -15,21 +15,41 @@ import java.util.Optional;
 public interface AlertProjectRepository extends JpaRepository<AlertProject, Long> {
 
     /**
-     * 특정 유저의 모든 프로젝트 알림을 최신순으로 조회 (DESC)
+     * 특정 유저(알람 소유자)의 모든 프로젝트 알람을 최신순으로 조회 (DESC)
      */
-    @Query("SELECT a FROM AlertProject a WHERE a.user.id = :userId ORDER BY a.createdAt DESC")
-    List<AlertProject> findByUserId(Long userId);
+    @Query("SELECT a FROM AlertProject a WHERE a.alertOwnerId.id = :userId ORDER BY a.createdAt DESC")
+    List<AlertProject> findByAlertOwnerId(@Param("userId") Long userId);
 
     /**
-     * 특정 유저의 읽지 않은 프로젝트 알림을 최신순으로 조회 (DESC)
+     * 특정 유저(알람 소유자)의 읽지 않은 프로젝트 알람을 최신순으로 조회 (DESC)
      */
-    @Query("SELECT a FROM AlertProject a WHERE a.user.id = :userId AND a.isRead = false ORDER BY a.createdAt DESC")
-    List<AlertProject> findByUserIdAndIsRead(Long userId, boolean isRead);
+    @Query("SELECT a FROM AlertProject a WHERE a.alertOwnerId.id = :userId AND a.isRead = false ORDER BY a.createdAt DESC")
+    List<AlertProject> findByAlertOwnerIdAndIsRead(@Param("userId") Long userId, boolean isRead);
 
+    /**
+     * 특정 유저(알람 소유자)의 모든 알람을 읽음 처리 (업데이트)
+     */
     @Modifying
     @Transactional
-    @Query("UPDATE AlertProject a SET a.isRead = true WHERE a.user.id = :userId")
-    int markAllAsReadByUserId(@Param("userId") Long userId);
+    @Query("UPDATE AlertProject a SET a.isRead = true WHERE a.alertOwnerId.id = :userId")
+    int markAllAsReadByAlertOwnerId(@Param("userId") Long userId);
 
-    Optional<AlertProject> findByProjectIdAndUserIdAndStatus(Long projectId, Long applicantId, AlertProject.Status status);
+    /**
+     * 신청자용 알림 조회: alertOwnerId가 신청자 ID와 일치하는 알림을 조회합니다.
+     */
+    @Query("SELECT a FROM AlertProject a WHERE a.project.id = :projectId AND a.alertOwnerId.id = :applicantId AND a.status = :status")
+    Optional<AlertProject> findApplicantAlertByProjectIdAndAlertOwnerIdAndStatus(
+            @Param("projectId") Long projectId,
+            @Param("applicantId") Long applicantId,
+            @Param("status") AlertProject.Status status);
+
+    /**
+     * 소유자용 알림 조회: alertOwnerId가 프로젝트 소유자 ID와 일치하는 알림을 조회합니다.
+     */
+    @Query("SELECT a FROM AlertProject a WHERE a.project.id = :projectId AND a.alertOwnerId.id = :ownerId AND a.status = :status")
+    Optional<AlertProject> findOwnerAlertByProjectIdAndAlertOwnerIdAndStatus(
+            @Param("projectId") Long projectId,
+            @Param("ownerId") Long ownerId,
+            @Param("status") AlertProject.Status status);
+
 }

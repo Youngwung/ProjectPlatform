@@ -1,6 +1,6 @@
 package com.ppp.backend.service.alert;
 
-import com.ppp.backend.controller.AuthApiController;
+import com.ppp.backend.controller.AuthApiController; // 사용하지 않는 경우 추후 삭제 가능
 import com.ppp.backend.domain.Project;
 import com.ppp.backend.domain.User;
 import com.ppp.backend.domain.alert.AlertProject;
@@ -9,11 +9,12 @@ import com.ppp.backend.dto.ProjectDTO;
 import com.ppp.backend.dto.UserDto;
 import com.ppp.backend.dto.alert.AlertProjectDto;
 import com.ppp.backend.repository.LinkRepository;
-import com.ppp.backend.repository.LinkTypeRepository;
+import com.ppp.backend.repository.LinkTypeRepository; // 사용하지 않는 경우 추후 삭제 가능
 import com.ppp.backend.repository.ProjectRepository;
 import com.ppp.backend.repository.ProjectTypeRepository;
 import com.ppp.backend.repository.UserRepository;
 import com.ppp.backend.repository.alert.AlertProjectRepository;
+import com.ppp.backend.util.AuthUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -31,16 +32,21 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AlertProjectService {
 
+    // ==================== 필드 ====================
     private final AlertProjectRepository alertProjectRepository;
-    private final AuthApiController authApiController;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final ProjectTypeRepository projectTypeRepository;
     private final LinkRepository linkRepository;
-    private final LinkTypeRepository linkTypeRepository;
+    // private final LinkTypeRepository linkTypeRepository; // 사용하지 않음 (추후 삭제 가능)
+    private final AuthUtil authUtil;
 
+    // ==================== 조회 관련 메서드 ====================
     /**
-     * 🔹 유저의 모든 프로젝트 알림 조회 (DTO 변환)
+     * 정의: 유저의 모든 프로젝트 알림을 조회하여 AlertProjectDto 리스트로 반환합니다.
+     *
+     * @param request HTTP 요청 객체에 JWT 쿠키에서 사용자 ID를 추출합니다.
+     * @return 해당 사용자의 모든 프로젝트 알림을 담은 List&lt;AlertProjectDto&gt; 반환
      */
     public List<AlertProjectDto> getUserProjectAlerts(HttpServletRequest request) {
         Long userId = extractUserIdOrThrow(request);
@@ -52,7 +58,10 @@ public class AlertProjectService {
     }
 
     /**
-     * 🔹 유저의 읽지 않은 프로젝트 알림 조회 (DTO 변환)
+     * 유저의 읽지 않은 프로젝트 알림을 조회하여 AlertProjectDto 리스트로 반환
+     *
+     * @param request HTTP 요청 객체에 JWT 쿠키에서 사용자 ID를 추출함
+     * @return 읽지 않은 알림만을 포함한 List&lt;AlertProjectDto&gt; 반환
      */
     public List<AlertProjectDto> getUnreadProjectAlerts(HttpServletRequest request) {
         Long userId = extractUserIdOrThrow(request);
@@ -64,12 +73,54 @@ public class AlertProjectService {
     }
 
     /**
-     * 🔹 새로운 프로젝트 알림 저장 (DTO 변환 후 저장)
+     * 특정 알림 ID에 해당하는 프로젝트 알림을 조회하여 AlertProjectDto로 반환합니다.
+     *
+     * @param alertId 조회할 알림의 고유 ID
+     * @param request HTTP 요청 객체로, JWT 쿠키에서 사용자 ID를 추출합니다.
+     * @return 조회된 프로젝트 알림을 변환한 AlertProjectDto 반환
+     * @throws EntityNotFoundException 해당 알림이 존재하지 않을 경우 예외 발생
+     */
+    public AlertProjectDto getProjectAlertById(Long alertId, HttpServletRequest request) {
+        Long userId = extractUserIdOrThrow(request);
+        log.info("✅ [getProjectAlertById] 유저 ID: {} - 알림 ID: {}", userId, alertId);
+
+        AlertProject alertProject = alertProjectRepository.findById(alertId)
+                .orElseThrow(() -> {
+                    log.warn("❌ [getProjectAlertById] 프로젝트 알림 ID {} 찾을 수 없음", alertId);
+                    return new EntityNotFoundException("해당 프로젝트 알림을 찾을 수 없습니다. ID: " + alertId);
+                });
+
+        AlertProjectDto alertProjectDto = convertToDto(alertProject, userId);
+        log.info("✅ [getProjectAlertById] 조회 성공 - 알림 ID: {}", alertProjectDto.getId());
+        return alertProjectDto;
+    }
+
+    /**
+     * 요청한 사용자의 모든 프로젝트 알림을 읽음 처리합니다.
+     *
+     * @param request HTTP 요청 객체로, JWT 쿠키에서 사용자 ID를 추출합니다.
+     */
+    public void markAllProjectAlertsAsRead(HttpServletRequest request) {
+        Long userId = extractUserIdOrThrow(request);
+        log.info("✅ [markAllProjectAlertsAsRead] 유저 ID {}의 모든 알림 읽음 처리 요청", userId);
+
+        int updatedCount = alertProjectRepository.markAllAsReadByAlertOwnerId(userId);
+        log.info("✅ [markAllProjectAlertsAsRead] 총 {}개의 프로젝트 알림 읽음 처리 완료", updatedCount);
+    }
+
+    // ==================== 생성/수정/삭제 관련 메서드 ====================
+
+    /**
+     * 새로운 프로젝트 알림을 생성하여 저장하고, 저장된 알림을 AlertProjectDto로 반환합니다.
+     *
+     * @param alertProjectDto 생성할 알림의 정보를 담은 DTO 객체
+     * @return 저장된 알림을 변환한 AlertProjectDto 반환
+     * @throws EntityNotFoundException 해당 프로젝트가 존재하지 않을 경우 예외 발생
      */
     public AlertProjectDto createProjectAlert(AlertProjectDto alertProjectDto) {
         log.info("✅ [createProjectAlert] 요청 데이터: {}", alertProjectDto);
 
-        var project = projectRepository.findById(alertProjectDto.getProject().getId())
+        Project project = projectRepository.findById(alertProjectDto.getProject().getId())
                 .orElseThrow(() -> {
                     log.error("❌ [createProjectAlert] 프로젝트 ID {} 찾을 수 없음", alertProjectDto.getProject().getId());
                     return new EntityNotFoundException("해당 프로젝트를 찾을 수 없습니다. ID: " + alertProjectDto.getProject().getId());
@@ -89,7 +140,9 @@ public class AlertProjectService {
     }
 
     /**
-     * 🔹 프로젝트 알림을 읽음 처리
+     * 특정 알림 ID에 해당하는 프로젝트 알림을 읽음 처리합니다.
+     *
+     * @param alertId 읽음 처리할 알림의 고유 ID
      */
     public void markProjectAlertAsRead(Long alertId) {
         log.info("✅ [markProjectAlertAsRead] 알림 ID: {}", alertId);
@@ -101,7 +154,10 @@ public class AlertProjectService {
     }
 
     /**
-     * 🔹 특정 프로젝트 알림 삭제
+     * 특정 알림 ID에 해당하는 프로젝트 알림을 삭제합니다.
+     *
+     * @param alertId 삭제할 알림의 고유 ID
+     * @throws EntityNotFoundException 해당 알림이 존재하지 않을 경우 예외 발생
      */
     public void deleteProjectAlert(Long alertId) {
         log.info("✅ [deleteProjectAlert] 삭제 요청 - 알림 ID: {}", alertId);
@@ -115,135 +171,15 @@ public class AlertProjectService {
         log.info("✅ [deleteProjectAlert] 알림 ID {} 삭제 완료", alertId);
     }
 
-    /**
-     * 🔹 특정 프로젝트 알림 조회
-     */
-    public AlertProjectDto getProjectAlertById(Long alertId, HttpServletRequest request) {
-        Long userId = extractUserIdOrThrow(request);
-        log.info("✅ [getProjectAlertById] 유저 ID: {} - 알림 ID: {}", userId, alertId);
-
-        AlertProject alertProject = alertProjectRepository.findById(alertId)
-                .orElseThrow(() -> {
-                    log.warn("❌ [getProjectAlertById] 프로젝트 알림 ID {} 찾을 수 없음", alertId);
-                    return new EntityNotFoundException("해당 프로젝트 알림을 찾을 수 없습니다. ID: " + alertId);
-                });
-
-        AlertProjectDto alertProjectDto = convertToDto(alertProject, userId);
-        log.info("✅ [getProjectAlertById] 조회 성공 - 알림 ID: {}", alertProjectDto.getId());
-        return alertProjectDto;
-    }
+    // ==================== 프로세스 처리 관련 메서드 ====================
 
     /**
-     * 🔹 AlertProject 엔티티 → AlertProjectDto 변환
-     * senderUserDto와 receiverUserDto를 분리하여 담습니다.
-     */
-    private AlertProjectDto convertToDto(AlertProject alertProject, Long loginUserId) {
-        // 프로젝트 타입 조회
-        String projectType = projectTypeRepository.findByProjectId(alertProject.getProject().getId())
-                .map(pt -> pt.getType().name())
-                .orElse(null);
-
-        // ProjectDTO 변환
-        ProjectDTO projectDTO = ProjectDTO.builder()
-                .id(alertProject.getProject().getId())
-                .userId(alertProject.getProject().getUser().getId())
-                .title(alertProject.getProject().getTitle())
-                .description(alertProject.getProject().getDescription())
-                .maxPeople(alertProject.getProject().getMaxPeople())
-                .status(alertProject.getProject().getStatus().name())
-                .isPublic(alertProject.getProject().isPublic())
-                .type(projectType)
-                .createdAt(alertProject.getProject().getCreatedAt().toLocalDateTime())
-                .updatedAt(alertProject.getProject().getUpdatedAt().toLocalDateTime())
-                .build();
-
-        // 로그인한 사용자가 프로젝트 소유자인지 확인 (내 프로젝트 여부)
-        boolean isMyProject = loginUserId != null && loginUserId.equals(alertProject.getProject().getUser().getId());
-
-        User senderUser = alertProject.getSenderId();
-        User receiverUser = alertProject.getReceiverId();
-        User alertOwnerUser = alertProject.getAlertOwnerId();
-        // 엔티티에서 저장된 sender, receiver, alertOwner 정보를 그대로 사용
-        UserDto senderUserDto = convertToUserDto(alertProject.getSenderId());
-        UserDto receiverUserDto = convertToUserDto(alertProject.getReceiverId());
-        UserDto alertOwnerUserDto = convertToUserDto(alertProject.getAlertOwnerId());
-        // 디버깅용 로그 출력
-        log.debug("convertToDto - senderUser id: {}, name: {}", senderUser.getId(), senderUser.getName());
-        log.debug("convertToDto - receiverUser id: {}, name: {}", receiverUser.getId(), receiverUser.getName());
-        log.debug("convertToDto - alertOwnerUser id: {}, name: {}", alertOwnerUser.getId(), alertOwnerUser.getName());
-        return AlertProjectDto.builder()
-                .id(alertProject.getId())
-                .project(projectDTO)
-                .status(alertProject.getStatus().name())
-                .content(alertProject.getContent())
-                .type(alertProject.getType().name())
-                .createdAt(alertProject.getCreatedAt())
-                .isRead(alertProject.isRead())
-                .isMyProject(isMyProject)
-                .step(alertProject.getStep())
-                .senderUserDto(senderUserDto)
-                .receiverUserDto(receiverUserDto)
-                .alertOwnerUserDto(alertOwnerUserDto)
-                .build();
-    }
-
-
-
-    /**
-     * 🔹 User 엔티티 → UserDto 변환
-     * User 엔티티에 links 필드가 없으므로, LinkRepository를 통해 userId로 링크들을 조회하여 LinkDto로 변환합니다.
-     */
-    private UserDto convertToUserDto(User user) {
-        List<LinkDto> linkDtos = linkRepository.findByUserId(user.getId()).stream()
-                .map(link -> LinkDto.builder()
-                        .id(link.getId())
-                        .userId(link.getUser().getId())
-                        .linkTypeId(link.getLinkType() != null ? link.getLinkType().getId() : 1L)
-                        .url(link.getUrl())
-                        .description(link.getDescription())
-                        .build())
-                .collect(Collectors.toList());
-
-        // TODO: user의 skill 정보 변환 로직 추가 필요 시
-
-        return UserDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .experience(user.getExperience())
-                .links(linkDtos)
-                .build();
-    }
-
-    /**
-     * 🔹 유저 ID를 쿠키에서 추출 (없으면 예외 발생)
-     */
-    private Long extractUserIdOrThrow(HttpServletRequest request) {
-        Long userId = authApiController.extractUserIdFromCookie(request);
-        if (userId == null) {
-            log.warn("🚨 [extractUserIdOrThrow] 유저 인증 실패 - 쿠키 없음");
-            throw new IllegalStateException("유저 인증에 실패했습니다.");
-        }
-        log.info("✅ [extractUserIdOrThrow] 유저 인증 성공 - ID: {}", userId);
-        return userId;
-    }
-
-    /**
-     * 🔹 모든 프로젝트 알림 읽음 처리
-     */
-    public void markAllProjectAlertsAsRead(HttpServletRequest request) {
-        Long userId = extractUserIdOrThrow(request);
-        log.info("✅ [markAllProjectAlertsAsRead] 유저 ID {}의 모든 알림 읽음 처리 요청", userId);
-
-        int updatedCount = alertProjectRepository.markAllAsReadByAlertOwnerId(userId);
-        log.info("✅ [markAllProjectAlertsAsRead] 총 {}개의 프로젝트 알림 읽음 처리 완료", updatedCount);
-    }
-
-    /**
-     * 🔹 프로젝트 신청 처리
-     * 신청 시, 두 개의 원본 알림을 생성합니다.
-     * - 프로젝트 소유자 알림: 발신인 = 신청자, 수신인 = 프로젝트 소유자, alertOwner = 프로젝트 소유자
-     * - 신청자 알림: 발신인 = 프로젝트 소유자, 수신인 = 신청자, alertOwner = 신청자
+     * 프로젝트 신청을 처리합니다.
+     * 프로젝트 소유자와 신청자에게 각각 알림을 생성합니다.
+     *
+     * @param projectId 신청할 프로젝트의 고유 ID
+     * @param request   HTTP 요청 객체로, JWT 쿠키에서 신청자의 사용자 ID를 추출합니다.
+     * @throws EntityNotFoundException 프로젝트 또는 사용자 정보를 찾을 수 없을 경우 예외 발생
      */
     public void applyProject(Long projectId, HttpServletRequest request) {
         Long applicantUserId = extractUserIdOrThrow(request);
@@ -255,12 +191,12 @@ public class AlertProjectService {
                 .orElseThrow(() -> new EntityNotFoundException("신청자를 찾을 수 없습니다. ID: " + applicantUserId));
         User projectOwner = project.getUser();
 
-        // 프로젝트 소유자 알림: 신청자(발신인) → 프로젝트 소유자(수신인), alertOwnerId = 프로젝트 소유자
+        // 프로젝트 소유자 알림 생성 (신청자 → 프로젝트 소유자)
         AlertProject alertForOwner = AlertProject.builder()
                 .project(project)
-                .senderId(applicant)         // 발신인: 신청자
-                .receiverId(projectOwner)      // 수신인: 프로젝트 소유자
-                .alertOwnerId(projectOwner)    // 알림 소유자: 프로젝트 소유자
+                .senderId(applicant)
+                .receiverId(projectOwner)
+                .alertOwnerId(projectOwner)
                 .status(AlertProject.Status.신청)
                 .type(AlertProject.Type.참가알림)
                 .content(applicant.getName() + " 님이 프로젝트 [" + project.getTitle() + "]에 신청했습니다.")
@@ -270,12 +206,12 @@ public class AlertProjectService {
         alertProjectRepository.save(alertForOwner);
         log.info("✅ [applyProject] 프로젝트 소유자 알림 생성 완료, alert ID: {}", alertForOwner.getId());
 
-        // 신청자 알림: 프로젝트 소유자(발신인) → 신청자(수신인), alertOwnerId = 신청자
+        // 신청자 알림 생성 (프로젝트 소유자 → 신청자)
         AlertProject alertForApplicant = AlertProject.builder()
                 .project(project)
-                .senderId(projectOwner)        // 발신인: 프로젝트 소유자
-                .receiverId(applicant)         // 수신인: 신청자
-                .alertOwnerId(applicant)       // 알림 소유자: 신청자
+                .senderId(projectOwner)
+                .receiverId(applicant)
+                .alertOwnerId(applicant)
                 .status(AlertProject.Status.검토중)
                 .type(AlertProject.Type.참가알림)
                 .content("프로젝트 [" + project.getTitle() + "]에 신청하였습니다. 검토 중입니다.")
@@ -287,10 +223,14 @@ public class AlertProjectService {
     }
 
     /**
-     * 🔹 프로젝트 초대 처리
-     * 초대 시, 두 개의 원본 알림을 생성합니다.
-     * - 초대받는 사용자 알림: 발신인 = 프로젝트 소유자, 수신인 = 초대받는 사용자, alertOwner = 프로젝트 소유자
-     * - 초대 전송 확인 알림: 발신인 = 프로젝트 소유자, 수신인 = 프로젝트 소유자, alertOwner = 프로젝트 소유자
+     * 프로젝트 초대를 처리합니다.
+     * 초대받는 사용자와 초대 전송 확인을 위한 알림을 생성합니다.
+     *
+     * @param projectId 초대할 프로젝트의 고유 ID
+     * @param inviteeId 초대받을 사용자의 고유 ID
+     * @param request   HTTP 요청 객체로, JWT 쿠키에서 초대 요청자의 사용자 ID를 추출합니다.
+     * @throws EntityNotFoundException 프로젝트 또는 사용자 정보를 찾을 수 없을 경우 예외 발생
+     * @throws IllegalStateException    초대 요청자가 프로젝트 소유자가 아닐 경우 예외 발생
      */
     public void inviteToProject(Long projectId, Long inviteeId, HttpServletRequest request) {
         Long inviterId = extractUserIdOrThrow(request);
@@ -305,13 +245,13 @@ public class AlertProjectService {
         User invitee = userRepository.findById(inviteeId)
                 .orElseThrow(() -> new EntityNotFoundException("초대받는 사용자를 찾을 수 없습니다. ID: " + inviteeId));
 
-        // 초대받는 사용자 알림: 발신인 = 프로젝트 소유자, 수신인 = 초대받는 사용자, alertOwnerId = 프로젝트 소유자
+        // 초대받는 사용자 알림 생성 (프로젝트 소유자 → 초대받는 사용자)
         String contentForInvitee = project.getUser().getName() + " 님이 프로젝트 [" + project.getTitle() + "]에 초대했습니다.";
         AlertProject alertForInvitee = AlertProject.builder()
                 .project(project)
-                .senderId(project.getUser())   // 발신인: 초대를 보낸 사람 (프로젝트 소유자)
-                .receiverId(invitee)           // 수신인: 초대받는 사용자
-                .alertOwnerId(project.getUser())// 알림 소유자: 프로젝트 소유자
+                .senderId(project.getUser())
+                .receiverId(invitee)
+                .alertOwnerId(project.getUser())
                 .status(AlertProject.Status.신청)
                 .type(AlertProject.Type.초대알림)
                 .content(contentForInvitee)
@@ -321,13 +261,13 @@ public class AlertProjectService {
         alertProjectRepository.save(alertForInvitee);
         log.info("✅ [inviteToProject] 초대받는 사용자 알림 생성 완료, alert ID: {}", alertForInvitee.getId());
 
-        // 초대 전송 확인 알림: 발신인 = 프로젝트 소유자, 수신인 = 프로젝트 소유자, alertOwnerId = 프로젝트 소유자
+        // 초대 전송 확인 알림 생성 (프로젝트 소유자 → 본인)
         String contentForInviter = "프로젝트 [" + project.getTitle() + "] 초대가 " + invitee.getName() + " 님에게 전송되었습니다.";
         AlertProject alertForInviter = AlertProject.builder()
                 .project(project)
-                .senderId(project.getUser())   // 발신인: 프로젝트 소유자
-                .receiverId(project.getUser()) // 수신인: 본인(초대 보낸 사람)
-                .alertOwnerId(project.getUser())// 알림 소유자: 프로젝트 소유자
+                .senderId(project.getUser())
+                .receiverId(project.getUser())
+                .alertOwnerId(project.getUser())
                 .status(AlertProject.Status.신청)
                 .type(AlertProject.Type.초대알림)
                 .content(contentForInviter)
@@ -338,12 +278,16 @@ public class AlertProjectService {
         log.info("✅ [inviteToProject] 초대 전송 확인 알림 생성 완료, alert ID: {}", alertForInviter.getId());
     }
 
-
     /**
-     * 🔹 초대 응답 처리
-     * 초대받은 사용자가 수락/거절한 결과를 처리하며,
-     * - 기존 원본 알림(초대받는 사용자 알림)은 업데이트되어 step을 2로 변경
-     * - 새 응답 알림을 각각 프로젝트 소유자와 초대받은 사용자에게 생성 (step 3)
+     * 초대 응답을 처리합니다.
+     * 기존 알림을 업데이트하고, 프로젝트 소유자와 초대받은 사용자에게 새 응답 알림을 생성합니다.
+     *
+     * @param projectId 초대에 해당하는 프로젝트의 고유 ID
+     * @param inviteId  응답할 초대 알림의 고유 ID
+     * @param accepted  초대 수락 여부 (true: 수락, false: 거절)
+     * @param request   HTTP 요청 객체로, JWT 쿠키에서 초대 응답자의 사용자 ID를 추출합니다.
+     * @throws EntityNotFoundException 해당 초대 알림이 존재하지 않을 경우 예외 발생
+     * @throws IllegalStateException    초대 응답 권한이 없거나 프로젝트 정보가 일치하지 않을 경우 예외 발생
      */
     public void handleInviteResponse(Long projectId, Long inviteId, boolean accepted, HttpServletRequest request) {
         Long inviteeId = extractUserIdOrThrow(request);
@@ -355,14 +299,13 @@ public class AlertProjectService {
             log.error("🚨 [handleInviteResponse] 프로젝트 정보 불일치");
             throw new IllegalStateException("프로젝트 정보가 일치하지 않습니다.");
         }
-        // 초대 응답은 수신인(receiverId)로 설정된 사용자가 응답해야 함
         if (!inviteAlert.getReceiverId().getId().equals(inviteeId)) {
             log.error("🚨 [handleInviteResponse] 초대 응답 권한 없음");
             throw new IllegalStateException("초대 응답 권한이 없습니다.");
         }
         User projectOwner = inviteAlert.getProject().getUser();
 
-        // 기존 원본 알림 업데이트: step 1 -> 2, 상태 업데이트 및 읽음 처리
+        // 기존 알림 업데이트: 상태, 읽음 처리, 단계 변경 (1 -> 2)
         AlertProject.Status newStatus = accepted ? AlertProject.Status.초대수락 : AlertProject.Status.초대거절;
         inviteAlert.setStatus(newStatus);
         inviteAlert.markAsRead();
@@ -370,7 +313,7 @@ public class AlertProjectService {
         alertProjectRepository.save(inviteAlert);
         log.info("✅ [handleInviteResponse] 기존 알림 업데이트 완료: {} / step: {}", newStatus, inviteAlert.getStep());
 
-        // 새 응답 알림 생성 (프로젝트 소유자 대상): 발신인 = 프로젝트 소유자, 수신인 = 프로젝트 소유자, alertOwnerId = 프로젝트 소유자, step 3
+        // 새 응답 알림 생성 (프로젝트 소유자 대상, step 3)
         String contentForOwner = accepted
                 ? inviteAlert.getSenderId().getName() + " 님이 프로젝트 [" + inviteAlert.getProject().getTitle() + "] 초대를 수락했습니다."
                 : inviteAlert.getSenderId().getName() + " 님이 프로젝트 [" + inviteAlert.getProject().getTitle() + "] 초대를 거절했습니다.";
@@ -388,7 +331,7 @@ public class AlertProjectService {
         alertProjectRepository.save(responseAlertForOwner);
         log.info("✅ [handleInviteResponse] 새로운 알림(프로젝트 소유자 대상) 생성 완료, alert ID: {}", responseAlertForOwner.getId());
 
-        // 새 응답 알림 생성 (초대받은 사용자 대상): 발신인 = 프로젝트 소유자, 수신인 = 초대받은 사용자, alertOwnerId = 프로젝트 소유자, step 3
+        // 새 응답 알림 생성 (초대받은 사용자 대상, step 3)
         String contentForInvitee = "프로젝트 [" + inviteAlert.getProject().getTitle() + "] 초대를 " + (accepted ? "수락" : "거절") + "하였습니다.";
         AlertProject responseAlertForInvitee = AlertProject.builder()
                 .project(inviteAlert.getProject())
@@ -405,12 +348,16 @@ public class AlertProjectService {
         log.info("✅ [handleInviteResponse] 새로운 알림(초대받은 사용자 대상) 생성 완료, alert ID: {}", responseAlertForInvitee.getId());
     }
 
-
     /**
-     * 🔹 프로젝트 신청 응답 처리
-     * 프로젝트 소유자가 신청자에 대한 응답을 처리하며,
-     * - 기존 신청 알림(원본, step 1)을 업데이트하여 step 2로 변경
-     * - 새 응답 알림을 각각 신청자와 프로젝트 소유자에게 생성 (step 3)
+     * 프로젝트 신청 응답을 처리합니다.
+     * 기존 신청 알림을 업데이트하고, 신청자와 프로젝트 소유자에게 새 응답 알림을 생성합니다.
+     *
+     * @param projectId  신청에 해당하는 프로젝트의 고유 ID
+     * @param applicantId 신청한 사용자의 고유 ID
+     * @param accepted   신청 수락 여부 (true: 합격, false: 불합격)
+     * @param request    HTTP 요청 객체로, JWT 쿠키에서 프로젝트 소유자의 사용자 ID를 추출합니다.
+     * @throws EntityNotFoundException 신청자 또는 소유자 알림을 찾을 수 없을 경우 예외 발생
+     * @throws IllegalStateException    프로젝트 소유자가 아닐 경우 예외 발생
      */
     public void handleApplication(Long projectId, Long applicantId, boolean accepted, HttpServletRequest request) {
         Long ownerId = extractUserIdOrThrow(request);
@@ -426,11 +373,9 @@ public class AlertProjectService {
         User applicant = userRepository.findById(applicantId)
                 .orElseThrow(() -> new EntityNotFoundException("신청자를 찾을 수 없습니다. ID: " + applicantId));
 
-        // 새로운 상태 결정: 수락 → 합격, 거절 → 불합격
         AlertProject.Status newStatus = accepted ? AlertProject.Status.합격 : AlertProject.Status.불합격;
 
-
-        // 기존 신청 알림(신청자용) 업데이트: alertOwnerId가 신청자 ID인 알림
+        // 기존 신청 알림(신청자용) 업데이트
         Optional<AlertProject> optionalApplicantAlert = alertProjectRepository
                 .findApplicantAlertByProjectIdAndAlertOwnerIdAndStatus(projectId, applicantId, AlertProject.Status.검토중);
         if (optionalApplicantAlert.isEmpty()) {
@@ -445,7 +390,7 @@ public class AlertProjectService {
         alertProjectRepository.save(applicantAlert);
         log.info("✅ [handleApplication] 신청자용 기존 알림 업데이트 완료: alert ID: {} / step: {}", applicantAlert.getId(), applicantAlert.getStep());
 
-        // 기존 신청 알림(소유자용) 업데이트: alertOwnerId가 프로젝트 소유자 ID인 알림
+        // 기존 신청 알림(소유자용) 업데이트
         Optional<AlertProject> optionalOwnerAlert = alertProjectRepository
                 .findOwnerAlertByProjectIdAndAlertOwnerIdAndStatus(projectId, ownerId, AlertProject.Status.신청);
         if (optionalOwnerAlert.isEmpty()) {
@@ -459,8 +404,8 @@ public class AlertProjectService {
         ownerAlert.setStep(2);
         alertProjectRepository.save(ownerAlert);
         log.info("✅ [handleApplication] 소유자용 기존 알림 업데이트 완료: alert ID: {} / step: {}", ownerAlert.getId(), ownerAlert.getStep());
-        log.info("asdfafsdafdsafs");
-        // 새 응답 알림 생성 (신청자 대상): 발신인 = 프로젝트 소유자, 수신인 = 신청자, alertOwnerId = 신청자, step 3
+
+        // 새 응답 알림 생성 (신청자 대상, step 3)
         String contentForApplicant = accepted
                 ? "프로젝트 [" + project.getTitle() + "] 참가 신청이 수락되었습니다."
                 : "프로젝트 [" + project.getTitle() + "] 참가 신청이 거절되었습니다.";
@@ -478,7 +423,7 @@ public class AlertProjectService {
         alertProjectRepository.save(responseAlertForApplicant);
         log.info("✅ [handleApplication] 새로운 알림(신청자 대상) 생성 완료, alert ID: {}", responseAlertForApplicant.getId());
 
-        // 새 응답 알림 생성 (프로젝트 소유자 대상): 발신인 = 신청자, 수신인 = 프로젝트 소유자, alertOwnerId = 프로젝트 소유자, step 3
+        // 새 응답 알림 생성 (프로젝트 소유자 대상, step 3)
         String contentForOwner = "신청자 " + applicant.getName() + " 의 참가 신청에 대해 " + (accepted ? "수락" : "거절") + " 응답을 전송하였습니다.";
         AlertProject responseAlertForOwner = AlertProject.builder()
                 .project(project)
@@ -495,4 +440,105 @@ public class AlertProjectService {
         log.info("✅ [handleApplication] 새로운 알림(소유자 대상) 생성 완료, alert ID: {}", responseAlertForOwner.getId());
     }
 
+    // ==================== Private Helper 메서드 ====================
+
+    /**
+     * AlertProject 엔티티를 AlertProjectDto로 변환합니다.
+     *
+     * @param alertProject 변환할 AlertProject 엔티티
+     * @param loginUserId  현재 로그인한 사용자의 ID (null 가능)
+     * @return 변환된 AlertProjectDto 객체 반환
+     */
+    private AlertProjectDto convertToDto(AlertProject alertProject, Long loginUserId) {
+        String projectType = projectTypeRepository.findByProjectId(alertProject.getProject().getId())
+                .map(pt -> pt.getType().name())
+                .orElse(null);
+
+        ProjectDTO projectDTO = ProjectDTO.builder()
+                .id(alertProject.getProject().getId())
+                .userId(alertProject.getProject().getUser().getId())
+                .title(alertProject.getProject().getTitle())
+                .description(alertProject.getProject().getDescription())
+                .maxPeople(alertProject.getProject().getMaxPeople())
+                .status(alertProject.getProject().getStatus().name())
+                .isPublic(alertProject.getProject().isPublic())
+                .type(projectType)
+                .createdAt(alertProject.getProject().getCreatedAt().toLocalDateTime())
+                .updatedAt(alertProject.getProject().getUpdatedAt().toLocalDateTime())
+                .build();
+
+        boolean isMyProject = loginUserId != null && loginUserId.equals(alertProject.getProject().getUser().getId());
+
+        User senderUser = alertProject.getSenderId();
+        User receiverUser = alertProject.getReceiverId();
+        User alertOwnerUser = alertProject.getAlertOwnerId();
+        UserDto senderUserDto = convertToUserDto(senderUser);
+        UserDto receiverUserDto = convertToUserDto(receiverUser);
+        UserDto alertOwnerUserDto = convertToUserDto(alertOwnerUser);
+
+        log.debug("convertToDto - senderUser id: {}, name: {}", senderUser.getId(), senderUser.getName());
+        log.debug("convertToDto - receiverUser id: {}, name: {}", receiverUser.getId(), receiverUser.getName());
+        log.debug("convertToDto - alertOwnerUser id: {}, name: {}", alertOwnerUser.getId(), alertOwnerUser.getName());
+
+        return AlertProjectDto.builder()
+                .id(alertProject.getId())
+                .project(projectDTO)
+                .status(alertProject.getStatus().name())
+                .content(alertProject.getContent())
+                .type(alertProject.getType().name())
+                .createdAt(alertProject.getCreatedAt())
+                .isRead(alertProject.isRead())
+                .isMyProject(isMyProject)
+                .step(alertProject.getStep())
+                .senderUserDto(senderUserDto)
+                .receiverUserDto(receiverUserDto)
+                .alertOwnerUserDto(alertOwnerUserDto)
+                .build();
+    }
+
+    /**
+     * User 엔티티를 UserDto로 변환합니다.
+     *
+     * @param user 변환할 User 엔티티
+     * @return 변환된 UserDto 객체 반환
+     */
+    private UserDto convertToUserDto(User user) {
+        List<LinkDto> linkDtos = linkRepository.findByUserId(user.getId()).stream()
+                .map(link -> LinkDto.builder()
+                        .id(link.getId())
+                        .userId(link.getUser().getId())
+                        .linkTypeId(link.getLinkType() != null ? link.getLinkType().getId() : 1L)
+                        .url(link.getUrl())
+                        .description(link.getDescription())
+                        .build())
+                .collect(Collectors.toList());
+
+        // TODO: 사용자 skill 정보 변환 로직 추가 필요 시
+
+        return UserDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .experience(user.getExperience())
+                .links(linkDtos)
+                .build();
+    }
+
+    /**
+     * HTTP 요청 쿠키에서 사용자 ID를 추출합니다.
+     * 인증 실패 시 예외를 발생시킵니다.
+     *
+     * @param request HTTP 요청 객체
+     * @return 추출된 사용자 ID 반환
+     * @throws IllegalStateException 인증 실패 시 예외 발생
+     */
+    private Long extractUserIdOrThrow(HttpServletRequest request) {
+        Long userId = authUtil.extractUserIdFromCookie(request);
+        if (userId == null) {
+            log.warn("🚨 [extractUserIdOrThrow] 유저 인증 실패 - 쿠키 없음");
+            throw new IllegalStateException("유저 인증에 실패했습니다.");
+        }
+        log.info("✅ [extractUserIdOrThrow] 유저 인증 성공 - ID: {}", userId);
+        return userId;
+    }
 }

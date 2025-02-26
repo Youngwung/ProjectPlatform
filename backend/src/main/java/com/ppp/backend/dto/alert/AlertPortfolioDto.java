@@ -1,5 +1,6 @@
 package com.ppp.backend.dto.alert;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.sql.Timestamp;
@@ -16,5 +17,7 @@ public class AlertPortfolioDto {
     private String status;
     private String content;
     private Timestamp createdAt;
+
+    @JsonProperty("isRead")
     private boolean isRead;
 }

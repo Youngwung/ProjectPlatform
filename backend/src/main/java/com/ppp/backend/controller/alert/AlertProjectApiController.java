@@ -37,7 +37,18 @@ public class AlertProjectApiController {
         List<AlertProjectDto> unreadAlerts = alertProjectService.getUnreadProjectAlerts(request);
         return ResponseEntity.ok(unreadAlerts);
     }
+    @GetMapping("/{alertId}")
+    public ResponseEntity<AlertProjectDto> getProjectAlertById(@PathVariable Long alertId,HttpServletRequest request) {
+        log.info("✅ [GET] /api/alert/project/{} - 특정 프로젝트 알림 조회 요청", alertId);
+        AlertProjectDto alert = alertProjectService.getProjectAlertById(alertId,request);
 
+        if (alert == null) {
+            log.warn("🚨 [GET] 프로젝트 알림 조회 실패 - ID: {}", alertId);
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(alert);
+    }
     /**
      * 🔹 새로운 프로젝트 알림 생성 (DTO 기반)
      */
@@ -57,6 +68,11 @@ public class AlertProjectApiController {
         alertProjectService.markProjectAlertAsRead(alertId);
         return ResponseEntity.ok().build();
     }
+    @PutMapping("/all/read")
+    public ResponseEntity<Void> markAllProjectAlertsAsRead(HttpServletRequest request) {
+        alertProjectService.markAllProjectAlertsAsRead(request);
+        return ResponseEntity.ok().build();
+    }
 
     /**
      * 🔹 특정 프로젝트 알림 삭제
@@ -65,6 +81,48 @@ public class AlertProjectApiController {
     public ResponseEntity<Void> deleteProjectAlert(@PathVariable Long alertId) {
         log.info("✅ [DELETE] /api/alert/project/{} - 알림 삭제 요청", alertId);
         alertProjectService.deleteProjectAlert(alertId);
+        return ResponseEntity.ok().build();
+    }
+
+    // 🔸 프로젝트 참가 신청 API
+    @PostMapping("/{projectId}/apply")
+    public ResponseEntity<Void> applyProject(@PathVariable Long projectId, HttpServletRequest request) {
+        alertProjectService.applyProject(projectId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    // 🔸 프로젝트 초대 API
+    @PostMapping("/{projectId}/invite/{inviteeId}")
+    public ResponseEntity<Void> inviteToProject(@PathVariable Long projectId, @PathVariable Long inviteeId, HttpServletRequest request) {
+        alertProjectService.inviteToProject(projectId, inviteeId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    // 🔸 프로젝트 초대 수락 API
+    @PostMapping("/{projectId}/invite/{inviteId}/accept")
+    public ResponseEntity<Void> acceptInvite(@PathVariable Long projectId, @PathVariable Long inviteId, HttpServletRequest request) {
+        alertProjectService.handleInviteResponse(projectId, inviteId, true, request);
+        return ResponseEntity.ok().build();
+    }
+
+    // 🔸 프로젝트 초대 거절 API
+    @PostMapping("/{projectId}/invite/{inviteId}/reject")
+    public ResponseEntity<Void> rejectInvite(@PathVariable Long projectId, @PathVariable Long inviteId, HttpServletRequest request) {
+        alertProjectService.handleInviteResponse(projectId, inviteId, false, request);
+        return ResponseEntity.ok().build();
+    }
+
+    // 🔸 프로젝트 참가 신청 수락 API
+    @PostMapping("/{projectId}/application/{applicantId}/accept")
+    public ResponseEntity<Void> acceptApplication(@PathVariable Long projectId, @PathVariable Long applicantId, HttpServletRequest request) {
+        alertProjectService.handleApplication(projectId, applicantId, true, request);
+        return ResponseEntity.ok().build();
+    }
+
+    // 🔸 프로젝트 참가 신청 거절 API
+    @PostMapping("/{projectId}/application/{applicantId}/reject")
+    public ResponseEntity<Void> rejectApplication(@PathVariable Long projectId, @PathVariable Long applicantId, HttpServletRequest request) {
+        alertProjectService.handleApplication(projectId, applicantId, false, request);
         return ResponseEntity.ok().build();
     }
 }

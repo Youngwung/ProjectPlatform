@@ -56,18 +56,36 @@ dependencies {
 }
 
 // ✅ QueryDSL 관련 빌드 설정
-def querydslDir = "$buildDir/generated/sources/annotationProcessor/java/main"
+def querydslMainDir = "$buildDir/generated/sources/annotationProcessor/java/main"
+def querydslTestDir = "$buildDir/generated/sources/annotationProcessor/java/test"
 
 sourceSets {
-	main.java.srcDirs += querydslDir
+	main {
+		java {
+			srcDirs += querydslMainDir
+		}
+	}
+	test {
+		java {
+			srcDirs += querydslTestDir
+		}
+	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-	options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
+	if (name.toLowerCase().contains('test')) {
+		options.annotationProcessorGeneratedSourcesDirectory = file(querydslTestDir)
+	} else {
+		options.annotationProcessorGeneratedSourcesDirectory = file(querydslMainDir)
+	}
 }
 
 // ✅ clean 시 QueryDSL 생성된 파일 삭제
 clean.doLast {
-	delete file(querydslDir)
+	// 메인용 Q파일 디렉토리 삭제
+	delete file(querydslMainDir)
+	// 테스트용 Q파일 디렉토리 삭제
+	delete file(querydslTestDir)
+	// 혹시 남아 있을 수 있는 src/main/generated 폴더도 삭제
 	delete file("src/main/generated")
 }

@@ -53,7 +53,11 @@ public class AlertPortfolioApiController {
         alertPortfolioService.markPortfolioAlertAsRead(alertId);
         return ResponseEntity.ok().build();
     }
-
+    @PutMapping("/all/read")
+    public ResponseEntity<Void> markAllPortfolioAlertsAsRead(HttpServletRequest request) {
+        alertPortfolioService.markAllPortfolioAlertsAsRead(request);
+        return ResponseEntity.ok().build();
+    }
     /**
      * 특정 포트폴리오 알림 삭제
      */

@@ -52,3 +52,5 @@ export default AlertPage;
 
 
 //TODO  AlertProjectList.jsx 와  AlertPortfolioList.jsx 의 삭제 버튼 클릭 이벤트 처리와 삭제 로직 구현 또한 각각의 isRead상태를 표시를 하는것을 작성
+
+// TODO 페이징처리와 검색기능 구현은 보류

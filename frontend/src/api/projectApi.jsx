@@ -77,3 +77,13 @@ export const projectSearch = async (params) => {
 
 	return res.data;
 };
+// 내 프로젝트 조회 api (현재 로그인한 사용자가 생성한 프로젝트 목록)
+export const getMyProjects = async () => {
+	try {
+	  const res = await axiosInstance.get(`${prefix}/my`, { withCredentials: true });
+	  return res.data;
+	} catch (error) {
+	  console.error("🚨 내 프로젝트 조회 실패:", error);
+	  throw error;
+	}
+};

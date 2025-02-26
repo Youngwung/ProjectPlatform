@@ -3,7 +3,8 @@ import { Container, Nav, Navbar, NavDropdown,OverlayTrigger,Tooltip } from 'reac
 import { Link,useNavigate} from 'react-router-dom';
 import { FaUser} from "react-icons/fa"; // 🔹 react-icons에서 가져옴
 import AuthApi from '../api/authApi';
-
+import AlertBtn from '../components/alert/AlertBtn'; // 🔹 AlertBtn 컴포넌트 추가
+//TODO ALERTBTN은 현재 프롭스를 안받아오고잇는 상태 그러므로 프롭스를 받아와서 참가신청을하면 알람이 뜨게끔 해야함
 const Top = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userName, setUsername] = useState('21332112');
@@ -85,7 +86,7 @@ const Top = () => {
                       <FaUser size={20} />
                     </Nav.Link>
                   </OverlayTrigger>
-
+                  <AlertBtn/>
                   {/* 🔹 로그아웃 버튼 */}
                   <Nav.Link onClick={handleLogout} style={{ cursor: 'pointer', marginLeft: '15px' }}>로그아웃</Nav.Link>
                 </>

@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ppp.backend.controller.AuthApiController;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -38,20 +40,22 @@ public class ProjectServiceImpl extends
 	private final ProjectRepository projectRepo;
 	private final UserRepository userRepo;
 	private final ProjectTypeRepository projectTypeRepo;
+	private final AuthApiController	authApiController;
 
 	// Lombok의 애너테이션으로는 부모클래스의 final field을 초기화할 수 없음
 	public ProjectServiceImpl(
-			ProjectRepository projectRepo,
-			UserRepository userRepo,
-			SkillRepository skillRepo,
-			SkillLevelRepository skillLevelRepo,
-			ProjectSkillRepository projectSkillRepo,
-			ProjectTypeRepository projectTypeRepo) {
+            ProjectRepository projectRepo,
+            UserRepository userRepo,
+            SkillRepository skillRepo,
+            SkillLevelRepository skillLevelRepo,
+            ProjectSkillRepository projectSkillRepo,
+            ProjectTypeRepository projectTypeRepo, AuthApiController authApiController) {
 		super(projectSkillRepo, skillRepo, skillLevelRepo);
 		this.projectRepo = projectRepo;
 		this.userRepo = userRepo;
 		this.projectTypeRepo = projectTypeRepo;
-	}
+        this.authApiController = authApiController;
+    }
 
 	@Override
 	public ProjectDTO get(Long projectId) {
@@ -455,6 +459,23 @@ public class ProjectServiceImpl extends
 		}
 	}
 
-	
+	@Override
+	public List<ProjectDTO> getMyProjects(HttpServletRequest request) {
+		Long userId = extractUserIdOrThrow(request);
+		log.info("✅ [getMyProjects] 내 프로젝트 조회, userId: {}", userId);
+		List<Project> projects = projectRepo.findByUserId(userId);
+		return projects.stream()
+				.map(this::fromEntity)
+				.collect(Collectors.toList());
+	}
+
+	// AuthApiController에 있는 메서드를 활용하여 쿠키에서 사용자 ID를 추출합니다.
+	private Long extractUserIdOrThrow(HttpServletRequest request) {
+		Long userId = authApiController.extractUserIdFromCookie(request);
+		if (userId == null) {
+			throw new IllegalStateException("유저 인증에 실패했습니다.");
+		}
+		return userId;
+	}
 
 }

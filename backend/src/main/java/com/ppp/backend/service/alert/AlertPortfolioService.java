@@ -81,7 +81,13 @@ public class AlertPortfolioService {
 
         return convertToDto(savedAlert);
     }
+    public void markAllPortfolioAlertsAsRead(HttpServletRequest request) {
+        Long userId = extractUserIdOrThrow(request);
+        log.info("✅ [markAllPortfolioAlertsAsRead] 유저 ID {}의 모든 알림 읽음 처리 요청", userId);
 
+        int updatedCount = alertPortfolioRepository.markAllAsReadByUserId(userId);
+        log.info("✅ [markAllPortfolioAlertsAsRead] 총 {}개의 알림 읽음 처리 완료", updatedCount);
+    }
     /**
      * 🔹 포트폴리오 알림을 읽음 처리
      */

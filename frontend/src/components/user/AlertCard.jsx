@@ -20,8 +20,13 @@ const AlertCard = ({ projectAlerts = [], portfolioAlerts = [] }) => {
       // ✅ 읽음 처리 API 호출
       await alertApi.markAlertAsRead(alertId, isProject);
 
-      // ✅ 알림 상세 페이지로 이동 (예: /alert/1)
-      navigate(`/alert/${alertId}`);
+      if (isProject) {
+      // 프로젝트 알림인 경우
+      navigate(`alert/project/${alertId}`);
+    } else {
+      // 포트폴리오 알림인 경우
+      navigate(`alert/portfolio/${alertId}`);
+    }
     } catch (error) {
       console.error("❌ 알림 읽음 처리 실패:", error);
     }

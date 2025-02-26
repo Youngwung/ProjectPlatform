@@ -11,6 +11,7 @@ import UserInfoCard from "./UserInfoCard";
 import DashboardCard from "./DashboardCard";
 import ExperienceCard from "./ExperienceCard";
 import AlertCard from "./AlertCard";
+import MyProjectPortfolioCard from "./MyProjectPortfolioCard";
 
 const MyPageTotalInfo = () => {
   // 사용자 정보 상태
@@ -208,6 +209,11 @@ const handlePortfolioAlerts = async () => {
             projectAlerts={projectAlerts}
             portfolioAlerts={portfolioAlerts}
           />
+        </Col>
+      </Row>
+      <Row>
+        <Col md={12}>
+          <MyProjectPortfolioCard/>
         </Col>
       </Row>
     </Container>

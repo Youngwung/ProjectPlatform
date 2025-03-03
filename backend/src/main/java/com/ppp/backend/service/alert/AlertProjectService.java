@@ -1,6 +1,12 @@
 package com.ppp.backend.service.alert;
 
-import com.ppp.backend.controller.AuthApiController; // 사용하지 않는 경우 추후 삭제 가능
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.ppp.backend.domain.Project;
 import com.ppp.backend.domain.User;
 import com.ppp.backend.domain.alert.AlertProject;
@@ -9,22 +15,16 @@ import com.ppp.backend.dto.ProjectDTO;
 import com.ppp.backend.dto.UserDto;
 import com.ppp.backend.dto.alert.AlertProjectDto;
 import com.ppp.backend.repository.LinkRepository;
-import com.ppp.backend.repository.LinkTypeRepository; // 사용하지 않는 경우 추후 삭제 가능
 import com.ppp.backend.repository.ProjectRepository;
 import com.ppp.backend.repository.ProjectTypeRepository;
 import com.ppp.backend.repository.UserRepository;
 import com.ppp.backend.repository.alert.AlertProjectRepository;
 import com.ppp.backend.util.AuthUtil;
+
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,7 +67,7 @@ public class AlertProjectService {
         Long userId = extractUserIdOrThrow(request);
         log.info("✅ [getUnreadProjectAlerts] 유저 ID: {}", userId);
 
-        return alertProjectRepository.findByAlertOwnerIdAndIsRead(userId, false).stream()
+        return alertProjectRepository.findByAlertOwnerIdAndIsRead(userId).stream()
                 .map(alert -> convertToDto(alert, userId))
                 .collect(Collectors.toList());
     }

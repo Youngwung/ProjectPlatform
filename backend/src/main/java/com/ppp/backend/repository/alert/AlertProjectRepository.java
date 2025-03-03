@@ -1,15 +1,17 @@
 package com.ppp.backend.repository.alert;
 
-import com.ppp.backend.domain.alert.AlertProject;
-import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import com.ppp.backend.domain.alert.AlertProject;
+
+import jakarta.transaction.Transactional;
 
 @Repository
 public interface AlertProjectRepository extends JpaRepository<AlertProject, Long> {
@@ -24,7 +26,7 @@ public interface AlertProjectRepository extends JpaRepository<AlertProject, Long
      * 특정 유저(알람 소유자)의 읽지 않은 프로젝트 알람을 최신순으로 조회 (DESC)
      */
     @Query("SELECT a FROM AlertProject a WHERE a.alertOwnerId.id = :userId AND a.isRead = false ORDER BY a.createdAt DESC")
-    List<AlertProject> findByAlertOwnerIdAndIsRead(@Param("userId") Long userId, boolean isRead);
+    List<AlertProject> findByAlertOwnerIdAndIsRead(@Param("userId") Long userId);
 
     /**
      * 특정 유저(알람 소유자)의 모든 알람을 읽음 처리 (업데이트)

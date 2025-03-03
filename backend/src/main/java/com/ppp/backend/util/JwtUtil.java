@@ -1,14 +1,18 @@
 package com.ppp.backend.util;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.util.Base64;
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Date;
-import java.util.Base64;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
@@ -86,5 +90,23 @@ public class JwtUtil {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    // 소셜로그인 회원가입 시 가져온 정보를 채우기 위한 임시 토큰 발급 메서드
+    public String generateTempToken(String email, String name, String providerName) {
+        return Jwts.builder()
+                .setSubject(email) // email을 subject로 저장
+                .claim("name", name) // `email`을 추가 claims에 저장
+                .claim("providerName", providerName)
+                .claim("temp", true) // 임시 토큰임을 표시
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    // 임시 토큰 여부 확인 메서드
+    public boolean isTemporaryToken(String token) {
+        return parseClaims(token).containsKey("temp") && (boolean) parseClaims(token).get("temp");
     }
 }

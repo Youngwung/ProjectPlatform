@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Dropdown, Badge, Tabs, Tab, ListGroup, Button } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Badge, Button, Dropdown, ListGroup, Tab, Tabs } from "react-bootstrap";
 import { FaBell } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import alertApi from "../../api/alertApi";
@@ -56,13 +56,13 @@ const AlertBtn = () => {
   useEffect(() => {
     handleProjectAlerts();
     handlePortfolioAlerts();
-    const intervalId = setInterval(() => {
-      handleProjectAlerts();
-      handlePortfolioAlerts();
-    }, 30000); // 30,000ms = 30초
+    // const intervalId = setInterval(() => {
+    //   handleProjectAlerts();
+    //   handlePortfolioAlerts();
+    // }, 30000); // 30,000ms = 30초
 
     // 컴포넌트 언마운트 시 interval 클리어
-    return () => clearInterval(intervalId);
+    // return () => clearInterval(intervalId);
   }, []);
 
   // 알림 클릭 시: 읽음 처리 후 상세 페이지로 이동

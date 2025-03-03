@@ -50,5 +50,13 @@ const userApi = {
         throw error;
         }
     },
+    userOauth: async (provider) => {
+        try {
+            const response = await axios.get(`${prefix}/oauth2`);
+            return response.data;
+        } catch (error) {
+            console.error(error);
+        }
+    }
 };
 export default userApi;

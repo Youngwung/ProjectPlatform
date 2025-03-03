@@ -3,9 +3,10 @@ package com.ppp.backend.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ppp.backend.util.AuthUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ppp.backend.dto.UserDto;
 import com.ppp.backend.service.UserService;
+import com.ppp.backend.util.AuthUtil;
 import com.ppp.backend.util.JwtUtil;
 
 import jakarta.servlet.http.Cookie;
@@ -204,6 +206,39 @@ public class AuthApiController {
             log.error("❌ 비밀번호 변경 실패: userId={}, 오류={}", userId, e.getMessage());
             return ResponseEntity.status(500).body("비밀번호 변경 중 오류가 발생했습니다.");
         }
+    }
+
+
+    /**
+     * ✅ JWT 쿠키에서 userId 추출 메서드
+     * 쿠키 이름 "accessToken"에서 토큰을 가져와 jwtUtil로 검증 후 userId를 추출합니다.
+     */
+    public Long extractUserIdFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("accessToken".equals(cookie.getName())) {
+                    String token = cookie.getValue();
+                    try {
+                        if (jwtUtil.validateToken(token)) {
+                            return jwtUtil.extractUserId(token);
+                        }
+                    } catch (Exception e) {
+                        log.warn("🚨 JWT 검증 실패: {}", e.getMessage());
+                        return null;
+                    }
+                }
+            }
+        }
+        log.warn("🚨 인증되지 않은 사용자 요청 (JWT 없음)");
+        return null;
+    }
+
+    
+    @GetMapping("/oauth2")
+    public Map<String, Object> oauth2User(@AuthenticationPrincipal OAuth2User principal) {
+        log.info("OAuth2 = {}", principal.getAttributes());
+        return principal.getAttributes();
     }
 
 }

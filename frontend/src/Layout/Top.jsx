@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Nav, Navbar, NavDropdown,OverlayTrigger,Tooltip } from 'react-bootstrap';
-import { Link,useNavigate} from 'react-router-dom';
-import { FaUser} from "react-icons/fa"; // 🔹 react-icons에서 가져옴
+import React, { useEffect, useState } from 'react';
+import { Container, Nav, Navbar, NavDropdown, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { FaUser } from "react-icons/fa"; // 🔹 react-icons에서 가져옴
+import { Link, useNavigate } from 'react-router-dom';
 import AuthApi from '../api/authApi';
 import AlertBtn from '../components/alert/AlertBtn'; // 🔹 AlertBtn 컴포넌트 추가
 //TODO ALERTBTN은 현재 프롭스를 안받아오고잇는 상태 그러므로 프롭스를 받아와서 참가신청을하면 알람이 뜨게끔 해야함
 const Top = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userName, setUsername] = useState('21332112');
+  const [userName, setUsername] = useState('');
 
   const navigate = useNavigate();
   

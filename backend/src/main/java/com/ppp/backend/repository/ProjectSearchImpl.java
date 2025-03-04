@@ -38,44 +38,45 @@ public class ProjectSearchImpl extends QuerydslRepositorySupport implements Proj
 
 	@Override
 	public Page<Project> searchString(PageRequestDTO pageRequestDTO) {
-
+		
 		QProject project = QProject.project;
-
+		
 		BooleanExpression isPublic = project.isPublic.eq(true);
-
+		
 		// JoinProject 테이블에서
 		JPQLQuery<Project> query = from(project);
-
+		
 		// 공개 변수가 true인 조건 설정
 		query.where(isPublic);
-
+		
 		// pageable 객체 생성
 		// DTO의 값으로 수정
 		Pageable pageable = PageRequest.of(pageRequestDTO.getPage() - 1, pageRequestDTO.getSize(),
-				Sort.by("id").descending());
-
+		Sort.by("id").descending());
+		
 		// QueryDSL에서 페이징 처리 하는 방법
 		this.getQuerydsl().applyPagination(pageable, query);
 		// query에 페이징 처리가 적용됨.
-
+		
 		List<Project> list = query.fetch(); // 페이징 처리된 목록 데이터
-
+		
 		long total = query.fetchCount(); // 검색된 전체 데이터 양
-
+		
 		// Collect와 Pageable객체, 전체 데이터 개수로 Page<E>를 리턴해주는 생성자: PageImpl
 		return new PageImpl<>(list, pageable, total);
 	}
-
+	
 	@Override
 	public Page<Project> searchKeyword(PageRequestDTO pageRequestDTO) {
 		QProject project = QProject.project;
 		QProjectType projectType = QProjectType.projectType;
-
+		
 		// 공개인 것만 데이터 패칭
 		BooleanExpression isPublic = project.isPublic.eq(true);
 
 		// 프로젝트 유형: all. content, skill에 따른 검색 조건 설정
 		String requestType = pageRequestDTO.getType();
+		
 		BooleanExpression type = projectType.type.eq(ProjectTypeEnum.valueOf(requestType));
 
 		// JoinProject 테이블에서
@@ -87,9 +88,13 @@ public class ProjectSearchImpl extends QuerydslRepositorySupport implements Proj
 		QProjectSkill projectSkill = QProjectSkill.projectSkill;
 		QSkill skill = QSkill.skill;
 
+		BooleanExpression titleContains = Expressions.TRUE;
+		BooleanExpression descriptionContains = Expressions.TRUE;;
 		// 검색 키워드
-		BooleanExpression titleContains = project.title.containsIgnoreCase(pageRequestDTO.getQuery());
-		BooleanExpression descriptionContains = project.description.containsIgnoreCase(pageRequestDTO.getQuery());
+		if (!pageRequestDTO.getQuery().equals("")) {
+			titleContains = project.title.containsIgnoreCase(pageRequestDTO.getQuery());
+			descriptionContains = project.description.containsIgnoreCase(pageRequestDTO.getQuery());
+		}
 
 		// Project가 가진 스킬 중 querySkills에 해당하는 스킬의 개수를 구함
 		NumberExpression<Integer> matchedSkillsCount = new CaseBuilder()

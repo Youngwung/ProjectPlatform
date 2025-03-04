@@ -163,6 +163,8 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
         UserDto dto = convertToDto(user);
         dto.setProviderName(user.getProvider().getName());
         dto.setPassword(user.getPassword());
+        String skills = getSkill(id);
+        dto.setSkills(skills);
         // ✅ 사용자의 링크 조회 후 DTO에 세팅
         List<LinkDto> userLinks = linkService.getUserLinks(user.getId());
         dto.setLinks(userLinks);

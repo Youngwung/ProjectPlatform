@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Modal, Button, Form, InputGroup } from "react-bootstrap";
+import React, { useCallback, useEffect, useState } from "react";
+import { Button, Form, InputGroup, Modal } from "react-bootstrap";
 import linkApi from "../../api/linkApi"; // ✅ 링크 타입 API 가져오기
+import InputSkillComponent from "../skill/InputSkillComponent";
 
 const EditInfoModal = ({
   show,
@@ -15,6 +16,7 @@ const EditInfoModal = ({
   const [newLink, setNewLink] = useState(null);
   const [editMode, setEditMode] = useState(null);
   const [originalLink, setOriginalLink] = useState(null);
+  const [skills, setSkills] = useState("");
 
   // editUser의 링크 데이터를 userLinks 상태에 초기화
   useEffect(() => {
@@ -30,6 +32,9 @@ const EditInfoModal = ({
           description: String(link.description ?? ""),
         }))
       );
+    if (editUser?.skills) {
+      setSkills(editUser?.skills);
+    }
     } else {
       setUserLinks([]);
     }
@@ -154,7 +159,7 @@ const EditInfoModal = ({
           }
         })
       );
-      const updatedUser = { ...editUser, links: processedLinks };
+      const updatedUser = { ...editUser, links: processedLinks, skills: skills };
       await handleSaveUserInfo(updatedUser);
       onHide(); // 모달 닫기
     } catch (error) {
@@ -168,6 +173,20 @@ const EditInfoModal = ({
     onHide();
     fetchUserData(); // 모달이 닫힐 때 사용자 데이터를 다시 조회
   };
+
+  // 스킬 관련 로직
+  // 스킬 Input 컴포넌트로부터 데이터 불러오기
+  const [validation, setValidation] = useState({skills: false})
+    const handleValidationComplete = useCallback(({ isValid, value }) => {
+      setValidation((prev) => ({
+        ...prev,
+        skills: isValid,
+      }));
+  
+      if (isValid) {
+        setSkills(value);
+      }
+    }, []);
 
   return (
     <Modal show={show} onHide={handleClose} centered>
@@ -186,6 +205,13 @@ const EditInfoModal = ({
               value={editUser.phoneNumber || ""}
               onChange={handleChange}
               placeholder="전화번호를 입력하세요"
+            />
+          </Form.Group>
+
+          <Form.Group>
+            <InputSkillComponent
+              onValidationComplete={handleValidationComplete}
+              skills={skills}
             />
           </Form.Group>
 
@@ -304,7 +330,7 @@ const EditInfoModal = ({
         <Button variant="secondary" onClick={handleClose}>
           취소
         </Button>
-        <Button variant="primary" onClick={handleSave}>
+        <Button variant="primary" onClick={handleSave} disabled={!validation.skills}> 
           저장
         </Button>
       </Modal.Footer>

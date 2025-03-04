@@ -57,12 +57,20 @@ public class PortfolioSearchImpl extends QuerydslRepositorySupport implements Po
 		QUserSkill userSkill = QUserSkill.userSkill;
 		QSkill skill = QSkill.skill;
 
+
+		BooleanExpression titleContains = Expressions.TRUE;
+		BooleanExpression descriptionContains = Expressions.TRUE;
 		// 검색 키워드
-		BooleanExpression titleContains = portfolio.title.containsIgnoreCase(pageRequestDTO.getQuery());
-		BooleanExpression descriptionContains = portfolio.description.containsIgnoreCase(pageRequestDTO.getQuery());
+		if (!pageRequestDTO.getQuery().equals("")) {
+			titleContains = portfolio.title.containsIgnoreCase(pageRequestDTO.getQuery());
+			descriptionContains = portfolio.description.containsIgnoreCase(pageRequestDTO.getQuery());
+		}
 
 		// 스킬이 하나라도 존재하는 포트폴리오만 출력
-		BooleanExpression skillExist = userSkill.skill.name.in(pageRequestDTO.getQuerySkills());
+		BooleanExpression skillExist = Expressions.TRUE;
+		if (!pageRequestDTO.getQuerySkills().isEmpty()) {
+			skillExist = userSkill.skill.name.in(pageRequestDTO.getQuerySkills());
+		}
 
 		// Portfolio가 가진 스킬 중 querySkills에 해당하는 스킬의 개수를 구함
 		NumberExpression<Integer> matchedSkillsCount = new CaseBuilder()

@@ -2,6 +2,8 @@ package com.ppp.backend.repository;
 
 import java.util.List;
 
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -19,4 +21,8 @@ public interface UserSkillRepository extends BaseSkillRepository<UserSkill> {
             """)
     List<UserSkill> findByOwner(@Param("ownerId") Long ownerId);
 
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM UserSkill u WHERE u.user.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
 }

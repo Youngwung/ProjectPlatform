@@ -15,7 +15,6 @@ const EditInfoModal = ({
   const [newLink, setNewLink] = useState(null);
   const [editMode, setEditMode] = useState(null);
   const [originalLink, setOriginalLink] = useState(null);
-
   // editUser의 링크 데이터를 userLinks 상태에 초기화
   useEffect(() => {
     if (!editUser || Object.keys(editUser).length === 0) {

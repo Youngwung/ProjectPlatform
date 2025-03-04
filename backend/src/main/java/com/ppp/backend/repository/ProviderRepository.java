@@ -6,4 +6,5 @@ import com.ppp.backend.domain.Provider;
 
 public interface ProviderRepository extends JpaRepository<Provider, Long>{
 	Provider findByName(String name);
+
 }

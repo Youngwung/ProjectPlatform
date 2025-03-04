@@ -54,16 +54,8 @@ const Top = () => {
           <Navbar.Toggle aria-controls="navbarScroll" />
           <Navbar.Collapse id="navbarScroll">
             <Nav className="me-auto my-2 my-lg-0" style={{ maxHeight: '100px' }} navbarScroll>
-              <NavDropdown title="프로젝트" id="navbarScrollingDropdown">
-                <NavDropdown.Item as={Link} to="/project">전체보기</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/project/frontend">Frontend</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/project/backend">Backend</NavDropdown.Item>
-              </NavDropdown>
-              <NavDropdown title="포트폴리오" id="navbarScrollingDropdown">
-                <NavDropdown.Item as={Link} to="/portfolio">전체보기</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/portfolio/frontend">Frontend</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/portfolio/backend">Backend</NavDropdown.Item>
-              </NavDropdown>
+              <Nav.Link as={Link} to="/project">프로젝트</Nav.Link>
+              <Nav.Link as={Link} to="/portfolio">포트폴리오</Nav.Link>
               <Nav.Link as={Link} to="/link">링크</Nav.Link>
             </Nav>
 
@@ -71,11 +63,6 @@ const Top = () => {
             <Nav className="d-flex align-items-center">
               {isAuthenticated ? (
                 <>
-                  {/* 🔹 알람 아이콘 (현재 미구현) */}
-                  {/* <Nav.Link as={Link} to="/notifications">
-                    <FaBell size={24} className="mx-2" />
-                  </Nav.Link> */}
-
                   {/* 🔹 사용자 이름 및 마이페이지 아이콘 */}
                   <span className="mx-2">{userName} 님</span>
                   <OverlayTrigger

@@ -1,6 +1,7 @@
 package com.ppp.backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ppp.backend.dto.skill.BaseSkillDto;
 import lombok.*;
@@ -15,6 +16,7 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL) // ✅ null 값은 JSON에서 자동 제거
 public class UserDto extends BaseSkillDto {
 
     @JsonProperty("id") // ✅ JSON 필드명 명확히 설정
@@ -24,15 +26,19 @@ public class UserDto extends BaseSkillDto {
     private String email;
     private String phoneNumber;
     private String experience;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // ✅ 요청에서는 받지만, 응답에서는 제외됨 프론트에서 백엔드로는 보내는데 백에서 프론트로는 안보냄
     private String password;
-    private Long providerId;
+
     private List<LinkDto> links;
     private String providerName;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // ✅ 요청에서는 허용, 응답에서는 제외
     private String newPassword;
 
     @JsonCreator
     public UserDto(
-            @JsonProperty("id") Object id, // ✅ 다양한 타입 지원
+            @JsonProperty("id") Object id,
             @JsonProperty("name") String name,
             @JsonProperty("email") String email,
             @JsonProperty("phoneNumber") String phoneNumber,
@@ -49,7 +55,6 @@ public class UserDto extends BaseSkillDto {
         this.phoneNumber = phoneNumber;
         this.experience = experience;
         this.password = password;
-        this.providerId = providerId;
         this.links = links;
         this.providerName = providerName;
         this.newPassword = newPassword;

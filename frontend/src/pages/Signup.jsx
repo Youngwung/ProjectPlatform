@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Button,
 	Card,
@@ -8,89 +8,114 @@ import {
 	Form,
 	InputGroup,
 	Row,
+	Alert,
 } from "react-bootstrap";
 import { useSearchParams } from "react-router-dom";
 import authApi from "../api/authApi";
 import userApi from "../api/userApi";
 
-//TODO 아이디 찾기 오류 발생하여 수정해야함
-
-const handleSubmit = async (e) => {
-	e.preventDefault();
-	const email = e.target.email.value;
-	// TODO: 패스워드 정규식 처리 필요, 현재 서버에서 8자 이상 받기로 설정되어있음
-	const password = e.target.password.value;
-	const confirmPassword = e.target.confirmPassword.value;
-	const name = e.target.name.value;
-	const phoneNumber = e.target.phoneNumber.value;
-	const experience = e.target.experience.value;
-	// TODO: 토큰에서 ProviderName 전달하는 로직으로 변경
-	const providerId = "4";
-	if (password !== confirmPassword) {
-		alert("비밀번호가 일치하지 않습니다.");
-		return;
-	}
-	try {
-		const response = await userApi.createUser({
-			email,
-			password,
-			name,
-			phoneNumber,
-			experience,
-			// TODO: 토큰에서 ProviderName 전달하는 로직으로 변경
-			providerId,
-		});
-		console.log(response);
-		alert("회원가입이 완료되었습니다.");
-		window.location.href = "/login";
-	} catch (error) {
-		alert("회원가입 중 오류가 발생했습니다.");
-	}
-};
-
 const Signup = () => {
 	const [queryParams] = useSearchParams();
+	const [errorMsg, setErrorMsg] = useState("");
+	const [isPasswordValid, setIsPasswordValid] = useState(true);
 
-	// 소셜 로그인 구현 부분
-	const [userInfo, setUserInfo] = useState({
-		email: "",
+	// 입력값을 useState로 관리
+	const [formData, setFormData] = useState({
 		name: "",
-		providerName: "",
+		email: "",
+		password: "",
+		confirmPassword: "",
+		phoneNumber: "",
+		experience: "",
+		providerName: "local", // 기본값을 로컬 로그인("local")으로 설정
 	});
 
+	// 소셜 로그인 정보 저장
 	useEffect(() => {
-		const tempToken= queryParams.get("token", "");
-		console.log(tempToken);
+		const tempToken = queryParams.get("token");
 		if (tempToken) {
 			const decoded = jwtDecode(tempToken);
-			console.log(decoded);
-			setUserInfo({
-				...userInfo,
+			setFormData((prevData) => ({
+				...prevData,
 				email: decoded.sub,
 				name: decoded.name,
-				providerName: decoded.providerName,
-			});
+				providerName: decoded.providerName, // 소셜 로그인 제공자 정보 저장
+			}));
 		}
-	}, []);
+	}, [queryParams]);
 
-	const emailRef = useRef();
+	/** ✅ 비밀번호 유효성 검사 */
+	const validatePassword = (password) => {
+		const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+		return passwordRegex.test(password);
+	};
 
+	/** ✅ 입력값 변경 핸들러 */
+	const handleInputChange = (e) => {
+		const { id, value } = e.target;
+		setFormData((prevData) => ({ ...prevData, [id]: value }));
+
+		if (id === "password") {
+			setIsPasswordValid(validatePassword(value));
+		}
+	};
+
+	/** ✅ 이메일 중복 확인 */
 	const handleDuplicate = async () => {
-		// TODO 중복되지 않은 이메일도 중복되었다고 뜸
-		const email = emailRef.current.value;
+		const { email } = formData;
 		if (!email) {
 			alert("이메일을 입력해주세요.");
 			return;
 		}
 		try {
 			const response = await authApi.checkEmail(email);
+
 			if (response) {
-				alert("중복된 이메일입니다.");
+				alert("❌ 중복된 이메일입니다. 다른 이메일을 입력해주세요.");
 			} else {
-				alert("사용 가능한 이메일입니다.");
+				const confirmUse = window.confirm("✅ 사용 가능한 이메일입니다. 이 이메일을 사용하시겠습니까?");
+				if (confirmUse) {
+					alert("✔ 이메일이 확정되었습니다.");
+				} else {
+					alert("이메일 입력을 변경할 수 있습니다.");
+				}
 			}
 		} catch (error) {
-			alert("중복 확인 중 오류가 발생했습니다.");
+			alert("⚠ 이메일 중복 확인 중 오류가 발생했습니다. 다시 시도해주세요.");
+		}
+	};
+
+
+	/** ✅ 회원가입 */
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		const { email, password, confirmPassword, name, phoneNumber, experience, providerName } = formData;
+
+		// 소셜 로그인이 아닐 경우 비밀번호 검사
+		if (providerName === "local") {
+			if (!validatePassword(password)) {
+				setErrorMsg("비밀번호는 최소 8자 이상, 숫자, 문자, 특수문자를 포함해야 합니다.");
+				return;
+			}
+			if (password !== confirmPassword) {
+				setErrorMsg("비밀번호가 일치하지 않습니다.");
+				return;
+			}
+		}
+
+		try {
+			await userApi.createUser({
+				email,
+				password,
+				name,
+				phoneNumber,
+				experience,
+				providerName, // "local" 또는 "kakao", "naver", "google" 값 전달
+			});
+			alert("회원가입이 완료되었습니다.");
+			window.location.href = "/login";
+		} catch (error) {
+			alert("회원가입 중 오류가 발생했습니다.");
 		}
 	};
 
@@ -101,83 +126,71 @@ const Signup = () => {
 					<Card>
 						<Card.Body>
 							<Card.Title>회원가입</Card.Title>
+							{errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
 							<Form onSubmit={handleSubmit}>
 								<Form.Group controlId="name">
 									<Form.Label>이름</Form.Label>
-									{userInfo.name ? 
-									(
-										<Form.Control
+									<Form.Control
 										type="text"
-										className="bg-slate-300"
-										placeholder="이름을 입력해주세요"
-										value={userInfo.name}
-										readOnly={true}
-										/>
-									) 
-									: 
-									(
-										<Form.Control
-										type="text"
-										placeholder="이름을 입력해주세요"
-										required
-										/>
-									)}
-									
+										value={formData.name}
+										onChange={handleInputChange}
+									/>
 								</Form.Group>
 
 								<Form.Group controlId="email">
 									<Form.Label>이메일</Form.Label>
 									<InputGroup>
-										{userInfo.email ? (
-											<Form.Control
+										<Form.Control
 											type="email"
 											placeholder="이메일을 입력해주세요"
-											ref={emailRef}
-											value={userInfo.email}
-											className="bg-slate-300"
-											readOnly={true}
+											value={formData.email}
+											onChange={handleInputChange}
 											required
+											readOnly={!!formData.providerName && formData.providerName !== "local"} // 소셜 로그인 이메일 수정 불가
 										/>
-										) 
-										: 
-										(
-											<Form.Control
-												type="email"
-												placeholder="이메일을 입력해주세요"
-												ref={emailRef}
-												required
-											/>	
-										)}
-										<Button variant="secondary" onClick={handleDuplicate}>
+										<Button variant="secondary" onClick={handleDuplicate} disabled={!!formData.providerName && formData.providerName !== "local"}>
 											중복확인
 										</Button>
-										
 									</InputGroup>
 								</Form.Group>
 
-								<Form.Group controlId="password">
-									<Form.Label>비밀번호</Form.Label>
-									<Form.Control
-										type="password"
-										placeholder="비밀번호를 입력해주세요"
-										required
-									/>
-								</Form.Group>
+								{/* ✅ 일반 회원가입일 경우 비밀번호 입력 가능 */}
+								{formData.providerName === "local" && (
+									<>
+										<Form.Group controlId="password">
+											<Form.Label>비밀번호</Form.Label>
+											<Form.Control
+												type="password"
+												placeholder="비밀번호를 입력해주세요"
+												value={formData.password}
+												onChange={handleInputChange}
+												required
+											/>
+											{!isPasswordValid && formData.password.length > 0 && (
+												<small className="text-danger">비밀번호는 최소 8자 이상, 숫자, 문자, 특수문자를 포함해야 합니다.</small>
+											)}
+										</Form.Group>
 
-								<Form.Group controlId="confirmPassword">
-									<Form.Label>비밀번호 확인</Form.Label>
-									<Form.Control
-										type="password"
-										placeholder="비밀번호를 확인해주세요"
-										required
-									/>
-								</Form.Group>
+										<Form.Group controlId="confirmPassword">
+											<Form.Label>비밀번호 확인</Form.Label>
+											<Form.Control
+												type="password"
+												placeholder="비밀번호를 확인해주세요"
+												value={formData.confirmPassword}
+												onChange={handleInputChange}
+												required
+											/>
+										</Form.Group>
+									</>
+								)}
 
 								<Form.Group controlId="phoneNumber">
 									<Form.Label>전화번호</Form.Label>
 									<Form.Control
 										type="text"
 										placeholder="전화번호를 입력해주세요"
+										value={formData.phoneNumber}
+										onChange={handleInputChange}
 									/>
 								</Form.Group>
 
@@ -186,7 +199,9 @@ const Signup = () => {
 									<Form.Control
 										as="textarea"
 										rows={10}
-										placeholder="경력을 입력해주세요 미입력가능"
+										placeholder="경력을 입력해주세요 (미입력 가능)"
+										value={formData.experience}
+										onChange={handleInputChange}
 									/>
 								</Form.Group>
 

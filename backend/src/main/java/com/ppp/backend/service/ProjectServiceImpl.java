@@ -235,7 +235,6 @@ public class ProjectServiceImpl extends
 
 		// // 유효하지 않은 데이터가 있는 경우
 		// if (!invalidList.isEmpty()) {
-		// // TODO: 예외 처리 필요
 		// }
 
 		// // 기존 스킬 리스트를 가져옴

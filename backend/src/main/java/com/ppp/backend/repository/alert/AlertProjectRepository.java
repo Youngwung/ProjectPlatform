@@ -54,4 +54,9 @@ public interface AlertProjectRepository extends JpaRepository<AlertProject, Long
             @Param("ownerId") Long ownerId,
             @Param("status") AlertProject.Status status);
 
+    @Modifying
+    @Query("DELETE FROM AlertProject a WHERE a.senderId.id = :userId OR a.receiverId.id = :userId OR a.alertOwnerId.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
+
+
 }

@@ -201,6 +201,19 @@ const authApi = {
       throw error;
     }
   },
+  // ✅ 회원 탈퇴 API
+  deleteUser: async () => {
+    try {
+      const response = await axios.delete(`${API_URL}/deleteuser`, {
+        withCredentials: true, // ✅ JWT 쿠키 포함
+      });
+      console.log("✅ 회원 탈퇴 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ 회원 탈퇴 실패:", error);
+      throw error;
+    }
+  },
 };
 
 export default authApi;

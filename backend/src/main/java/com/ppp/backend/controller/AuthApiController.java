@@ -7,12 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.ppp.backend.dto.UserDto;
 import com.ppp.backend.service.UserService;
@@ -118,7 +113,6 @@ public class AuthApiController {
 
         UserDto userDto = userService.getUserById(userId);
         log.info("🔎 사용자 정보 조회 성공: userId={}, name={}, dto={}", userDto.getId(), userDto.getName(), userDto);
-        //TODO: 해당 메서드가 useDto를 반환하는 문제: true or false를 반환하도록 수정해야 할 듯
         return ResponseEntity.ok(userDto);
     }
     /**
@@ -132,7 +126,6 @@ public class AuthApiController {
             return ResponseEntity.status(401).body("인증되지 않은 사용자");
         }
         try {
-            updatedUser.setProviderId(4L); // TODO: 프로바이더 관련 로직 적용
             UserDto updatedUserInfo = userService.updateUserInfo(userId, updatedUser);
             log.info("✅ 사용자 정보 수정 완료: userId={}, {}", userId, updatedUser);
             return ResponseEntity.ok(updatedUserInfo);
@@ -208,37 +201,30 @@ public class AuthApiController {
         }
     }
 
-
-    /**
-     * ✅ JWT 쿠키에서 userId 추출 메서드
-     * 쿠키 이름 "accessToken"에서 토큰을 가져와 jwtUtil로 검증 후 userId를 추출합니다.
-     */
-    public Long extractUserIdFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
-                    String token = cookie.getValue();
-                    try {
-                        if (jwtUtil.validateToken(token)) {
-                            return jwtUtil.extractUserId(token);
-                        }
-                    } catch (Exception e) {
-                        log.warn("🚨 JWT 검증 실패: {}", e.getMessage());
-                        return null;
-                    }
-                }
-            }
-        }
-        log.warn("🚨 인증되지 않은 사용자 요청 (JWT 없음)");
-        return null;
-    }
-
     
     @GetMapping("/oauth2")
     public Map<String, Object> oauth2User(@AuthenticationPrincipal OAuth2User principal) {
         log.info("OAuth2 = {}", principal.getAttributes());
         return principal.getAttributes();
+    }
+
+    @DeleteMapping("/deleteuser")
+    public ResponseEntity<?> deleteUser(HttpServletRequest request) {
+
+        // JWT 쿠키에서 userId 추출하여 본인 확인
+        Long userId = authUtil.extractUserIdFromCookie(request);
+        if (userId == null) {
+            return ResponseEntity.status(401).body("인증되지 않은 사용자");
+        }
+
+        try {
+            userService.deleteUser(userId);
+            log.info("✅ 회원 탈퇴 완료: userId={}", userId);
+            return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+        } catch (Exception e) {
+            log.error("❌ 회원 탈퇴 실패: userId={}, 오류={}", userId, e.getMessage());
+            return ResponseEntity.status(500).body("회원 탈퇴 중 오류가 발생했습니다.");
+        }
     }
 
 }

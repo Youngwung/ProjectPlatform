@@ -15,8 +15,6 @@ const Main = lazy(() => import("../pages/Main"));
 const ProjectIndex = lazy(() => import("../pages/project/IndexPage"));
 const Portfolio = lazy(() => import("../pages/portfolio/IndexPage"));
 const MyPage = lazy(() => import("../pages/MyPage"));
-const Link = lazy(() => import("../pages/Link"));
-
 const root = createBrowserRouter([
   {
     path: "/",
@@ -98,14 +96,6 @@ const root = createBrowserRouter([
             ),
           },
         ],
-      },
-      {
-        path: "/link",
-        element: (
-          <Suspense fallback={<Loading />}>
-            <Link />
-          </Suspense>
-        ),
       },
       {
         path: "/login",

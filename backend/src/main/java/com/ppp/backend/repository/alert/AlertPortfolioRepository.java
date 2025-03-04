@@ -29,4 +29,9 @@ public interface AlertPortfolioRepository extends JpaRepository<AlertPortfolio, 
     @Transactional
     @Query("UPDATE AlertPortfolio a SET a.isRead = true WHERE a.portfolio.user.id = :userId")
     int markAllAsReadByUserId(@Param("userId") Long userId);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM AlertPortfolio a WHERE a.user.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
 }

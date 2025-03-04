@@ -27,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/user")
 @Slf4j
 public class UserApiController {
-    // TODO: 응답 데이터 객체 말고 단순한 데이터로 변경
 
     private final UserService userService;
     @GetMapping("/list")
@@ -50,17 +49,7 @@ public class UserApiController {
 
     @PostMapping("/create")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
-        userDto.setProviderId(4L);
-        log.info("userDto===api====={}",userDto);
         UserDto userDtoCreated = userService.createUser(userDto);
         return ResponseEntity.ok(userDtoCreated);
     }
-
-    @DeleteMapping("/list/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    
 }

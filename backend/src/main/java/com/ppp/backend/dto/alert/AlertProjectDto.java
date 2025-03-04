@@ -29,5 +29,4 @@ public class AlertProjectDto {
     private UserDto receiverUserDto;
     private UserDto senderUserDto;
     private UserDto alertOwnerUserDto;
-    //TODO 필요한 유저 데이터만 담아서 쏴주기....
 }

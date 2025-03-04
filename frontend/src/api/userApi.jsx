@@ -41,15 +41,6 @@ const userApi = {
         throw error;
         }
     },
-    deleteUser: async (id) => {
-        try {
-        const response = await axios.delete(`${prefix}/list/${id}`);
-        return response.data;
-        } catch (error) {
-        console.error("유저 삭제 실패:", error);
-        throw error;
-        }
-    },
     userOauth: async (provider) => {
         try {
             const response = await axios.get(`${prefix}/oauth2`);

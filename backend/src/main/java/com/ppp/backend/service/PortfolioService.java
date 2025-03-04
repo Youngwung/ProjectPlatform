@@ -164,4 +164,12 @@ public class PortfolioService extends AbstractSkillService<UserSkill, PortfolioD
                                 .skillLevel(skillLevel)
                                 .build();
         }
+
+        public List<PortfolioDto> getMyPortfolios(Long userId) {
+                List<Portfolio> portfolios = portfolioRepository.findByUserId(userId);
+                return portfolios.stream()
+                        .map(this::convertToDto)
+                        .collect(Collectors.toList());
+        }
+
 }

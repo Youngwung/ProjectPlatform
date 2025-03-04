@@ -513,8 +513,6 @@ public class AlertProjectService {
                         .build())
                 .collect(Collectors.toList());
 
-        // TODO: 사용자 skill 정보 변환 로직 추가 필요 시
-
         return UserDto.builder()
                 .id(user.getId())
                 .name(user.getName())

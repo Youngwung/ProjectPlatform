@@ -72,7 +72,7 @@ const DashboardCard = ({ bookmarkProjectList = [], bookmarkPortfolioList = [],on
                     <ListGroup.Item
                       key={bookmark.id}
                       className="d-flex justify-content-between"
-                      onClick={()=> navigate(`/portfolio/list/${bookmark.id}`)}
+                      onClick={()=> navigate(`/portfolio/list/${bookmark.portfolioId}`)}
                       style={{ cursor: "pointer" }}
                     >
                       <span>{bookmark.title}</span>

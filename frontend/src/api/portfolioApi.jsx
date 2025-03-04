@@ -105,6 +105,15 @@ const portfolioApi = {
       throw error;
 		}
 	},
+	getMyPortfolios: async () => {
+		try {
+			const response = await axiosInstance.get(`${prefix}/my`, { withCredentials: true });
+			return response.data;
+		} catch (error) {
+			console.error("내 포트폴리오 조회 실패:", error);
+			throw error;
+		}
+	}
 };
 
 export default portfolioApi;

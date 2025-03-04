@@ -3,8 +3,15 @@ package com.ppp.backend.service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.ppp.backend.domain.alert.AlertProject;
+import com.ppp.backend.repository.*;
+import com.ppp.backend.repository.alert.AlertPortfolioRepository;
+import com.ppp.backend.repository.alert.AlertProjectRepository;
+import com.ppp.backend.repository.bookmark.BookmarkPortfolioRepository;
+import com.ppp.backend.repository.bookmark.BookmarkProjectRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,11 +25,6 @@ import com.ppp.backend.domain.User;
 import com.ppp.backend.domain.UserSkill;
 import com.ppp.backend.dto.LinkDto;
 import com.ppp.backend.dto.UserDto;
-import com.ppp.backend.repository.ProviderRepository;
-import com.ppp.backend.repository.SkillLevelRepository;
-import com.ppp.backend.repository.SkillRepository;
-import com.ppp.backend.repository.UserRepository;
-import com.ppp.backend.repository.UserSkillRepository;
 import com.ppp.backend.util.JwtUtil;
 
 import jakarta.transaction.Transactional;
@@ -34,6 +36,14 @@ import lombok.extern.slf4j.Slf4j;
 public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSkillRepository, User> {
 
     private final UserRepository userRepository;
+    private final AlertProjectRepository alertProjectRepository;
+    private final AlertPortfolioRepository alertPortfolioRepository;
+    private final BookmarkPortfolioRepository bookmarkPortfolioRepository;
+    private final BookmarkProjectRepository bookmarkProjectRepository;
+    private final LinkRepository linkRepository;
+    private final PortfolioRepository portfolioRepository;
+    private final ProjectRepository projectRepository;
+    private final UserSkillRepository userSkillRepository;
     private final ProviderRepository providerRepository;
     private final PasswordEncoder passwordEncoder;
     private final LinkService linkService;
@@ -43,13 +53,21 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
             UserSkillRepository repository,
             SkillRepository skillRepo,
             SkillLevelRepository skillLevelRepo,
-            UserRepository userRepository,
+            UserRepository userRepository, AlertProjectRepository alertProjectRepository, AlertPortfolioRepository alertPortfolioRepository, BookmarkPortfolioRepository bookmarkPortfolioRepository, BookmarkProjectRepository bookmarkProjectRepository, LinkRepository linkRepository, PortfolioRepository portfolioRepository, ProjectRepository projectRepository, SkillRepository skillRepository, UserSkillRepository userSkillRepository,
             PasswordEncoder passwordEncoder,
             ProviderRepository providerRepository,
             LinkService linkService,
             JwtUtil jwtUtil) {
         super(repository, skillRepo, skillLevelRepo);
         this.userRepository = userRepository;
+        this.alertProjectRepository = alertProjectRepository;
+        this.alertPortfolioRepository = alertPortfolioRepository;
+        this.bookmarkPortfolioRepository = bookmarkPortfolioRepository;
+        this.bookmarkProjectRepository = bookmarkProjectRepository;
+        this.linkRepository = linkRepository;
+        this.portfolioRepository = portfolioRepository;
+        this.projectRepository = projectRepository;
+        this.userSkillRepository = userSkillRepository;
         this.passwordEncoder = passwordEncoder;
         this.providerRepository = providerRepository;
         this.linkService = linkService;
@@ -82,8 +100,8 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
         // ✅ 비밀번호 암호화 후 저장
         String encodedPassword = passwordEncoder.encode(userDto.getPassword());
 
-        Provider provider = providerRepository.findById(userDto.getProviderId())
-                .orElseThrow(() -> new RuntimeException("Provider를 찾을 수 없습니다."));
+        Provider provider = providerRepository.findByName(userDto.getProviderName());
+
 
         User user = User.builder()
                 .name(userDto.getName())
@@ -228,8 +246,9 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
     public void updatePassword(Long userId, String nowPassword, String newPassword) {
         log.info("🔑 비밀번호 변경 요청: userId={}", userId);
 
-        if (newPassword == null || newPassword.trim().isEmpty()) {
-            throw new IllegalArgumentException("새 비밀번호는 비워둘 수 없습니다.");
+        // 새 비밀번호 검증
+        if (!isValidPassword(newPassword)) {
+            throw new IllegalArgumentException("비밀번호는 최소 8자 이상, 숫자, 문자, 특수문자를 포함해야 합니다.");
         }
 
         User existingUser = userRepository.findById(userId)
@@ -247,8 +266,53 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
     }
 
     /** ✅ 사용자 삭제 */
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+    @Transactional
+    public void deleteUser(Long userId) {
+        log.info("🚨 [Hard Delete] 회원 탈퇴 진행: userId={}", userId);
+
+        try {
+            // 1️⃣ 연관 데이터 삭제
+            log.info("🟢 alertPortfolio 삭제 시작...");
+            alertPortfolioRepository.deleteByUserId(userId);
+            log.info("✅ alertPortfolio 삭제 완료");
+
+            log.info("🟢 alertProject 삭제 시작...");
+            alertProjectRepository.deleteByUserId(userId);
+            log.info("✅ alertProject 삭제 완료");
+
+            log.info("🟢 bookmarkPortfolio 삭제 시작...");
+            bookmarkPortfolioRepository.deleteByUserId(userId);
+            log.info("✅ bookmarkPortfolio 삭제 완료");
+
+            log.info("🟢 bookmarkProject 삭제 시작...");
+            bookmarkProjectRepository.deleteByUserId(userId);
+            log.info("✅ bookmarkProject 삭제 완료");
+
+            log.info("🟢 link 삭제 시작...");
+            linkRepository.deleteByUserId(userId);
+            log.info("✅ link 삭제 완료");
+
+            log.info("🟢 portfolio 삭제 시작...");
+            portfolioRepository.deleteByUserId(userId);
+            log.info("✅ portfolio 삭제 완료");
+
+            log.info("🟢 project 삭제 시작...");
+            projectRepository.deleteByUserId(userId);
+            log.info("✅ project 삭제 완료");
+
+            log.info("🟢 userSkill 삭제 시작...");
+            userSkillRepository.deleteByUserId(userId);
+            log.info("✅ userSkill 삭제 완료");
+
+            // 2️⃣ 최종적으로 회원 삭제
+            log.info("🟢 user 삭제 시작...");
+            userRepository.deleteById(userId);
+            log.info("✅ 회원 탈퇴 완료: userId={}", userId);
+
+        } catch (Exception e) {
+            log.error("❌ 회원 탈퇴 중 오류 발생! userId={}, 오류={}", userId, e.getMessage(), e);
+            throw new RuntimeException("회원 탈퇴 중 오류 발생", e);
+        }
     }
 
     /** ✅ User → UserDto 변환 */
@@ -279,5 +343,9 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
 
         return convertToDto(updatedUser);
     }
-
+    private boolean isValidPassword(String password) {
+        // 최소 8자 이상, 숫자 1개 이상, 문자 1개 이상, 특수문자 1개 이상
+        String passwordRegex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
+        return password != null && Pattern.matches(passwordRegex, password);
+    }
 }

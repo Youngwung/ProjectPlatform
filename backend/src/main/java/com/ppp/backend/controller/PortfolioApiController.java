@@ -1,5 +1,7 @@
 package com.ppp.backend.controller;
 
+import com.ppp.backend.util.AuthUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +24,8 @@ import com.ppp.backend.service.PortfolioService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/portfolio")
 @RequiredArgsConstructor
@@ -29,24 +33,37 @@ import lombok.extern.slf4j.Slf4j;
 public class PortfolioApiController {
 
     private final PortfolioService portfolioService;
+    private final AuthUtil authUtil;
 
-
-    // **1. 전체 프로젝트 조회 (GET)**
+    // **1. 전체 포폴 조회 (GET)**
     @GetMapping("/list")
     public ResponseEntity<PageResponseDTO<PortfolioDto>> getAllPortfolios() {
         PageResponseDTO<PortfolioDto> projectList = portfolioService.getAllPortfolios(PageRequestDTO.builder().build());
         log.info("프로젝트 전체조회 요청: {}", projectList);
         return ResponseEntity.ok(projectList);
     }
-    
-    // **3. 프로젝트 상세 조회 (GET)**
+    // **2. 특정 사용자 포폴 조회(GET)**
+    @GetMapping("/my")
+    public ResponseEntity<List<PortfolioDto>> getMyPortfolios(HttpServletRequest request) {
+        Long userId = authUtil.extractUserIdFromCookie(request);
+        if (userId == null) {
+            return ResponseEntity.status(401).build(); // ❌ 인증 실패 (401 Unauthorized)
+        }
+
+        log.info("🔎 [Portfolio 조회] userId={}", userId);
+        List<PortfolioDto> myPortfolios = portfolioService.getMyPortfolios(userId);
+
+        return ResponseEntity.ok(myPortfolios); // ✅ 포트폴리오 목록 반환
+    }
+
+    // **3. 포폴 상세 조회 (GET)**
     @GetMapping("/list/{id}")
     public PortfolioDto getPortfolioById(@PathVariable(name = "id") Long id) {
-        log.info("프로젝트 상세 조회 요청: {}", id);
+        log.info("포폴 상세 조회 요청: {}", id);
         return portfolioService.getPortfolioById(id);
     }
 
-    // **4. 새 프로젝트 생성 (POST)**
+    // **4. 새 포폴 생성 (POST)**
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PortfolioDto> createPortfolio(
@@ -67,21 +84,21 @@ public class PortfolioApiController {
         return ResponseEntity.ok(createdProject);
     }
 
-    // **5. 기존 프로젝트 수정 (PUT)**
+    // **5. 기존 포폴 수정 (PUT)**
     @PutMapping("/{id}")
     public ResponseEntity<PortfolioDto> updatePortfolio(
             @PathVariable Long id,
             @RequestBody PortfolioDto PortfolioDto
     ) {
-        log.info("프로젝트 수정 요청: ID={}, Data={}", id, PortfolioDto);
+        log.info("포폴 수정 요청: ID={}, Data={}", id, PortfolioDto);
         PortfolioDto updatedProject = portfolioService.updatePortfolio(id, PortfolioDto);
         return ResponseEntity.ok(updatedProject);
     }
 
-    // **6. 프로젝트 삭제 (DELETE)**
+    // **6. 포폴 삭제 (DELETE)**
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePortfolio(@PathVariable Long id) {
-        log.info("프로젝트 삭제 요청: ID={}", id);
+        log.info("포폴 삭제 요청: ID={}", id);
         portfolioService.deletePortfolio(id);
         return ResponseEntity.ok("프로젝트가 성공적으로 삭제되었습니다.");
     }

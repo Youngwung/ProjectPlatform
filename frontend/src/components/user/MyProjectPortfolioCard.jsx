@@ -56,7 +56,7 @@ const MyProjectPortfolioCard = () => {
     setErrorMessage("");
     try {
       // API 호출하여 내 포트폴리오 데이터를 가져옴
-      const data = await portfolioApi.getAllProjects();
+      const data = await portfolioApi.getMyPortfolios();
       console.log("✅ 내 포트폴리오 데이터:", data);
       // 가져온 데이터를 상태에 저장
       setPortfolioList(data);

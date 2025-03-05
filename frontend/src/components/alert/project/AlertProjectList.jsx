@@ -4,6 +4,7 @@ import { HiOutlineMail, HiOutlineMailOpen } from "react-icons/hi"; // 🔹 읽�
 import alertApi from "../../../api/alertApi";
 import { useNavigate } from "react-router-dom";
 
+//TODO 특정 alert클릭시 alertbtn도 읽음처리되게 하기
 const AlertProjectList = () => {
   const [projectAlerts, setProjectAlerts] = useState([]);
   const [selectedAlerts, setSelectedAlerts] = useState([]);

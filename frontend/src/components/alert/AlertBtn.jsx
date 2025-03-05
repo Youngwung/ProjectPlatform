@@ -56,13 +56,6 @@ const AlertBtn = () => {
   useEffect(() => {
     handleProjectAlerts();
     handlePortfolioAlerts();
-    // const intervalId = setInterval(() => {
-    //   handleProjectAlerts();
-    //   handlePortfolioAlerts();
-    // }, 30000); // 30,000ms = 30초
-
-    // 컴포넌트 언마운트 시 interval 클리어
-    // return () => clearInterval(intervalId);
   }, []);
 
   // 알림 클릭 시: 읽음 처리 후 상세 페이지로 이동
@@ -70,8 +63,18 @@ const AlertBtn = () => {
     try {
       await alertApi.markAlertAsRead(alertId, isProject);
       if (isProject) {
+        setProjectAlerts(prevAlerts =>
+          prevAlerts.map(alert =>
+            alert.id === alertId ? { ...alert, isRead: true } : alert
+          )
+        );
         navigate(`mypage/alert/project/${alertId}`);
       } else {
+        setPortfolioAlerts(prevAlerts =>
+          prevAlerts.map(alert =>
+            alert.id === alertId ? { ...alert, isRead: true } : alert
+          )
+        );
         navigate(`mypage/alert/portfolio/${alertId}`);
       }
     } catch (error) {
@@ -81,7 +84,9 @@ const AlertBtn = () => {
   };
 
   // 전체 알림 개수 (프로젝트 + 포트폴리오)
-  const totalAlerts = projectAlerts.length + portfolioAlerts.length;
+  const unreadProjectCount = projectAlerts.filter(alert => !alert.isRead).length;
+  const unreadPortfolioCount = portfolioAlerts.filter(alert => !alert.isRead).length;
+  const totalAlerts = unreadProjectCount + unreadPortfolioCount;
 
   return (
     <Dropdown show={showDropdown} onToggle={setShowDropdown}>

@@ -252,7 +252,7 @@ const Signup = () => {
 								</Form.Group>
 
 								<OverlayTrigger
-									placement="top" // 툴팁 위치 (top, bottom, left, right 선택 가능)
+									placement="top"
 									overlay={!isConfirmedEmail ?
 										<Tooltip>중복 확인을 해주세요</Tooltip>
 										:<></>}

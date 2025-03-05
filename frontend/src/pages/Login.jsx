@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
+import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import AuthApi from "../api/authApi";
 
 const Login = () => {
-  const navigate = useNavigate();
+	const navigate = useNavigate();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
@@ -34,13 +35,13 @@ const Login = () => {
 		}
 	};
 
-  // 소셜 로그인 구현을 위한 코드
-  const handleLogin = (provider) => {
+	// 소셜 로그인 구현을 위한 코드
+	const handleLogin = (provider) => {
 		const oauth2URL = `http://localhost:8080/oauth2/authorization/${provider}`;
 		console.log(oauth2URL);
-		
-    window.location.href = oauth2URL;
-  }
+
+		window.location.href = oauth2URL;
+	};
 
 	return (
 		<Container className="my-5">
@@ -78,12 +79,37 @@ const Login = () => {
 							</Button>
 						</Card.Body>
 						<div>
-							<h2>소셜 로그인</h2>
-							<Button onClick={() => handleLogin("google")}>
-								Google 로그인
-							</Button>
-							<Button onClick={() => handleLogin("naver")}>Naver 로그인</Button>
-							<Button onClick={() => handleLogin("kakao")}>Kakao 로그인</Button>
+							<div className="flex justify-center gap-2 my-3">
+								<button
+									className="flex items-center px-5 py-2 border border-gray-300 rounded bg-white cursor-pointer"
+									onClick={() => handleLogin("google")}
+								>
+
+									<FcGoogle className="mr-2 text-xl" /> Google
+								</button>
+								<button
+									className="flex items-center px-5 py-2 border border-gray-300 rounded bg-white cursor-pointer"
+									onClick={() => handleLogin("naver")}
+								>
+									<img 
+										src="https://i.imgur.com/bEMZvBl.png" 
+										alt="Naver Login"
+										className="mr-2 h-5 w-5"
+									/>
+									Naver
+								</button>
+								<button
+									className="flex items-center px-5 py-2 border border-gray-300 rounded bg-white cursor-pointer"
+									onClick={() => handleLogin("kakao")}
+								>
+									<img 
+										src="https://i.imgur.com/HGAA6oU.png"
+										alt="Kakao Login" 
+										className="mr-2 h-5 w-5"
+									/>
+									 Kakao
+								</button>
+							</div>
 						</div>
 					</Card>
 				</Col>

@@ -80,7 +80,7 @@ public class AuthApiController {
         Map<String, Object> response = new HashMap<>();
         response.put("exists", exists);
         response.put("message", exists ? "이미 사용 중인 이메일입니다." : "사용 가능한 이메일입니다.");
-
+        log.info("{} res",response);
         return ResponseEntity.ok(response);
     }
 

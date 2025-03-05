@@ -50,12 +50,18 @@ const authApi = {
       throw error;
     }
   },
+  /**
+   * 이메일의 값이 check-email API를 통해 중복되는지 확인 true 시 중복, false 시 중복되지 않음
+   * @param {email} email 
+   * @returns 
+   */
   checkEmail: async (email) => {
     try {
         const response = await axios.post(`${API_URL}/check-email`, { email }, {
             headers: { "Content-Type": "application/json" } // ✅ 명시적으로 JSON 타입 지정
         });
-        return response.data;  // `true` 또는 `false` 반환
+        console.log("✅ 이메일 중복 확인 결과:", response.data);
+        return response.data;
     } catch (error) {
         console.error("❌ 이메일 중복 확인 오류!");
 

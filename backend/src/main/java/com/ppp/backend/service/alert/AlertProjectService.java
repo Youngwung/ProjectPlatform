@@ -245,13 +245,13 @@ public class AlertProjectService {
         User invitee = userRepository.findById(inviteeId)
                 .orElseThrow(() -> new EntityNotFoundException("초대받는 사용자를 찾을 수 없습니다. ID: " + inviteeId));
 
-        // 초대받는 사용자 알림 생성 (프로젝트 소유자 → 초대받는 사용자)
+        // ✅ 초대받는 사용자 알림 생성 (프로젝트 소유자 → 초대받는 사용자)
         String contentForInvitee = project.getUser().getName() + " 님이 프로젝트 [" + project.getTitle() + "]에 초대했습니다.";
         AlertProject alertForInvitee = AlertProject.builder()
                 .project(project)
-                .senderId(project.getUser())
-                .receiverId(invitee)
-                .alertOwnerId(project.getUser())
+                .senderId(project.getUser()) // 보낸 사람: 프로젝트 소유자
+                .receiverId(invitee)    // 받는 사람: 초대받은 사용자
+                .alertOwnerId(invitee)
                 .status(AlertProject.Status.신청)
                 .type(AlertProject.Type.초대알림)
                 .content(contentForInvitee)
@@ -261,7 +261,7 @@ public class AlertProjectService {
         alertProjectRepository.save(alertForInvitee);
         log.info("✅ [inviteToProject] 초대받는 사용자 알림 생성 완료, alert ID: {}", alertForInvitee.getId());
 
-        // 초대 전송 확인 알림 생성 (프로젝트 소유자 → 본인)
+        // ✅ 초대 전송 확인 알림 생성 (프로젝트 소유자 → 본인)
         String contentForInviter = "프로젝트 [" + project.getTitle() + "] 초대가 " + invitee.getName() + " 님에게 전송되었습니다.";
         AlertProject alertForInviter = AlertProject.builder()
                 .project(project)

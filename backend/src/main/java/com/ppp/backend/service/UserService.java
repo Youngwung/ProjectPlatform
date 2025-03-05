@@ -6,12 +6,6 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.ppp.backend.domain.alert.AlertProject;
-import com.ppp.backend.repository.*;
-import com.ppp.backend.repository.alert.AlertPortfolioRepository;
-import com.ppp.backend.repository.alert.AlertProjectRepository;
-import com.ppp.backend.repository.bookmark.BookmarkPortfolioRepository;
-import com.ppp.backend.repository.bookmark.BookmarkProjectRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +19,18 @@ import com.ppp.backend.domain.User;
 import com.ppp.backend.domain.UserSkill;
 import com.ppp.backend.dto.LinkDto;
 import com.ppp.backend.dto.UserDto;
+import com.ppp.backend.repository.LinkRepository;
+import com.ppp.backend.repository.PortfolioRepository;
+import com.ppp.backend.repository.ProjectRepository;
+import com.ppp.backend.repository.ProviderRepository;
+import com.ppp.backend.repository.SkillLevelRepository;
+import com.ppp.backend.repository.SkillRepository;
+import com.ppp.backend.repository.UserRepository;
+import com.ppp.backend.repository.UserSkillRepository;
+import com.ppp.backend.repository.alert.AlertPortfolioRepository;
+import com.ppp.backend.repository.alert.AlertProjectRepository;
+import com.ppp.backend.repository.bookmark.BookmarkPortfolioRepository;
+import com.ppp.backend.repository.bookmark.BookmarkProjectRepository;
 import com.ppp.backend.util.JwtUtil;
 
 import jakarta.transaction.Transactional;
@@ -92,9 +98,15 @@ public class UserService extends AbstractSkillService<UserSkill, UserDto, UserSk
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
 
-        // ✅ 비밀번호 검증 (최소 6자)
-        if (userDto.getPassword() == null || userDto.getPassword().length() < 6) {
-            throw new IllegalArgumentException("비밀번호는 최소 6자 이상이어야 합니다.");
+        // ✅ 로컬 회원가입인 경우 비밀번호 검증 (최소 6자)
+        if (!isValidPassword(userDto.getPassword()) && userDto.getProviderName().equals("local")) {
+            throw new IllegalArgumentException("비밀번호가 정규식 검사를 통과하지 못했습니다.");
+        }
+
+        // 소셜 회원가입인 경우 비밀번호를 생성해서 삽입
+        if(!userDto.getProviderName().equals("local")) {
+            String socialPassword = userDto.getProviderName() + userDto.getName();
+            userDto.setPassword(socialPassword);
         }
 
         // ✅ 비밀번호 암호화 후 저장

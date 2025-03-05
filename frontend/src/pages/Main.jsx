@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Container, Row, Col } from 'react-bootstrap';
+import { Card, Col, Container, Row } from 'react-bootstrap';
 const jobs = [
   { title: '프론트엔드 개발자', description: 'React 및 Vue.js 경험자를 모집합니다.', image: 'https://source.unsplash.com/300x200/?technology' },
   { title: '백엔드 개발자', description: 'Spring Boot 및 MySQL 경험자를 모집합니다.', image: 'https://source.unsplash.com/300x200/?startup' },
@@ -26,7 +26,7 @@ const Main = () => {
   return (
     <Container className="my-5">
       <section>
-        <h2 className="my-4">구인 섹션</h2>
+        <h2 className="my-4">추천 프로젝트</h2>
         <Row>
           {jobs.map((job, index) => (
             <Col key={index} md={3} className="mb-4">
@@ -43,7 +43,7 @@ const Main = () => {
       </section>
 
       <section className="mt-5">
-        <h2 className="my-4">구직 섹션</h2>
+        <h2 className="my-4">인기 포트폴리오</h2>
         <Row>
           {seekers.map((seeker, index) => (
             <Col key={index} md={3} className="mb-4">

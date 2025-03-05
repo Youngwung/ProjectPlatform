@@ -5,12 +5,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.ppp.backend.controller.AuthApiController;
-import com.ppp.backend.util.AuthUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import com.ppp.backend.controller.AuthApiController;
 import com.ppp.backend.domain.Project;
 import com.ppp.backend.domain.ProjectSkill;
 import com.ppp.backend.domain.ProjectType;
@@ -29,7 +27,9 @@ import com.ppp.backend.repository.SkillLevelRepository;
 import com.ppp.backend.repository.SkillRepository;
 import com.ppp.backend.repository.UserRepository;
 import com.ppp.backend.status.ProjectStatus;
+import com.ppp.backend.util.AuthUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
@@ -100,7 +100,7 @@ public class ProjectServiceImpl extends
 		if (dto.getSkills() != null && !dto.getSkills().isEmpty()) {
 			saveParentEntity(dto, project);
 			// 스킬이 비어있으니 type을 content로 자동 변경
-			dto.setType("content");
+			dto.setType("all");
 		}
 		// 프로젝트 타입 저장
 		

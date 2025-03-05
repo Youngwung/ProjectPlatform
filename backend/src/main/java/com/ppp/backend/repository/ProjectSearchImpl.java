@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 
 import com.ppp.backend.domain.Project;
 import com.ppp.backend.domain.QProject;
+import com.ppp.backend.domain.QProjectApplication;
 import com.ppp.backend.domain.QProjectSkill;
 import com.ppp.backend.domain.QProjectType;
 import com.ppp.backend.domain.QSkill;
@@ -38,58 +39,58 @@ public class ProjectSearchImpl extends QuerydslRepositorySupport implements Proj
 
 	@Override
 	public Page<Project> searchString(PageRequestDTO pageRequestDTO) {
-		
+
 		QProject project = QProject.project;
-		
+
 		BooleanExpression isPublic = project.isPublic.eq(true);
-		
+
 		// JoinProject 테이블에서
 		JPQLQuery<Project> query = from(project);
-		
+
 		// 공개 변수가 true인 조건 설정
 		query.where(isPublic);
-		
+
 		// pageable 객체 생성
 		// DTO의 값으로 수정
 		Pageable pageable = PageRequest.of(pageRequestDTO.getPage() - 1, pageRequestDTO.getSize(),
-		Sort.by("id").descending());
-		
+				Sort.by("id").descending());
+
 		// QueryDSL에서 페이징 처리 하는 방법
 		this.getQuerydsl().applyPagination(pageable, query);
 		// query에 페이징 처리가 적용됨.
-		
+
 		List<Project> list = query.fetch(); // 페이징 처리된 목록 데이터
-		
+
 		long total = query.fetchCount(); // 검색된 전체 데이터 양
-		
+
 		// Collect와 Pageable객체, 전체 데이터 개수로 Page<E>를 리턴해주는 생성자: PageImpl
 		return new PageImpl<>(list, pageable, total);
 	}
-	
+
 	@Override
 	public Page<Project> searchKeyword(PageRequestDTO pageRequestDTO) {
 		QProject project = QProject.project;
 		QProjectType projectType = QProjectType.projectType;
-		
+		QProjectApplication projectApplication = QProjectApplication.projectApplication;
+
 		// 공개인 것만 데이터 패칭
 		BooleanExpression isPublic = project.isPublic.eq(true);
 
 		// 프로젝트 유형: all. content, skill에 따른 검색 조건 설정
 		String requestType = pageRequestDTO.getType();
-		
+
 		BooleanExpression type = projectType.type.eq(ProjectTypeEnum.valueOf(requestType));
 
 		// JoinProject 테이블에서
 		JPQLQuery<Project> query = from(project);
-
-
 
 		// ! 검색 우선순위 로직
 		QProjectSkill projectSkill = QProjectSkill.projectSkill;
 		QSkill skill = QSkill.skill;
 
 		BooleanExpression titleContains = Expressions.TRUE;
-		BooleanExpression descriptionContains = Expressions.TRUE;;
+		BooleanExpression descriptionContains = Expressions.TRUE;
+		;
 		// 검색 키워드
 		if (!pageRequestDTO.getQuery().equals("")) {
 			titleContains = project.title.containsIgnoreCase(pageRequestDTO.getQuery());
@@ -122,7 +123,8 @@ public class ProjectSearchImpl extends QuerydslRepositorySupport implements Proj
 		}
 
 		// 위의 조건을 만족하지 못하는 프로젝트는 가장 낮은 우선순위 부여 (높은 숫자)
-		NumberExpression<Integer> priority = caseBuilder.when(Expressions.TRUE.isTrue()).then(priorityIndex).otherwise(priorityIndex);
+		NumberExpression<Integer> priority = caseBuilder.when(Expressions.TRUE.isTrue()).then(priorityIndex)
+				.otherwise(priorityIndex);
 
 		// 공개 변수가 true인 조건 설정
 		query.leftJoin(projectSkill).on(projectSkill.project.eq(project));
@@ -132,8 +134,21 @@ public class ProjectSearchImpl extends QuerydslRepositorySupport implements Proj
 		query.where(type);
 		query.where(titleContains.or(descriptionContains));
 		query.groupBy(project.id);
-		query.orderBy(priority.asc(), matchedSkillsCount.desc(), queryScore.desc());
 
+		switch (pageRequestDTO.getSortOption()) {
+			case "popularity":
+			// 인기 순
+			log.info("인기순 실행");
+			query.leftJoin(projectApplication).on(project.id.eq(projectApplication.id));
+			query.orderBy(projectApplication.id.asc(), priority.asc());
+			break;
+
+			default:
+				// 관련도 순
+				log.info("관련도순 실행");
+				query.orderBy(priority.asc(), matchedSkillsCount.desc(), queryScore.desc());
+				break;
+		}
 
 		// pageable 객체 생성
 		// DTO의 값으로 수정

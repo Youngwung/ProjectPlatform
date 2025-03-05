@@ -33,6 +33,7 @@ export default function useCustomMove() {
 	const searchQuery = getString(queryParams.get("query"), "");
 	const searchSkills = getString(queryParams.getAll("querySkills"), []);
 	const searchType = getString(queryParams.get("type"), "");
+	const searchSortOption = getString(queryParams.get("sortOption"), "");
 
 	// 변수로 저장되어있는 값을 주소창에서 사용할 수 있는 형태로 변환
 	// ? page=1&size=12
@@ -40,7 +41,8 @@ export default function useCustomMove() {
 		page,
 		size,
 		query: searchQuery,
-		type: searchType
+		type: searchType,
+		sortOption: searchSortOption,
 	});
 	searchSkills.forEach((skill) => {
 		queryDefaultParam.append("querySkills", skill);
@@ -98,11 +100,14 @@ export default function useCustomMove() {
 			const searchQueryString = getString(params.query, "");
 			const searchSkills = params.querySkills || [];
 			const searchType = params.type || "all";
+			const searchSortOption = params.sortOption || "relevance";
+
 			queryStr = new URLSearchParams({
 				page: pageNum,
 				size: sizeNum,
 				query: searchQueryString,
-				type: searchType
+				type: searchType,
+				sortOption: searchSortOption,
 			});
 			searchSkills.forEach((skill) => {
 				queryStr.append("querySkills", skill);

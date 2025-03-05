@@ -1,6 +1,7 @@
 import { jwtDecode } from "jwt-decode";
 import React, { useEffect, useState } from "react";
 import {
+	Alert,
 	Button,
 	Card,
 	Col,
@@ -37,12 +38,19 @@ const Signup = () => {
 		const tempToken = queryParams.get("token");
 		if (tempToken) {
 			const decoded = jwtDecode(tempToken);
+			console.log(decoded);
+			console.log(decoded.sub);
+			
+			
 			setFormData((prevData) => ({
 				...prevData,
 				email: decoded.sub,
 				name: decoded.name,
 				providerName: decoded.providerName, // 소셜 로그인 제공자 정보 저장
 			}));
+			console.log(formData.email);
+			console.log(formData.email === "");
+			console.log(formData.email !== "");
 		}
 	}, [queryParams]);
 
@@ -171,6 +179,7 @@ const Signup = () => {
 										type="text"
 										value={formData.name}
 										onChange={handleInputChange}
+										readOnly = {formData.providerName !== "local"}
 									/>
 								</Form.Group>
 
@@ -182,8 +191,9 @@ const Signup = () => {
 											placeholder="이메일을 입력해주세요"
 											value={formData.email}
 											onChange={handleInputChange}
-											required
-											readOnly={!!formData.providerName && formData.providerName !== "local"} // 소셜 로그인 이메일 수정 불가
+											required = {formData.email !== ''}
+											// readOnly={!!formData.providerName && formData.providerName !== "local"} // 소셜 로그인 이메일 수정 불가
+											readOnly={formData.email === ''} // 소셜 로그인 이메일 수정 불가
 										/>
 										<Button variant="secondary" onClick={handleDuplicate} disabled={!!formData.providerName && formData.providerName !== "local"}>
 											중복확인

@@ -15,7 +15,6 @@ const alertApi = {
       return [];
     }
   },
-
   /** 🔹 유저의 읽지 않은 포트폴리오 알림 조회 */
   getUnreadPortfolioAlerts: async () => {
     try {

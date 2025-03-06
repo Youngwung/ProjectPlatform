@@ -77,40 +77,49 @@ const Login = () => {
 							<Button variant="secondary" className="w-100 mt-3" href="/signup">
 								회원가입
 							</Button>
-						</Card.Body>
-						<div>
-							<div className="flex justify-center gap-2 my-3">
-								<button
-									className="flex items-center px-5 py-2 border border-gray-300 rounded bg-white cursor-pointer"
-									onClick={() => handleLogin("google")}
-								>
 
-									<FcGoogle className="mr-2 text-xl" /> Google
-								</button>
-								<button
-									className="flex items-center px-5 py-2 border border-gray-300 rounded bg-white cursor-pointer"
-									onClick={() => handleLogin("naver")}
-								>
-									<img 
-										src="https://i.imgur.com/bEMZvBl.png" 
-										alt="Naver Login"
-										className="mr-2 h-5 w-5"
-									/>
-									Naver
-								</button>
-								<button
-									className="flex items-center px-5 py-2 border border-gray-300 rounded bg-white cursor-pointer"
-									onClick={() => handleLogin("kakao")}
-								>
-									<img 
-										src="https://i.imgur.com/HGAA6oU.png"
-										alt="Kakao Login" 
-										className="mr-2 h-5 w-5"
-									/>
-									 Kakao
-								</button>
-							</div>
-						</div>
+							<Row className="my-3 text-center">
+								<Col xs={12} md={12} xl={12} className="">
+									
+									<p className="mb-3">소셜로그인</p>
+								</Col>
+								<Col xs={12} md={12} xl={4}>
+									<button
+										// w-100 클래스로 버튼이 Col의 전체 너비를 사용
+										className="flex items-center px-5 py-2 border border-gray-300 rounded bg-white cursor-pointer w-100 mb-3"
+										onClick={() => handleLogin("google")}
+									>
+										<FcGoogle className="mr-2 text-xl" /> Google
+									</button>
+								</Col>
+								<Col xs={12} md={12} xl={4}>
+									<button
+										className="flex items-center px-5 py-2 border border-gray-300 rounded bg-white cursor-pointer w-100 mb-3"
+										onClick={() => handleLogin("naver")}
+									>
+										<img 
+											src="https://i.imgur.com/bEMZvBl.png" 
+											alt="Naver Login"
+											className="mr-2 h-5 w-5"
+										/>
+										Naver
+									</button>
+								</Col>
+								<Col xs={12} md={12} xl={4}>
+									<button
+										className="flex items-center px-5 py-2 border border-gray-300 rounded bg-white cursor-pointer w-100"
+										onClick={() => handleLogin("kakao")}
+									>
+										<img 
+											src="https://i.imgur.com/HGAA6oU.png"
+											alt="Kakao Login" 
+											className="mr-2 h-5 w-5"
+										/>
+										Kakao
+									</button>
+								</Col>
+							</Row>
+						</Card.Body>
 					</Card>
 				</Col>
 			</Row>

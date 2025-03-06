@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Alert, Button, Card, Container, Spinner, Modal, Form } from "react-bootstrap";
+import { Alert, Button, Card, Container, Form, Modal, Spinner } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import portfolioApi from "../../api/portfolioApi";
-import BookmarkPortfolioBtn from "../../components/bookmark/BookmarkPortfolioBtn";
-import { getMyProjects } from "../../api/projectApi"; // 내가 만든 프로젝트 목록을 가져올 API
 import alertApi from "../../api/alertApi"; // 프로젝트 초대 API 호출
+import portfolioApi from "../../api/portfolioApi";
+import { getMyProjects } from "../../api/projectApi"; // 내가 만든 프로젝트 목록을 가져올 API
+import BookmarkPortfolioBtn from "../../components/bookmark/BookmarkPortfolioBtn";
 import SkillTagComponent from "../../components/skill/SkillTagComponent";
 import SkillTagGuideComponent from "../../components/skill/SkillTagGuideComponent";
 
@@ -17,7 +17,7 @@ const PortfolioDetail = () => {
     id: null,
     title: "",
     description: "",
-    userId: null,
+    userName: "",
     links: "",
     createdAt: "",
     updatedAt: "",
@@ -80,10 +80,10 @@ const PortfolioDetail = () => {
 
   // 초대 버튼 클릭 시 모달 열기 (자신의 포트폴리오는 초대 불가)
   const handleOpenInviteModal = () => {
-    if (portfolio.userId === currentUserId) {
-      alert("자신의 포트폴리오는 초대할 수 없습니다.");
-      return;
-    }
+    // if (portfolio.userId === currentUserId) {
+    //   alert("자신의 포트폴리오는 초대할 수 없습니다.");
+    //   return;
+    // }
     setShowInviteModal(true);
     fetchMyProjects();
   };
@@ -125,6 +125,7 @@ const PortfolioDetail = () => {
       setLoading(false);
     }
   };
+  
 
   if (loading) {
     return (
@@ -178,11 +179,11 @@ const PortfolioDetail = () => {
           <Button variant="danger" className="ms-2" onClick={handleDelete}>
             삭제
           </Button>
-          {portfolio.userId !== currentUserId && (
+          {/* {portfolio.userId !== currentUserId && ( */}
             <Button variant="success" className="ms-2" onClick={handleOpenInviteModal}>
               초대하기
             </Button>
-          )}
+          {/* )} */}
         </Card.Body>
       </Card>
       <Link to="/portfolio/list">

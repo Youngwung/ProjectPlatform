@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Badge, Button, Card, Col, Container, Row } from "react-bootstrap";
+import alertApi from "../../api/alertApi";
 import { getOne } from "../../api/projectApi";
 import useCustomMove from "../../hooks/useCustomMove";
 import useCustomString from "../../hooks/useCustomString";
 import BookmarkProjectBtn from "../bookmark/BookmarkProjectBtn";
 import SkillTagComponent from "../skill/SkillTagComponent";
 import SkillTagGuideComponent from "../skill/SkillTagGuideComponent";
-import alertApi from "../../api/alertApi";
 
 // 조회 기능을 구현하기 위한 컴포넌트
 
 // 기본값 설정
 const initState = {
 	id: 0,
-	userId: 0,
+	userName: "",
 	title: "",
 	description: "",
 	type: "",
@@ -101,11 +101,10 @@ export default function ReadComponent({ projectId }) {
 						<Col>
 							<BookmarkProjectBtn
 								projectId={project.id}
-								userId={project.userId}
 							/>
 						</Col>
 						<Col>
-							<strong>작성자:</strong> {project.userId}
+							<strong>작성자:</strong> {project.userName}
 						</Col>
 						<Col>
 							<strong>최대 인원:</strong> {project.maxPeople}명
@@ -137,7 +136,10 @@ export default function ReadComponent({ projectId }) {
 							</Button>
 						</Col>
 						<Col>
-							<Button variant="primary" onClick={() => moveToModify(projectId)}>
+							<Button 
+								variant="primary" 
+								onClick={() => moveToModify(projectId)}
+							>
 								수정
 							</Button>
 						</Col>

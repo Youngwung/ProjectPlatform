@@ -85,11 +85,13 @@ const portfolioApi = {
 	},
 
 	portfolioSearch: async (params) => {
-		const { page, size, query, querySkills } = params;
+		const { page, size, query, querySkills, sortOption } = params;
 		let searchParams = new URLSearchParams();
 		searchParams.append("page", page);
 		searchParams.append("size", size);
 		searchParams.append("query", query);
+		searchParams.append("sortOption", sortOption);
+
 		try {
 			if (querySkills && querySkills.length > 0) {
 				querySkills.forEach((skill) => {
@@ -113,7 +115,17 @@ const portfolioApi = {
 			console.error("내 포트폴리오 조회 실패:", error);
 			throw error;
 		}
-	}
+	},
+
+	getListForMain: async () => {
+		try {
+			const response = await axios.get(`${prefix}/main`);
+			return response.data
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	},
 };
 
 export default portfolioApi;

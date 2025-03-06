@@ -133,28 +133,30 @@ export default function SearchBar({ queryData }) {
 				<div className="flex flex-wrap gap-2"></div>
 				<div className="flex w-full justify-between align-items-center border">
 					<Row xs={12} className="w-full">
+						<Col xs = {3}>
+							<Form.Select
+								name="sortOption"
+								aria-label="Default select example"
+								value={data.sortOption}
+								onChange={handleChange}
+							>
+								<option value="relevance">정렬 선택</option>
+								<option value="relevance">관련도순</option>
+								<option value="popularity">인기순</option>
+							</Form.Select>
+						</Col>
 						{inProjectPage && (
-							<Col xs={6} className="flex gap-3">
+							<Col xs={3} className="flex gap-3">
 								<Form.Select
 									name="type"
 									aria-label="Default select example"
 									value={data.type}
 									onChange={handleChange}
 								>
-									<option value ="all">프로젝트 유형 선택</option>
+									<option value="all">프로젝트 유형 선택</option>
 									<option value="all">모두 설정됨 (기본)</option>
 									<option value="content">주제만 설정됨</option>
 									<option value="skill">사용 기술 스택만 설정됨</option>
-								</Form.Select>
-								<Form.Select
-									name="sortOption"
-									aria-label="Default select example"
-									value={data.sortOption}
-									onChange={handleChange}
-								>
-									<option value="relevance">정렬 선택</option>
-									<option value="relevance">관련도 순</option>
-									<option value="popularity">인기순</option>
 								</Form.Select>
 							</Col>
 						)}

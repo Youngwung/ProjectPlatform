@@ -82,8 +82,8 @@ const ModifyPortfolio = () => {
 		}
 	};
 	// 스킬 컴포넌트 관련 로직
-	const [userSkills, setUserSkills] = useState("");
 	const [showModal, setShowModal] = useState(false);
+	const [userSkills, setUserSkills] = useState("");
 
 	useEffect(() => {
 		getUserSkill()

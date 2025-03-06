@@ -90,7 +90,7 @@ export default function ListComponent() {
 											<Card.Body>
 												<Card.Title>{project.title}</Card.Title>
 												{/* TODO: 유저 이름 출력 (현재 userId 출력) */}
-												<Card.Text>작성자: {project.userId}</Card.Text>
+												<Card.Text>작성자: {project.userName}</Card.Text>
 												<Card.Text>인원: {project.maxPeople}</Card.Text>
 												<Card.Footer className="m-0 p-2 py-1">
 													<SkillTagComponent skills={project.skills} />

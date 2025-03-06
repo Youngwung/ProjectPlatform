@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 
 import com.ppp.backend.domain.Portfolio;
 import com.ppp.backend.domain.QPortfolio;
+import com.ppp.backend.domain.QPortfolioInvitation;
 import com.ppp.backend.domain.QSkill;
 import com.ppp.backend.domain.QUserSkill;
 import com.ppp.backend.dto.PageRequestDTO;
@@ -48,7 +49,7 @@ public class PortfolioSearchImpl extends QuerydslRepositorySupport implements Po
 	@Override
 	public Page<Portfolio> searchKeyword(PageRequestDTO pageRequestDTO) {
 		QPortfolio portfolio = QPortfolio.portfolio;
-
+		QPortfolioInvitation portfolioInvitation = QPortfolioInvitation.portfolioInvitation;
 
 		// JoinPortfolio 테이블에서
 		JPQLQuery<Portfolio> query = from(portfolio);
@@ -106,7 +107,18 @@ public class PortfolioSearchImpl extends QuerydslRepositorySupport implements Po
 		query.where(titleContains.or(descriptionContains));
 		query.where(skillExist);
 		query.groupBy(portfolio.id);
-		query.orderBy(priority.asc(), matchedSkillsCount.desc(), queryScore.desc());
+		switch (pageRequestDTO.getSortOption()) {
+			case "popularity":
+			// 인기 순
+			query.leftJoin(portfolioInvitation).on(portfolio.id.eq(portfolioInvitation.id));
+			query.orderBy(portfolioInvitation.counts.desc(), priority.asc());
+			break;
+
+			default:
+				// 관련도 순
+				query.orderBy(priority.asc(), matchedSkillsCount.desc(), queryScore.desc());
+				break;
+		}
 
 		// pageable 객체 생성
 		// DTO의 값으로 수정

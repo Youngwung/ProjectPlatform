@@ -8,7 +8,7 @@ import ModalComponent from "./ModalComponent";
 // 기본값 설정
 const initState = {
 	id: 0,
-	userId: 0,
+	userName: 0,
 	title: "",
 	skills: "",
 	description: "",

@@ -87,7 +87,7 @@ export default function useCustomMove() {
 
 	const moveToRead = (projectId) => {
 		navigate({
-			pathname: `../read/${projectId}`,
+			pathname: `/project/read/${projectId}`,
 			search: queryDefault,
 		});
 	};
@@ -124,12 +124,19 @@ export default function useCustomMove() {
 		setRefresh((prev) => !prev);
 	};
 
+	const moveToLogin = () => {
+		navigate({
+			pathname: "/login"
+		})
+	}
+
 	// refresh 값 반환
 	return {
 		moveToList,
 		moveToModify,
 		moveToRead,
 		moveToSearch,
+		moveToLogin,
 		page,
 		size,
 		refresh,

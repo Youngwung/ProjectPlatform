@@ -36,13 +36,13 @@ public class ProjectServiceTest {
 		ProjectDTO dto =ProjectDTO.builder()
 		.title("registerSkillTest")
 		.description("testDescription")
-		.userId(3L)
+		.userName("test")
 		.skills("#React:고급, #Java:중급")
 		.status("진행_중")
 		.type("all")
 		.maxPeople(6)
 		.build();
-		Long id = projectService.register(dto);
+		Long id = projectService.register(dto, 1L);
 		log.info("id = {}", id);
 	}
 
@@ -55,7 +55,7 @@ public class ProjectServiceTest {
 		.description("testSkillDescription")
 		.skills(skills)
 		.type("all")
-		.userId(1L)
+		.userName("test")
 		.isPublic(false)
 		.maxPeople(4)
 		.status("모집_중")
@@ -74,9 +74,9 @@ public class ProjectServiceTest {
 			ProjectDTO dto =ProjectDTO.builder()
 			.title("title: " + i)
 			.description("testDescription" + i)
-			.userId(1L)
+			.userName("test")
 			.build();
-			Long id = projectService.register(dto);
+			Long id = projectService.register(dto, 1L);
 			log.info("id = {}", id);
 		}
 	}

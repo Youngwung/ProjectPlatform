@@ -26,6 +26,7 @@ import com.ppp.backend.repository.ProjectTypeRepository;
 import com.ppp.backend.repository.SkillLevelRepository;
 import com.ppp.backend.repository.SkillRepository;
 import com.ppp.backend.repository.UserRepository;
+import com.ppp.backend.repository.alert.AlertProjectRepository;
 import com.ppp.backend.status.ProjectStatus;
 import com.ppp.backend.util.AuthUtil;
 
@@ -42,6 +43,7 @@ public class ProjectServiceImpl extends
 	private final UserRepository userRepo;
 	private final ProjectTypeRepository projectTypeRepo;
 	private final AuthUtil authUtil;
+	private final AlertProjectRepository alertProjectRepo;
 
 	// Lombok의 애너테이션으로는 부모클래스의 final field을 초기화할 수 없음
 	public ProjectServiceImpl(
@@ -50,12 +52,13 @@ public class ProjectServiceImpl extends
 			SkillRepository skillRepo,
 			SkillLevelRepository skillLevelRepo,
 			ProjectSkillRepository projectSkillRepo,
-			ProjectTypeRepository projectTypeRepo, AuthApiController authApiController, AuthUtil authUtil) {
+			ProjectTypeRepository projectTypeRepo, AuthApiController authApiController, AuthUtil authUtil, AlertProjectRepository alertProjectRepo) {
 		super(projectSkillRepo, skillRepo, skillLevelRepo);
 		this.projectRepo = projectRepo;
 		this.userRepo = userRepo;
 		this.projectTypeRepo = projectTypeRepo;
 		this.authUtil = authUtil;
+		this.alertProjectRepo = alertProjectRepo;
 	}
 
 	@Override
@@ -78,10 +81,11 @@ public class ProjectServiceImpl extends
 	}
 
 	@Override
-	public Long register(ProjectDTO dto) {
+	public Long register(ProjectDTO dto, Long userId) {
 		log.info("dto = {}", dto);
+		User user = userRepo.findById(userId).orElseGet(null);
+		dto.setUserName(user.getName());
 		Project project = toEntity(dto);
-
 		// DB에 없는 스킬을 입력받은 경우 -1리턴
 		if (!existingSkill(dto.getSkills())){
 			// 그냥 null로 저장
@@ -304,10 +308,11 @@ public class ProjectServiceImpl extends
 	}
 
 	@Override
-	public void remove(Long jpNo) {
-		int result = repository.deleteByProjectId(jpNo);
+	public void remove(Long projectId) {
+		int result = repository.deleteByProjectId(projectId);
+		alertProjectRepo.deleteByProjectId(projectId);
 		log.info("result = {}", result);
-		projectRepo.deleteById(jpNo);
+		projectRepo.deleteById(projectId);
 	}
 
 	@Override
@@ -397,8 +402,8 @@ public class ProjectServiceImpl extends
 			return null;
 		}
 
-		User user = userRepo.findById(dto.getUserId())
-				.orElseThrow(() -> new IllegalArgumentException("User not found with id: " + dto.getUserId()));
+		User user = userRepo.findByEmail(dto.getEmail())
+				.orElseThrow(() -> new IllegalArgumentException("User not found with id: " + dto.getUserName()));
 
 		// 만약에 스테이터스가 null이면 default값
 		// update 시 status가 항상 null로 초기화 되는 문제 해결을 위한 코드
@@ -431,7 +436,7 @@ public class ProjectServiceImpl extends
 
 		ProjectDTO dto = ProjectDTO.builder()
 				.id(entity.getId())
-				.userId(entity.getUser().getId()) // User 객체에서 ID 추출
+				.userName(entity.getUser().getName()) // User 객체에서 ID 추출
 				.title(entity.getTitle())
 				.description(entity.getDescription())
 				.maxPeople(entity.getMaxPeople())
@@ -477,5 +482,7 @@ public class ProjectServiceImpl extends
 		}
 		return userId;
 	}
+
+	
 
 }

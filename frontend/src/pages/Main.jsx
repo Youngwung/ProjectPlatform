@@ -1,65 +1,98 @@
-import React from 'react';
-import { Card, Col, Container, Row } from 'react-bootstrap';
-const jobs = [
-  { title: '프론트엔드 개발자', description: 'React 및 Vue.js 경험자를 모집합니다.', image: 'https://source.unsplash.com/300x200/?technology' },
-  { title: '백엔드 개발자', description: 'Spring Boot 및 MySQL 경험자를 모집합니다.', image: 'https://source.unsplash.com/300x200/?startup' },
-  { title: 'UI/UX 디자이너', description: '디자인 경험 3년 이상.', image: 'https://source.unsplash.com/300x200/?design' },
-  { title: '프로젝트 매니저', description: '프로젝트 관리 경력자.', image: 'https://source.unsplash.com/300x200/?management' },
-  { title: '프론트엔드 개발자', description: 'React 및 Vue.js 경험자를 모집합니다.', image: 'https://source.unsplash.com/300x200/?technology' },
-  { title: '백엔드 개발자', description: 'Spring Boot 및 MySQL 경험자를 모집합니다.', image: 'https://source.unsplash.com/300x200/?startup' },
-  { title: 'UI/UX 디자이너', description: '디자인 경험 3년 이상.', image: 'https://source.unsplash.com/300x200/?design' },
-  { title: '프로젝트 매니저', description: '프로젝트 관리 경력자.', image: 'https://source.unsplash.com/300x200/?management' },
-];
-
-const seekers = [
-  { title: '신입 프론트엔드 개발자', description: 'JavaScript 및 React 스킬 보유.', image: 'https://source.unsplash.com/300x200/?developer' },
-  { title: '신입 백엔드 개발자', description: 'Spring Framework 관심.', image: 'https://source.unsplash.com/300x200/?backend' },
-  { title: '마케팅 인턴', description: 'SEO와 데이터 분석 가능.', image: 'https://source.unsplash.com/300x200/?marketing' },
-  { title: '디자인 신입', description: 'Photoshop 및 Figma 가능.', image: 'https://source.unsplash.com/300x200/?creative' },
-  { title: '프론트엔드 개발자', description: 'React 및 Vue.js 경험자를 모집합니다.', image: 'https://source.unsplash.com/300x200/?technology' },
-  { title: '백엔드 개발자', description: 'Spring Boot 및 MySQL 경험자를 모집합니다.', image: 'https://source.unsplash.com/300x200/?startup' },
-  { title: 'UI/UX 디자이너', description: '디자인 경험 3년 이상.', image: 'https://source.unsplash.com/300x200/?design' },
-  { title: '프로젝트 매니저', description: '프로젝트 관리 경력자.', image: 'https://source.unsplash.com/300x200/?management' },
-];
+import React, { useEffect, useState } from "react";
+import { Card, Col, Container, Row } from "react-bootstrap";
+import portfolioApi from "../api/portfolioApi";
+import { getProjectsForMain } from "../api/projectApi";
+import SkillTagComponent from "../components/skill/SkillTagComponent";
+import useCustomMove from "../hooks/useCustomMove";
+import useCustomPortfolioMove from "../hooks/useCustomPortfolioMove";
 
 const Main = () => {
-  return (
-    <Container className="my-5">
-      <section>
-        <h2 className="my-4">추천 프로젝트</h2>
-        <Row>
-          {jobs.map((job, index) => (
-            <Col key={index} md={3} className="mb-4">
-              <Card>
-                <Card.Img variant="top" src={job.image} />
-                <Card.Body>
-                  <Card.Title>{job.title}</Card.Title>
-                  <Card.Text>{job.description}</Card.Text>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      </section>
+	const [project, setProject] = useState([]);
+	const [portfolio, setPortfolio] = useState([]);
+	const moveToProject = useCustomMove().moveToRead;
+	const moveToPortfolio = useCustomPortfolioMove().moveToRead;
+	useEffect(() => {
+		getProjectsForMain()
+			.then((res) => {
+				console.log(res);
 
-      <section className="mt-5">
-        <h2 className="my-4">인기 포트폴리오</h2>
-        <Row>
-          {seekers.map((seeker, index) => (
-            <Col key={index} md={3} className="mb-4">
-              <Card>
-                <Card.Img variant="top" src={seeker.image} />
-                <Card.Body>
-                  <Card.Title>{seeker.title}</Card.Title>
-                  <Card.Text>{seeker.description}</Card.Text>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      </section>
-    </Container>
-  );
+				setProject(res);
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+		portfolioApi
+			.getListForMain()
+			.then((res) => {
+				setPortfolio(res);
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+	}, []);
+
+	return (
+		<Container className="my-5">
+			<section>
+				<h2 className="my-4">추천 프로젝트</h2>
+				<Container className="mt-4">
+					<Row xs={1} sm={2} md={4} className="g-4">
+						{project.map((project, index) => (
+							<Col key={index}>
+								{project.public && (
+									<Card
+										onClick={() => moveToProject(project.id)}
+										className="cursor-pointer"
+									>
+										<Card.Body>
+											<Card.Title>{project.title}</Card.Title>
+											{/* TODO: 유저 이름 출력 (현재 userId 출력) */}
+											<Card.Text>작성자: {project.userId}</Card.Text>
+											<Card.Text>인원: {project.maxPeople}</Card.Text>
+											<Card.Footer className="m-0 p-2 py-1">
+												<SkillTagComponent skills={project.skills} />
+											</Card.Footer>
+										</Card.Body>
+									</Card>
+								)}
+							</Col>
+						))}
+					</Row>
+				</Container>
+			</section>
+
+			<section className="mt-5">
+				<h2 className="my-4">인기 포트폴리오</h2>
+				<Container>
+					<Row>
+						{portfolio.map((portfolio) => (
+							<Col md={3} className="mb-4" key={portfolio.id}>
+								<Card
+									onClick={() => moveToPortfolio(portfolio.id)}
+									style={{ cursor: "pointer" }}
+								>
+									{/* <Card.Img variant="top" src={portfolio.image_url} /> */}
+									<Card.Body>
+										<Card.Title>{portfolio.title}</Card.Title>
+										<Card.Text>
+											<strong>작성자:</strong> {portfolio.userId}
+										</Card.Text>
+										<Card.Text>{portfolio.description}</Card.Text>
+										<Card.Text>
+											<SkillTagComponent skills={portfolio.skills} />
+										</Card.Text>
+										<Card.Text>
+											<strong>링크 :</strong>
+										</Card.Text>
+									</Card.Body>
+								</Card>
+							</Col>
+						))}
+					</Row>
+				</Container>
+			</section>
+		</Container>
+	);
 };
 
 export default Main;

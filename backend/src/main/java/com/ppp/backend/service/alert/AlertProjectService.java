@@ -456,7 +456,7 @@ public class AlertProjectService {
 
         ProjectDTO projectDTO = ProjectDTO.builder()
                 .id(alertProject.getProject().getId())
-                .userId(alertProject.getProject().getUser().getId())
+                .userName(alertProject.getProject().getUser().getName())
                 .title(alertProject.getProject().getTitle())
                 .description(alertProject.getProject().getDescription())
                 .maxPeople(alertProject.getProject().getMaxPeople())

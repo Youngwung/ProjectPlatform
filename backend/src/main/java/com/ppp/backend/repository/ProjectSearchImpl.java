@@ -138,14 +138,12 @@ public class ProjectSearchImpl extends QuerydslRepositorySupport implements Proj
 		switch (pageRequestDTO.getSortOption()) {
 			case "popularity":
 			// 인기 순
-			log.info("인기순 실행");
 			query.leftJoin(projectApplication).on(project.id.eq(projectApplication.id));
-			query.orderBy(projectApplication.id.asc(), priority.asc());
+			query.orderBy(projectApplication.counts.desc(), priority.asc());
 			break;
 
 			default:
 				// 관련도 순
-				log.info("관련도순 실행");
 				query.orderBy(priority.asc(), matchedSkillsCount.desc(), queryScore.desc());
 				break;
 		}

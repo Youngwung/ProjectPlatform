@@ -26,6 +26,7 @@ const ListPage = () => {
 		query: "",
 		querySkills: [],
 		type: "all",
+		sortOption: "relevance",
 	};
 	const { page, size, moveToList, moveToPortfolioSearch, moveToRead, refresh } =
 		useCustomPortfolioMove();
@@ -45,17 +46,19 @@ const ListPage = () => {
 				const params = new URLSearchParams(location.search);
 				const query = params.get("query");
 				const querySkills = params.getAll("querySkills");
+				const sortOption = params.get("sortOption");
 				setQueryData({
 					page: page,
 					size: size,
 					query: query,
 					querySkills: querySkills,
+					sortOption: sortOption,
 				});
-				if (query || querySkills.length > 0) {
+				if (isSearchPage) {
 					// 검색 api 호출
 					console.log(querySkills);
 					await portfolioApi
-						.portfolioSearch({ page, size, query, querySkills })
+						.portfolioSearch({ page, size, query, querySkills, sortOption })
 						.then((data) => {
 							if (data.dtoList.length === 0) {
 								setNodata(true); // ✅ nodata 상태를 true로 변경
@@ -85,6 +88,7 @@ const ListPage = () => {
 
 		fetchAllportfolios();
 	}, [page, size, location.search]);
+	
 
 	if (loading) {
 		return (
@@ -125,7 +129,7 @@ const ListPage = () => {
 							<Card.Body>
 								<Card.Title>{portfolio.title}</Card.Title>
 								<Card.Text>
-									<strong>작성자:</strong> {portfolio.userId}
+									<strong>작성자:</strong> {portfolio.userName}
 								</Card.Text>
 								<Card.Text>{portfolio.description}</Card.Text>
 								<Card.Text>

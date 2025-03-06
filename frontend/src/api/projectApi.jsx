@@ -88,3 +88,14 @@ export const getMyProjects = async () => {
 	  throw error;
 	}
 };
+
+// 메인에 표시할 인기 프로젝트 api
+export const getProjectsForMain = async () => {
+	try {
+		const res =await axios.get(`${prefix}/main`);
+		return res.data;
+	} catch (error) {
+		console.log(error);
+		throw error;
+	}
+}

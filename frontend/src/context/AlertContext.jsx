@@ -18,6 +18,7 @@ export const AlertProvider = ({ children }) => {
         status: alert.status,
         createdAt: new Date(alert.createdAt).toLocaleString(),
         isRead: alert.isRead,
+        projectTitle : alert.project.title,
       }));
       setProjectAlerts(formattedAlerts);
     } catch (error) {

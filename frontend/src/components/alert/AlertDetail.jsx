@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Badge, Button, Spinner, Row, Col } from "react-bootstrap";
 import { HiOutlineMailOpen, HiOutlineMail } from "react-icons/hi";
 import alertApi from "../../api/alertApi";
+import { AlertContext } from "../../context/AlertContext";
 
 const AlertDetail = ({ isProject }) => {
   const { alertId } = useParams();
@@ -11,7 +12,7 @@ const AlertDetail = ({ isProject }) => {
   const [loading, setLoading] = useState(true);
   // 별도의 상태 변수(actionUI)를 이용하여 버튼/뱃지를 동적으로 관리
   const [actionUI, setActionUI] = useState(null);
-
+  const { refreshAlerts } = useContext(AlertContext);
   // 백엔드에서 AlertDetail 정보를 받아옴 (senderUserDto, receiverUserDto, alertOwnerUserDto 포함)
   useEffect(() => {
     const fetchAlertDetail = async () => {
@@ -25,7 +26,6 @@ const AlertDetail = ({ isProject }) => {
     fetchAlertDetail();
   }, [alertId, isProject]);
 
-  // alert나 isProject가 변경될 때마다 actionUI 업데이트
   useEffect(() => {
     if (!alert) return;
 
@@ -83,9 +83,19 @@ const AlertDetail = ({ isProject }) => {
     if (alert.type === "참가알림") {
       await alertApi.acceptApplication(alert.project.id, alert.senderUserDto.id);
       console.log("신청 수락 처리 완료");
+      setTimeout(async () => {
+        await refreshAlerts();
+        const updatedAlert = await alertApi.getOneAlert(alert.id, isProject);
+        setAlert(updatedAlert);
+      }, 500);
     } else if (alert.type === "초대알림") {
       await alertApi.acceptInvite(alert.project.id, alert.id);
       console.log("초대 수락 처리 완료");
+      setTimeout(async () => {
+        await refreshAlerts();
+        const updatedAlert = await alertApi.getOneAlert(alert.id, isProject);
+        setAlert(updatedAlert);
+      }, 500);
     }
   };
 

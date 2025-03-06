@@ -221,3 +221,6 @@ const handlePortfolioAlerts = async () => {
 };
 
 export default MyPageTotalInfo;
+
+
+//TODO UserContext 사용해서 user 정보 가져오기 유저의 정보를 그래서 중복된 로직과 코드를 줄이기

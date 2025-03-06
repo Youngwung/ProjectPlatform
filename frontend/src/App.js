@@ -9,7 +9,7 @@ import { AlertProvider } from './context/AlertContext';
 const App = () => {
   return (
     <AlertProvider>
-    <RouterProvider router={root} />
+      <RouterProvider router={root} />
     </AlertProvider>
   )
 }

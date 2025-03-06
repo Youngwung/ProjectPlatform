@@ -56,7 +56,6 @@ const Top = () => {
             <Nav className="me-auto my-2 my-lg-0" style={{ maxHeight: '100px' }} navbarScroll>
               <Nav.Link as={Link} to="/project">프로젝트</Nav.Link>
               <Nav.Link as={Link} to="/portfolio">포트폴리오</Nav.Link>
-              <Nav.Link as={Link} to="/link">링크</Nav.Link>
             </Nav>
 
             {/* 🔹 사용자 정보 및 아이콘 표시 */}

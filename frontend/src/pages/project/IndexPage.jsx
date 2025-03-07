@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Nav, NavDropdown } from "react-bootstrap";
+import { Nav } from "react-bootstrap";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import useCustomMove from "../../hooks/useCustomMove";
 
@@ -45,16 +45,6 @@ const Indexpage = () => {
 						프로젝트 등록
 					</Nav.Link>
 				</Nav.Item>
-				<NavDropdown title="Dropdown" id="nav-dropdown">
-					{/* 검색 옵션 설정 메뉴 있으면 좋을듯 */}
-					<NavDropdown.Item eventKey="4.1">Action</NavDropdown.Item>
-					<NavDropdown.Item eventKey="4.2">Another action</NavDropdown.Item>
-					<NavDropdown.Item eventKey="4.3">
-						Something else here
-					</NavDropdown.Item>
-					<NavDropdown.Divider />
-					<NavDropdown.Item eventKey="4.4">Separated link</NavDropdown.Item>
-				</NavDropdown>
 			</Nav>
 			<div>
 				<Outlet />

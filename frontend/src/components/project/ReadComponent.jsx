@@ -1,19 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Badge, Button, Card, Col, Container, Row } from "react-bootstrap";
-import { getOne } from "../../api/projectApi";
+import alertApi from "../../api/alertApi";
+import { checkWriter, getOne } from "../../api/projectApi";
+import { AlertContext } from "../../context/AlertContext";
 import useCustomMove from "../../hooks/useCustomMove";
 import useCustomString from "../../hooks/useCustomString";
 import BookmarkProjectBtn from "../bookmark/BookmarkProjectBtn";
 import SkillTagComponent from "../skill/SkillTagComponent";
 import SkillTagGuideComponent from "../skill/SkillTagGuideComponent";
-import alertApi from "../../api/alertApi";
-import { AlertContext } from "../../context/AlertContext";
 
 // 조회 기능을 구현하기 위한 컴포넌트
 // 기본값 설정
 const initState = {
 	id: 0,
-	userId: 0,
+	userName: "",
 	title: "",
 	description: "",
 	type: "",
@@ -48,11 +48,21 @@ export default function ReadComponent({ projectId }) {
 	// 커스텀 훅에서 스테이터스의 _를 공백으로 바꿔주는 함수 가져옴
 	const {statusToString} = useCustomString();
 	
+	// 수정버튼 활성화/비활성화 여부 저장 변수 선언
+	const [isWriter, setIsWriter] = useState(false);
+	
 	// 프로젝트 상세 정보 불러오기
 	useEffect(() => {
 		getOne(projectId).then((data) => {
 			setProject(data);
 		});
+
+		// 작성자인 지 확인하는 API 호출
+		checkWriter(projectId).then((res) => {
+			setIsWriter(res)
+		}).catch((error) => {
+			console.error(error);
+		})
 	}, [projectId]);
 
 	// 현재 로그인한 사용자가 받은 프로젝트 알림 목록 중, 이 프로젝트에 해당하는 알림을 찾음
@@ -106,11 +116,10 @@ export default function ReadComponent({ projectId }) {
 						<Col>
 							<BookmarkProjectBtn
 								projectId={project.id}
-								userId={project.userId}
 							/>
 						</Col>
 						<Col>
-							<strong>작성자:</strong> {project.userId}
+							<strong>작성자:</strong> {project.userName}
 						</Col>
 						<Col>
 							<strong>최대 인원:</strong> {project.maxPeople}명
@@ -142,7 +151,11 @@ export default function ReadComponent({ projectId }) {
 							</Button>
 						</Col>
 						<Col>
-							<Button variant="primary" onClick={() => moveToModify(projectId)}>
+							<Button 
+								hidden={!isWriter}
+								variant="primary" 
+								onClick={() => moveToModify(projectId)}
+							>
 								수정
 							</Button>
 						</Col>

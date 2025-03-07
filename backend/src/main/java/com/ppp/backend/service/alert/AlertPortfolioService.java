@@ -1,19 +1,21 @@
 package com.ppp.backend.service.alert;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.ppp.backend.domain.alert.AlertPortfolio;
 import com.ppp.backend.dto.alert.AlertPortfolioDto;
 import com.ppp.backend.repository.PortfolioRepository;
 import com.ppp.backend.repository.alert.AlertPortfolioRepository;
 import com.ppp.backend.util.AuthUtil;
+
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +57,7 @@ public class AlertPortfolioService {
         Long userId = extractUserIdOrThrow(request);
         log.info("✅ [getUnreadPortfolioAlerts] 유저 ID: {}", userId);
 
-        List<AlertPortfolioDto> alertDtos = alertPortfolioRepository.findByUserIdAndIsRead(userId, false).stream()
+        List<AlertPortfolioDto> alertDtos = alertPortfolioRepository.findByUserIdAndIsRead(userId).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
 

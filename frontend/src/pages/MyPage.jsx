@@ -1,13 +1,16 @@
-import React, { useState } from "react";
-import { Container, Row, Col, Nav } from "react-bootstrap";
-import { useNavigate, Outlet } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Col, Container, Nav, Row } from "react-bootstrap";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import authApi from "../api/authApi"; // ✅ API 불러오기
 import DeleteConfirmModal from "../components/user/DeleteConfirmModal";
+import LoginModal from "../components/user/LoginModal";
 
 const MyPage = () => {
   const navigate = useNavigate();
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
 
+  const location = useLocation();
+  const [show, setShow] = useState(false);
   // ✅ 계정 삭제 함수 (탈퇴 API 호출)
   const handleDeleteAccount = async () => {
     try {
@@ -18,6 +21,17 @@ const MyPage = () => {
       alert("계정 삭제에 실패했습니다.");
     }
   };
+
+  // 로그인 되었는지 확인
+  useEffect(() => {
+    authApi.checkLogin().then((res) => {
+      if (!res) {
+        // 로그인 유도 창 활성화
+        setShow(true);
+      }
+    })
+  }, [])
+  
 
   return (
     <Container fluid className="mt-4">
@@ -46,6 +60,11 @@ const MyPage = () => {
         show={showDeleteConfirmModal} 
         onHide={() => setShowDeleteConfirmModal(false)} 
         handleDeleteAccount={handleDeleteAccount} // ✅ 함수 전달
+      />
+      {/* 로그인 유도 모달 */}
+      <LoginModal 
+        parentShow={show}
+        redirectUrl={location.pathname}
       />
     </Container>
   );

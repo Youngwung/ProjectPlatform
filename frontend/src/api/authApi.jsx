@@ -220,6 +220,19 @@ const authApi = {
       throw error;
     }
   },
+
+  // 로그인 상태인 지 확인하는 API
+  checkLogin: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/checkLogin`, {
+        withCredentials: true, // ✅ JWT 쿠키 포함
+      });
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.error(error);
+    }
+  }
 };
 
 export default authApi;

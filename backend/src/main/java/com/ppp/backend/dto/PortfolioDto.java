@@ -19,10 +19,11 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class PortfolioDto extends BaseSkillDto {
     private Long id;
-    private Long userId;
+    private String userName;
     private String title;
     private String description;
     private String links;
+    private String email;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 }

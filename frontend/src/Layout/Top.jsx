@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Nav, Navbar, NavDropdown, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Container, Nav, Navbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FaUser } from "react-icons/fa"; // 🔹 react-icons에서 가져옴
 import { Link, useNavigate } from 'react-router-dom';
 import AuthApi from '../api/authApi';

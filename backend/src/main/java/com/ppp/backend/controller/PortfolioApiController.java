@@ -1,7 +1,8 @@
 package com.ppp.backend.controller;
 
-import com.ppp.backend.util.AuthUtil;
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,11 +21,12 @@ import com.ppp.backend.dto.PageResponseDTO;
 import com.ppp.backend.dto.PortfolioDto;
 import com.ppp.backend.security.CustomUserDetails;
 import com.ppp.backend.service.PortfolioService;
+import com.ppp.backend.util.AuthUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/portfolio")
@@ -42,6 +44,7 @@ public class PortfolioApiController {
         log.info("프로젝트 전체조회 요청: {}", projectList);
         return ResponseEntity.ok(projectList);
     }
+
     // **2. 특정 사용자 포폴 조회(GET)**
     @GetMapping("/my")
     public ResponseEntity<List<PortfolioDto>> getMyPortfolios(HttpServletRequest request) {
@@ -75,21 +78,22 @@ public class PortfolioApiController {
         }
 
         Long userId = userDetails.getUserId();
+        String email = userDetails.getUsername();
+        portfolioDto.setEmail(email);
         // ✅ JWT에서 `userId` 추출하여 자동 설정
         log.info("userDetails: {}", userDetails);
         String userName = userDetails.getUsername();
         log.info("userName유저 이름: {}", userName);
 
-        PortfolioDto createdProject = portfolioService.createPortfolio(portfolioDto,userId);
+        PortfolioDto createdProject = portfolioService.createPortfolio(portfolioDto, userId);
         return ResponseEntity.ok(createdProject);
     }
 
     // **5. 기존 포폴 수정 (PUT)**
     @PutMapping("/{id}")
     public ResponseEntity<PortfolioDto> updatePortfolio(
-            @PathVariable Long id,
-            @RequestBody PortfolioDto PortfolioDto
-    ) {
+            @PathVariable(name = "id") Long id,
+            @RequestBody PortfolioDto PortfolioDto) {
         log.info("포폴 수정 요청: ID={}, Data={}", id, PortfolioDto);
         PortfolioDto updatedProject = portfolioService.updatePortfolio(id, PortfolioDto);
         return ResponseEntity.ok(updatedProject);
@@ -97,7 +101,7 @@ public class PortfolioApiController {
 
     // **6. 포폴 삭제 (DELETE)**
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePortfolio(@PathVariable Long id) {
+    public ResponseEntity<String> deletePortfolio(@PathVariable(name = "id") Long id) {
         log.info("포폴 삭제 요청: ID={}", id);
         portfolioService.deletePortfolio(id);
         return ResponseEntity.ok("프로젝트가 성공적으로 삭제되었습니다.");
@@ -108,5 +112,21 @@ public class PortfolioApiController {
         log.info("Request = {}", pageRequestDTO);
         return portfolioService.getSearchResult(pageRequestDTO);
     }
+
+    @GetMapping("/main")
+    public List<PortfolioDto> getListForMain() {
+        PageRequestDTO pageDto = PageRequestDTO.builder().page(1).size(8).sortOption("popularity").query("")
+                .querySkills(new ArrayList<String>()).build();
+        List<PortfolioDto> result = portfolioService.getSearchResult(pageDto).getDtoList();
+        return result;
+    }
+
+    @GetMapping("/checkPortfolioWriter/{portfolioId}")
+    public boolean checkPortfolioWriter(HttpServletRequest request, @PathVariable(name = "portfolioId") Long portfolioId) {
+        Long userId = authUtil.extractUserIdFromCookie(request);
+
+        return portfolioService.checkPortfolioWriter(userId, portfolioId);
+    }
     
+
 }

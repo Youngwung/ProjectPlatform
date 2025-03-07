@@ -56,12 +56,13 @@ export const deleteOne = async (projectId) => {
 
 // 검색 api를 호출하는 비동기 통신 메서드
 export const projectSearch = async (params) => {
-	const { page, size, query, querySkills, type } = params;
+	const { page, size, query, querySkills, type, sortOption } = params;
 	let searchParams = new URLSearchParams();
 	searchParams.append("page", page);
 	searchParams.append("size", size);
 	searchParams.append("query", query);
-	searchParams.append("type", type);
+	searchParams.append("type", type || "all");
+	searchParams.append("sortOption", sortOption);
 	// console.log(querySkills);
 	if (querySkills && querySkills.length > 0) {
 		querySkills.forEach((skill) => {
@@ -87,3 +88,24 @@ export const getMyProjects = async () => {
 	  throw error;
 	}
 };
+
+// 메인에 표시할 인기 프로젝트 api
+export const getProjectsForMain = async () => {
+	try {
+		const res =await axios.get(`${prefix}/main`);
+		return res.data;
+	} catch (error) {
+		console.log(error);
+		throw error;
+	}
+}
+
+// 프로젝트의 작성자인 지 확인하는 api 호출
+export const checkWriter = async (projectId) => {
+	try {
+		const res = await axiosInstance.get(`${prefix}/checkWriter/${projectId}`);
+		return res.data;		
+	} catch (error) {
+		console.error(error);
+	}
+}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Nav, Navbar, NavDropdown, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Container, Nav, Navbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FaUser } from "react-icons/fa"; // 🔹 react-icons에서 가져옴
 import { Link, useNavigate } from 'react-router-dom';
 import AuthApi from '../api/authApi';
@@ -53,17 +53,8 @@ const Top = () => {
           <Navbar.Toggle aria-controls="navbarScroll" />
           <Navbar.Collapse id="navbarScroll">
             <Nav className="me-auto my-2 my-lg-0" style={{ maxHeight: '100px' }} navbarScroll>
-              <NavDropdown title="프로젝트" id="navbarScrollingDropdown">
-                <NavDropdown.Item as={Link} to="/project">전체보기</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/project/frontend">Frontend</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/project/backend">Backend</NavDropdown.Item>
-              </NavDropdown>
-              <NavDropdown title="포트폴리오" id="navbarScrollingDropdown">
-                <NavDropdown.Item as={Link} to="/portfolio">전체보기</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/portfolio/frontend">Frontend</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/portfolio/backend">Backend</NavDropdown.Item>
-              </NavDropdown>
-              <Nav.Link as={Link} to="/link">링크</Nav.Link>
+              <Nav.Link as={Link} to="/project">프로젝트</Nav.Link>
+              <Nav.Link as={Link} to="/portfolio">포트폴리오</Nav.Link>
             </Nav>
 
             {/* 🔹 사용자 정보 및 아이콘 표시 */}

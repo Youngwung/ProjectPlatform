@@ -126,6 +126,15 @@ const portfolioApi = {
 			throw error;
 		}
 	},
+
+	checkPortfolioWriter: async (portfolioId) => {
+		try {
+			const res = await axiosInstance.get(`${prefix}/checkPortfolioWriter/${portfolioId}`);
+			return res.data;
+		} catch (error) {
+			console.error(error);
+		}
+	}
 };
 
 export default portfolioApi;

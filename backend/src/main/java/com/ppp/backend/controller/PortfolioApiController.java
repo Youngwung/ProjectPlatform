@@ -27,6 +27,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+
 @RestController
 @RequestMapping("/api/portfolio")
 @RequiredArgsConstructor
@@ -119,5 +120,13 @@ public class PortfolioApiController {
         List<PortfolioDto> result = portfolioService.getSearchResult(pageDto).getDtoList();
         return result;
     }
+
+    @GetMapping("/checkPortfolioWriter/{portfolioId}")
+    public boolean checkPortfolioWriter(HttpServletRequest request, @PathVariable(name = "portfolioId") Long portfolioId) {
+        Long userId = authUtil.extractUserIdFromCookie(request);
+
+        return portfolioService.checkPortfolioWriter(userId, portfolioId);
+    }
+    
 
 }

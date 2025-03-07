@@ -7,7 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.ppp.backend.dto.UserDto;
 import com.ppp.backend.service.UserService;
@@ -19,6 +25,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -226,5 +233,16 @@ public class AuthApiController {
             return ResponseEntity.status(500).body("회원 탈퇴 중 오류가 발생했습니다.");
         }
     }
+
+    @GetMapping("/checkLogin")
+    public boolean checkLogin(HttpServletRequest request) {
+        Long userId = authUtil.extractUserIdFromCookie(request);
+        if (userId == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
 
 }

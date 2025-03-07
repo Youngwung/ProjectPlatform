@@ -172,4 +172,10 @@ public class PortfolioService extends AbstractSkillService<UserSkill, PortfolioD
                         .collect(Collectors.toList());
         }
 
+        public boolean checkPortfolioWriter(Long userId, Long portfolioId) {
+                log.info("portfolioId = {}, userId = {}", portfolioId, userId);
+                Long writer = portfolioRepository.findById(portfolioId).orElseThrow().getUser().getId();
+                return userId == writer;
+        }
+
 }

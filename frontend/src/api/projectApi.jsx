@@ -99,3 +99,13 @@ export const getProjectsForMain = async () => {
 		throw error;
 	}
 }
+
+// 프로젝트의 작성자인 지 확인하는 api 호출
+export const checkWriter = async (projectId) => {
+	try {
+		const res = await axiosInstance.get(`${prefix}/checkWriter/${projectId}`);
+		return res.data;		
+	} catch (error) {
+		console.error(error);
+	}
+}

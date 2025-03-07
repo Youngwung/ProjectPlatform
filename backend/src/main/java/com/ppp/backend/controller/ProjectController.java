@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
+
 /**
  * ProjectController는 프로젝트 관련 API를 제공함.
  *
@@ -172,5 +173,13 @@ public class ProjectController {
 		List<ProjectDTO> result = projectService.getSearchResult(pageDto).getDtoList();
 		return result;
 	}
+
+	@GetMapping("/checkWriter/{projectId}")
+	public boolean checkWriter(HttpServletRequest request, @PathVariable(name = "projectId") Long projectId) {
+		Long userId = authUtil.extractUserIdFromCookie(request);
+		
+		return projectService.checkWriter(userId, projectId);
+	}
+	
 	
 }

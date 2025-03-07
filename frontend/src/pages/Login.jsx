@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { FcGoogle } from "react-icons/fc";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AuthApi from "../api/authApi";
 
 const Login = () => {
@@ -9,6 +9,11 @@ const Login = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
+	// 리다이렉트 주소 설정을 위한 변수 선언
+	const location = useLocation();
+	const params = new URLSearchParams(location.search);
+	const redirectUrl = params.get('redirectUrl');
+	
 	const handleSubmit = async (event) => {
 		event.preventDefault();
 		alert("로그인 버튼 클릭");
@@ -22,7 +27,13 @@ const Login = () => {
 				if (response) {
 					alert("로그인 성공");
 					console.log("로그인아이디:" + email + "로그인비번" + password);
-					window.location.href = "/"; //로그인 성공시 홈으로 이동
+					if (redirectUrl) {
+						// 리다이렉트 url이 존재하는 경우 해당 url로 이동
+						navigate({pathname: redirectUrl})
+					} else {
+						// 아닌 경우 홈페이지로 이동
+						navigate({pathname: "/"})
+					}
 				} else {
 					//401 에러일때
 					alert("이메일 주소 또는 비밀번호가 올바르지 않습니다.");

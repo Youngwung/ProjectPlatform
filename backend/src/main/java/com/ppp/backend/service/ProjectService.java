@@ -23,4 +23,6 @@ public interface ProjectService {
 	PageResponseDTO<ProjectDTO> getSearchResult(PageRequestDTO pageRequestDTO);
 
 	List<ProjectDTO> getMyProjects(HttpServletRequest request);
+
+	boolean checkWriter(Long userId, Long projectId);
 }

@@ -1,10 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
-export default function LoginModal({show, handleClose, handleConfirm}) {
+export default function LoginModal({parentShow, redirectUrl}) {
+	const [show, setShow] = useState(parentShow);
+	const navigate = useNavigate();
+	const handleClose = () => {
+		setShow(false);
+		navigate({pathname: "/"});
+	}
+	const handleConfirm = () => {
+		setShow(false);
+		navigate({
+			pathname: "/login",
+			search: `redirectUrl=${redirectUrl}`
+		})
+	}
+
+	useEffect(() => {
+		setShow(parentShow)
+	
+	}, [parentShow])
+	
+	
 	return (
 		<div>
-			<Modal show={show} onHide={handleClose}>
+			<Modal show={show} onHide={handleClose} backdrop="static" keyboard={false}>
 				<Modal.Header closeButton>
 					<Modal.Title>확인</Modal.Title>
 				</Modal.Header>

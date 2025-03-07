@@ -483,6 +483,15 @@ public class ProjectServiceImpl extends
 		return userId;
 	}
 
+	@Override
+	public boolean checkWriter(Long userId, Long projectId) {
+		log.info("projectId = {}, userId = {}", projectId, userId);
+		Long writer = projectRepo.findById(projectId).orElseThrow().getUser().getId();
+
+		
+		return userId == writer;
+	}
+
 	
 
 }

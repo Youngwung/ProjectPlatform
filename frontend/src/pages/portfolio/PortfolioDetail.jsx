@@ -36,8 +36,8 @@ const PortfolioDetail = () => {
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [inviting, setInviting] = useState(false);
 
-  // 현재 로그인한 사용자 ID (임시로 localStorage 사용)
-  const currentUserId = Number(localStorage.getItem("currentUserId"));
+  // 작성자인 지 확인하는 api 호출 결과를 저장할 변수 선언
+  const [isWriter, setIsWriter] = useState(false);
 
   useEffect(() => {
     if (!portfolioId) {
@@ -64,7 +64,17 @@ const PortfolioDetail = () => {
       }
     };
 
+    const checkPortfolioWriter = async () => {
+      try {
+        const data = await portfolioApi.checkPortfolioWriter(portfolioId);
+        setIsWriter(data);
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
     fetchPortfolio();
+    checkPortfolioWriter();
   }, [portfolioId]);
 
   // 내 프로젝트 목록 가져오기
@@ -170,13 +180,19 @@ const PortfolioDetail = () => {
           )}
           <Button
             variant="primary"
+            hidden={!isWriter}
             onClick={() =>
               navigate(`/portfolio/modify/${portfolioId}`, { state: { portfolio } })
             }
           >
             수정
           </Button>
-          <Button variant="danger" className="ms-2" onClick={handleDelete}>
+          <Button 
+            variant="danger" 
+            className="ms-2" 
+            onClick={handleDelete}
+            hidden={!isWriter}
+          >
             삭제
           </Button>
           {/* {portfolio.userId !== currentUserId && ( */}

@@ -35,7 +35,7 @@ export default function InputSkillComponent({
 	// 통합 검증 처리 함수
 	const validateSkills = async (input) => {
 		setSkillsInput(input);
-		console.log(input);
+		//console.log(input);
 		// 검사 중인 경우 로딩창을 표시하기 위한 변수 초기화
 		setIsValidating(true);
 		// 에러메세지 초기화
@@ -67,7 +67,7 @@ export default function InputSkillComponent({
 
 			// DB 단어 검사
 			const result = await getProjectValid({ skills: input });
-			console.log(result.isValid);
+			//console.log(result.isValid);
 			if (!result.isValid) {
 				setValidationError(
 					`${result.wrongString}: 등록되지 않은 기술이 포함되어 있습니다`
@@ -82,7 +82,7 @@ export default function InputSkillComponent({
 			setValidationError("");
 		} catch (error) {
 			setValidationError(error.message);
-			console.log(error);
+			//console.log(error);
 			setIsValid(false);
 		} finally {
 			// 검증 과정 종료
@@ -121,7 +121,7 @@ export default function InputSkillComponent({
 			// 스킬 입력값 초기화
 			setSkillsInput("");
 		}
-		console.log(disabled);
+		//console.log(disabled);
 	}, [disabled]);
 
 	return (

@@ -18,8 +18,8 @@ export default function SearchBar({ queryData }) {
 			...data,
 			[name]: type === "checkbox" ? checked : value,
 		});
-		console.log(name);
-		console.log(value);
+		//console.log(name);
+		//console.log(value);
 	};
 
 	const handleOnSkillDelete = (skillToDelete) => {
@@ -34,8 +34,8 @@ export default function SearchBar({ queryData }) {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		// 검색어를 이용한 검색 기능 구현
-		console.log("submit");
-		console.log(data);
+		//console.log("submit");
+		//console.log(data);
 		setIsVisible(false);
 		if (inProjectPage) {
 			moveToSearch({

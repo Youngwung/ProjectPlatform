@@ -25,11 +25,11 @@ const NotificationModal = ({
 
   // "전체 보기" 버튼 클릭 시 동작. 예: 알림 전체 페이지로 이동 or 콘솔출력
   const handleViewAllPortfolio = () => {
-    console.log("포트폴리오 알림 전체보기");
+    //console.log("포트폴리오 알림 전체보기");
   };
 
   const handleViewAllProject = () => {
-    console.log("프로젝트 알림 전체보기");
+    //console.log("프로젝트 알림 전체보기");
   };
 
   return (

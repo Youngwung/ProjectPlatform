@@ -110,7 +110,7 @@ export default function useCustomMove() {
 		} else {
 			queryStr = queryDefault;
 		}
-		console.log(queryStr.toString());
+		//console.log(queryStr.toString());
 		navigate({
 			pathname: "/project/search",
 			search: queryStr.toString(),

@@ -62,7 +62,7 @@ export const projectSearch = async (params) => {
 	searchParams.append("size", size);
 	searchParams.append("query", query);
 	searchParams.append("type", type);
-	console.log(querySkills);
+	// console.log(querySkills);
 	if (querySkills && querySkills.length > 0) {
 		querySkills.forEach((skill) => {
 			searchParams.append("querySkills", skill);

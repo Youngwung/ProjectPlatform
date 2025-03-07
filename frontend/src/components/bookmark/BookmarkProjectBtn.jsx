@@ -17,14 +17,14 @@ export default function BookmarkProjectBtn({ projectId }) {
 		const checkAuth = async () => {
 			try {
 				const rs = await authApi.getAuthenticatedUser(); // 🔥 사용자 정보 가져오기
-				console.log(rs);
+				//console.log(rs);
 				if (rs === null) {
 					setIsAuthenticated(false);
 				} else {
 					setIsAuthenticated(true);
 				}
 			} catch (error) {
-				console.log(error);
+				console.error(error);
 			}
 		};
 		checkAuth();
@@ -36,11 +36,11 @@ export default function BookmarkProjectBtn({ projectId }) {
 			try {
 				const response = checkBookmarkProject(projectId);
 				response.then((result) => {
-					console.log(result);
+					//console.log(result);
 					setBookmarkId(result || null);
 				});
 			} catch (error) {
-				console.log(error);
+				console.error(error);
 			}
 		};
 		checkBookmarkStatus();

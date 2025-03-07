@@ -56,10 +56,10 @@ export const getUserBookmarkPortfolioList = async () => {
 		const res = await axios.get(`${portfolioPrefix}/user/list`, {
 			withCredentials: true, // ✅ 쿠키 포함 설정
 		});
-		console.log(res);
+		// console.log(res);
 		return res.data;
 	} catch (error) {
-		console.log("유저의 전체 북마크 조회 실패", error);
+		console.error("유저의 전체 북마크 조회 실패", error);
 		throw error;
 	}
 };
@@ -77,10 +77,10 @@ export const getUserBookmarkProjectList = async () => {
 		const res = await axios.get(`${projectPrefix}/user/list`, {
 			withCredentials: true, // ✅ 쿠키 포함 설정
 		});
-		console.log(res);
+		// console.log(res);
 		return res.data;
 	} catch (error) {
-		console.log("유저의 전체 북마크 조회 실패", error);
+		console.error("유저의 전체 북마크 조회 실패", error);
 		throw error;
 	}
 };

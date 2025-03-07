@@ -52,7 +52,7 @@ export default function ListComponent() {
 		})
 		if ((query || querySkills.length > 0)) {
 			// 검색 api 호출
-			console.log(querySkills);
+			// console.log(querySkills);
 			projectSearch({ page, size, query, querySkills, type }).then((data) => {
 				setServerData(data);
 			});

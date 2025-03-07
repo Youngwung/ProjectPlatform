@@ -55,7 +55,7 @@ const PortfolioDetail = () => {
         if (!data || !data.id) {
           throw new Error("데이터가 존재하지 않습니다.");
         }
-        console.log("📌 포트폴리오 데이터:", data);
+        //console.log("📌 포트폴리오 데이터:", data);
         setPortfolio(data);
       } catch (error) {
         console.error("❌ 포트폴리오 조회 실패:", error);

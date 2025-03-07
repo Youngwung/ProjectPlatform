@@ -12,7 +12,7 @@ const authApi = {
         { withCredentials: true } // ✅ 쿠키 포함 요청
       );
 
-      console.log("📢 로그인 성공, 응답 데이터:", response.data); // ✅ 응답 데이터 확인
+      //console.log("📢 로그인 성공, 응답 데이터:", response.data); // ✅ 응답 데이터 확인
       return response.data;
     } catch (error) {
       console.error("❌ 로그인 실패:", error);
@@ -24,7 +24,7 @@ const authApi = {
   logout: async () => {
     try {
       await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
-      console.log("✅ 로그아웃 성공 (쿠키 삭제)");
+      //console.log("✅ 로그아웃 성공 (쿠키 삭제)");
       return true;
     } catch (error) {
       console.error("❌ 로그아웃 실패:", error);
@@ -39,11 +39,11 @@ const authApi = {
         withCredentials: true, // ✅ JWT 쿠키 포함 요청
       });
 
-      console.log("✅ 사용자 정보:", response.data);
+      //console.log("✅ 사용자 정보:", response.data);
       return response.data;
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        console.log("🚨 인증되지 않은 사용자 (401 Unauthorized)");
+        //console.log("🚨 인증되지 않은 사용자 (401 Unauthorized)");
         return null;
       }
       console.error("🚨 사용자 정보 조회 실패:", error);
@@ -60,7 +60,7 @@ const authApi = {
         const response = await axios.post(`${API_URL}/check-email`, { email }, {
             headers: { "Content-Type": "application/json" } // ✅ 명시적으로 JSON 타입 지정
         });
-        console.log("✅ 이메일 중복 확인 결과:", response.data);
+        //console.log("✅ 이메일 중복 확인 결과:", response.data);
         return response.data;
     } catch (error) {
         console.error("❌ 이메일 중복 확인 오류!");
@@ -95,7 +95,7 @@ const authApi = {
         }
       );
   
-      console.log("✅ 사용자 정보 수정 성공:", response.data);
+      //console.log("✅ 사용자 정보 수정 성공:", response.data);
       return response.data;
     } catch (error) {
       console.error("❌ 사용자 정보 수정 실패:", error);
@@ -104,7 +104,7 @@ const authApi = {
   },
   updateUserExperience: async (updatedData) => {
     try {
-        console.log("📌 서버로 전송할 원본 데이터:", updatedData);
+        //console.log("📌 서버로 전송할 원본 데이터:", updatedData);
 
         // ✅ id 값이 올바른 숫자인지 확인 후 변환
         const requestData = {
@@ -112,14 +112,14 @@ const authApi = {
             experience: updatedData.experience ? String(updatedData.experience) : null // 기본값 설정
         };
 
-        console.log("📡 백엔드로 전송할 데이터:", requestData); // ✅ 전송되는 데이터 확인
+        //console.log("📡 백엔드로 전송할 데이터:", requestData); // ✅ 전송되는 데이터 확인
 
         const response = await axios.put(`${API_URL}/updatedExperience`, requestData, {
             headers: { "Content-Type": "application/json" },
             withCredentials: true // 🔥 JWT 쿠키 포함
         });
 
-        console.log("✅ 서버 응답:", response.data);
+        //console.log("✅ 서버 응답:", response.data);
         return response.data;
     } catch (error) {
         console.error("🚨 유저 경험 수정 실패", error);
@@ -133,9 +133,9 @@ const authApi = {
   verifyPassword: async ({ password }) => {
     try {
       // 전달받은 값에 대해 상세 로그 기록 (비밀번호는 민감 정보이므로 존재 여부만 체크)
-      console.log(
-        `🔍 verifyPassword 호출됨 - passwordProvided: ${password ? 'YES' : 'NO'}`
-      );
+      //console.log(
+      //   `🔍 verifyPassword 호출됨 - passwordProvided: ${password ? 'YES' : 'NO'}`
+      // );
 
       // userId는 서버에서 쿠키(accessToken)를 통해 추출하므로 클라이언트에서는 password만 전달합니다.
       const response = await axios.post(
@@ -148,7 +148,7 @@ const authApi = {
       );
 
       // 서버로부터 받은 응답을 꼼꼼하게 로그로 기록 (응답 데이터가 boolean 형태라고 가정)
-      console.log("✅ 비밀번호 검증 응답 데이터:", response.data);
+      //console.log("✅ 비밀번호 검증 응답 데이터:", response.data);
       
       // 응답 데이터가 true 또는 false인지 확인 후 반환
       if (typeof response.data !== "boolean") {
@@ -169,10 +169,10 @@ const authApi = {
   changePassword: async (password, newPassword) => {
     try {
       // 비밀번호 제공 여부 로그 (민감 정보는 출력하지 않음)
-      console.log(
-        `%c[DEBUG] changePassword 호출됨 - 현재 비밀번호 제공: ${password ? 'YES' : 'NO'}, 새 비밀번호 제공: ${newPassword ? 'YES' : 'NO'}`,
-        'color: green; font-weight: bold;'
-      );
+      //console.log(
+      //   `%c[DEBUG] changePassword 호출됨 - 현재 비밀번호 제공: ${password ? 'YES' : 'NO'}, 새 비밀번호 제공: ${newPassword ? 'YES' : 'NO'}`,
+      //   'color: green; font-weight: bold;'
+      // );
 
       const response = await axios.put(
         `${API_URL}/change-password`, 
@@ -187,11 +187,11 @@ const authApi = {
       );
 
       // 응답 데이터 로깅
-      console.log(
-        `%c[INFO] 비밀번호 변경 성공, 응답 데이터: `,
-        'color: blue; font-weight: bold;',
-        response.data
-      );
+      //console.log(
+      //   `%c[INFO] 비밀번호 변경 성공, 응답 데이터: `,
+      //   'color: blue; font-weight: bold;',
+      //   response.data
+      // );
       return response.data;
     } catch (error) {
       // 에러 메시지와 추가 정보를 로깅
@@ -213,7 +213,7 @@ const authApi = {
       const response = await axios.delete(`${API_URL}/deleteuser`, {
         withCredentials: true, // ✅ JWT 쿠키 포함
       });
-      console.log("✅ 회원 탈퇴 성공:", response.data);
+      //console.log("✅ 회원 탈퇴 성공:", response.data);
       return response.data;
     } catch (error) {
       console.error("❌ 회원 탈퇴 실패:", error);

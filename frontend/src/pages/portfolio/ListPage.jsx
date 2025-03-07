@@ -53,7 +53,7 @@ const ListPage = () => {
 				});
 				if (query || querySkills.length > 0) {
 					// 검색 api 호출
-					console.log(querySkills);
+					//console.log(querySkills);
 					await portfolioApi
 						.portfolioSearch({ page, size, query, querySkills })
 						.then((data) => {
@@ -73,7 +73,7 @@ const ListPage = () => {
 						setNodata(false); // ✅ 데이터가 있으면 false 설정
 					}
 
-					console.log("✅ 전체 프로젝트 조회 성공:", response);
+					//console.log("✅ 전체 프로젝트 조회 성공:", response);
 				}
 			} catch (error) {
 				console.error("❌ 전체 프로젝트 조회 실패:", error);

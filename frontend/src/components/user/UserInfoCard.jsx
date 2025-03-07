@@ -15,7 +15,7 @@ const UserInfoCard = () => {
   // ✅ 사용자 데이터 다시 조회 함수
   const fetchUserData = async () => {
     try {
-      console.log("🔍 사용자 데이터 다시 조회 중...");
+      //console.log("🔍 사용자 데이터 다시 조회 중...");
       const userData = await authApi.getAuthenticatedUser();
       setUser(userData);
       setEditUser(userData); // 수정할 데이터 업데이트
@@ -28,9 +28,9 @@ const UserInfoCard = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        console.log("🔍 현재 로그인된 사용자 정보 가져오는 중...");
+        //console.log("🔍 현재 로그인된 사용자 정보 가져오는 중...");
         const userData = await authApi.getAuthenticatedUser();
-        console.log("✅ 로그인된 사용자 정보:", userData);
+        //console.log("✅ 로그인된 사용자 정보:", userData);
         window.debugUserData = userData;
         setUser(userData);
         setEditUser(userData); // 수정할 데이터에도 저장
@@ -60,7 +60,7 @@ const UserInfoCard = () => {
   // ✅ 수정 정보 저장 함수 (백엔드 요청, 인자로 업데이트할 사용자 정보 전달)
   const handleSaveUserInfo = async (updatedUser) => {
     try {
-      console.log("✅ 수정된 정보 저장 중...", updatedUser);
+      //console.log("✅ 수정된 정보 저장 중...", updatedUser);
       await authApi.editUserInfo(updatedUser); // 백엔드 업데이트 요청
       setUser(updatedUser); // 화면에 즉시 반영
       setShowEditModal(false); // 모달 닫기

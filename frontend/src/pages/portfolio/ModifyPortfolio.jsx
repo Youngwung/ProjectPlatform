@@ -69,7 +69,7 @@ const ModifyPortfolio = () => {
 				github_url: githubUrl,
 			};
 
-			console.log("📌 업데이트 요청 데이터:", updatedData);
+			//console.log("📌 업데이트 요청 데이터:", updatedData);
 
 			await portfolioApi.updateProject(portfolioId, updatedData);
 			alert("포트폴리오가 성공적으로 수정되었습니다.");
@@ -88,11 +88,11 @@ const ModifyPortfolio = () => {
 	useEffect(() => {
 		getUserSkill()
 			.then((result) => {
-				console.log(result);
+				//console.log(result);
 				setUserSkills(result);
 			})
 			.catch((e) => {
-				console.log(e);
+				console.error(e);
 			})
 			.finally(() => {});
 	}, []);
@@ -108,10 +108,10 @@ const ModifyPortfolio = () => {
 
 	// 수정 모달 "확인" 클릭 시
 	const handleModifyConfirm = (exSkills) => {
-		console.log(exSkills);
+		//console.log(exSkills);
 		// 유저 스킬 수정 api 호출
 		putUserSkill(exSkills).then((result) => {
-			console.log(result);
+			//console.log(result);
 			setUserSkills(exSkills);
 		});
 		setShowModal(false);

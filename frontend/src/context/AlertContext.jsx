@@ -80,7 +80,7 @@ export const AlertProvider = ({ children }) => {
   const getProjectAlerts = async () => {
     try {
       const data = await alertApi.getProjectAlerts();
-      console.log("전체 프로젝트 알림:", data);
+      //console.log("전체 프로젝트 알림:", data);
       return data;
     } catch (error) {
       console.error("🚨 프로젝트 알림 조회 실패:", error);
@@ -92,7 +92,7 @@ export const AlertProvider = ({ children }) => {
   const getPortfolioAlerts = async () => {
     try {
       const data = await alertApi.getPortfolioAlerts();
-      console.log("전체 포트폴리오 알림:", data);
+      // console.log("전체 포트폴리오 알림:", data);
       return data;
     } catch (error) {
       console.error("🚨 포트폴리오 알림 조회 실패:", error);

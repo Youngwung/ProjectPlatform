@@ -8,7 +8,7 @@ const linkApi = {
   getAllLinks: async () => {
     try {
       const response = await axios.get(`${linkPrefix}/list`);
-      console.log("서버에서 데이터 뿌려주기")
+      //console.log("서버에서 데이터 뿌려주기")
       return response.data;
     } catch (error) {
       console.error("전체 링크 조회 실패:", error);
@@ -27,22 +27,20 @@ const linkApi = {
   createLink: async (linkData) => {
     try {
       const response = await axios.post(`${linkPrefix}/create`, linkData);
-      console.log(linkData);
+      //console.log(linkData);
       return response.data;
     } catch (error) {
       console.error("새 링크 생성 실패:", error);
-      console.error("linkData:", linkData);
       throw error;
     }
   },
   updateLink: async (id, updatedData) => {
     try {
       const response = await axios.put(`${linkPrefix}/${id}`, updatedData);
-      console.log("updatedData:", updatedData);
+      //console.log("updatedData:", updatedData);
       return response.data;
     } catch (error) {
       console.error("링크 수정 실패:", error);
-      console.error("updatedData:", updatedData);
       throw error;
     }
   },

@@ -5,7 +5,7 @@ import InputSkillComponent from "./InputSkillComponent";
 const SkillModalComponent = ({ show, handleClose, handleConfirm, skills }) => {
 	const [exSkills, setExSkills] = useState("");
 	useEffect(() => {
-		console.log(skills);
+		//console.log(skills);
 		setExSkills(skills);
 	}, [skills]);
 

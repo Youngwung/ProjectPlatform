@@ -17,7 +17,7 @@ const Top = () => {
     const checkAuth = async () => {
       try {
         const rs = await AuthApi.getAuthenticatedUser(); // 🔥 사용자 정보 가져오기
-        console.log(rs);
+        // console.log(rs);
         setIsAuthenticated(true);
         setUsername(rs.name); // 🔹 사용자 이름 저장 (현재 이메일)
       } catch (error) {

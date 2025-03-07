@@ -23,12 +23,12 @@ const CreatePortfolio = () => {
 			links,
 		};
 
-		console.log("포트폴리오 데이터:", portfolioData);
+		//console.log("포트폴리오 데이터:", portfolioData);
 
 		try {
 			// ✅ JWT 기반 인증이므로 userId 제거하고 요청
 			const response = await portfolioApi.createProject(portfolioData);
-			console.log("포트폴리오 저장 성공:", response);
+			//console.log("포트폴리오 저장 성공:", response);
 			alert("포트폴리오가 성공적으로 저장되었습니다!");
 			navigate("/portfolio/list");
 		} catch (error) {
@@ -47,10 +47,10 @@ const CreatePortfolio = () => {
 
 	// 수정 모달 "확인" 클릭 시
 	const handleModifyConfirm = (exSkills) => {
-    console.log(exSkills);
+    //console.log(exSkills);
     // 유저 스킬 수정 api 호출
     putUserSkill(exSkills).then((result) => {
-      console.log(result);
+      //console.log(result);
 			setUserSkills(exSkills);
     })
     setShowModal(false);
@@ -59,11 +59,11 @@ const CreatePortfolio = () => {
 	useEffect(() => {
 		getUserSkill()
 			.then((result) => {
-				console.log(result);
+				//console.log(result);
 				setUserSkills(result);
 			})
 			.catch((e) => {
-				console.log(e);
+				console.error(e);
 			})
 			.finally(() => {});
 	}, []);

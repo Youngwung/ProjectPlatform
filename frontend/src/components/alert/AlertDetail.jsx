@@ -19,7 +19,7 @@ const AlertDetail = ({ isProject }) => {
       if (!alertId) return;
       setLoading(true);
       const data = await alertApi.getOneAlert(alertId, isProject);
-      console.log("알림 상세 정보:", data);
+      //console.log("알림 상세 정보:", data);
       setAlert(data);
       setLoading(false);
     };
@@ -82,7 +82,7 @@ const AlertDetail = ({ isProject }) => {
     if (!alert || !alert.project) return;
     if (alert.type === "참가알림") {
       await alertApi.acceptApplication(alert.project.id, alert.senderUserDto.id);
-      console.log("신청 수락 처리 완료");
+      //console.log("신청 수락 처리 완료");
       setTimeout(async () => {
         await refreshAlerts();
         const updatedAlert = await alertApi.getOneAlert(alert.id, isProject);
@@ -90,7 +90,7 @@ const AlertDetail = ({ isProject }) => {
       }, 500);
     } else if (alert.type === "초대알림") {
       await alertApi.acceptInvite(alert.project.id, alert.id);
-      console.log("초대 수락 처리 완료");
+      // console.log("초대 수락 처리 완료");
       setTimeout(async () => {
         await refreshAlerts();
         const updatedAlert = await alertApi.getOneAlert(alert.id, isProject);
@@ -103,10 +103,10 @@ const AlertDetail = ({ isProject }) => {
     if (!alert || !alert.project) return;
     if (alert.type === "참가알림") {
       await alertApi.rejectApplication(alert.project.id, alert.senderUserDto.id);
-      console.log("신청 거절 처리 완료");
+      // console.log("신청 거절 처리 완료");
     } else if (alert.type === "초대알림") {
       await alertApi.rejectInvite(alert.project.id, alert.id);
-      console.log("초대 거절 처리 완료");
+      // console.log("초대 거절 처리 완료");
     }
   };
 

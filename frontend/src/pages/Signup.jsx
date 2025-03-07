@@ -37,8 +37,8 @@ const Signup = () => {
 		const tempToken = queryParams.get("token");
 		if (tempToken) {
 			const decoded = jwtDecode(tempToken);
-			console.log(decoded);
-			console.log(decoded.sub);
+			//console.log(decoded);
+			//console.log(decoded.sub);
 			
 			
 			setFormData((prevData) => ({
@@ -47,9 +47,9 @@ const Signup = () => {
 				name: decoded.name,
 				providerName: decoded.providerName, // 소셜 로그인 제공자 정보 저장
 			}));
-			console.log(formData.email);
-			console.log(formData.email === "");
-			console.log(formData.email !== "");
+			//console.log(formData.email);
+			//console.log(formData.email === "");
+			//console.log(formData.email !== "");
 		}
 	}, [queryParams]);
 
@@ -78,10 +78,10 @@ const Signup = () => {
 		}
 		try {
 			const response = await authApi.checkEmail(email);
-			console.log("response", response);
+			//console.log("response", response);
 			//true 중복, false 중복되지 않음
 			const ischeckEmail = response.exists;
-			console.log("ischeckEmail", response.exists);
+			//console.log("ischeckEmail", response.exists);
 			if (ischeckEmail) { // 중복된 이메일일 경우
 				alert("❌ 중복된 이메일입니다. 다른 이메일을 입력해주세요.");
 				setIsConfirmedEmail(false);

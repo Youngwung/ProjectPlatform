@@ -106,7 +106,7 @@ export default function useCustomPortfolioMove() {
 		} else {
 			queryStr = queryDefault;
 		}
-		console.log(queryStr.toString());
+		// console.log(queryStr.toString());
 		navigate({
 			pathname: "/portfolio/search",
 			search: queryStr.toString(),

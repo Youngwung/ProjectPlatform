@@ -38,7 +38,7 @@ export const getDuplicatedString = (skill) => {
 	const skillString = parseSkills(skill);
 	skillString.forEach((item) => {
 		const lowerItem = item.language.toLowerCase();
-		console.log(lowerItem);
+		//console.log(lowerItem);
 		if (
 			new Set(
 				uniqueArray.map((str) => {

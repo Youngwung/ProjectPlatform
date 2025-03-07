@@ -25,7 +25,7 @@ const userApi = {
     createUser: async (userData) => {
         try {
         const response = await axios.post(`${prefix}/create`, userData);
-        console.log(response);
+        //console.log(response);
         return response.data;
         } catch (error) {
         console.error("새 유저 생성 실패:", error);

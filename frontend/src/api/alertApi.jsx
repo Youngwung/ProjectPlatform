@@ -21,7 +21,7 @@ const alertApi = {
       const response = await axios.get(`${AlertPortfolioApiUrl}/unread`, { withCredentials: true });
       return response.data;
     } catch (error) {
-      console.error('🚨 읽지 않은 포트폴리오 알림 조회 실패:', error);
+      //console.error('🚨 읽지 않은 포트폴리오 알림 조회 실패:', error);
       return [];
     }
   },
@@ -62,7 +62,7 @@ const alertApi = {
       const response = await axios.get(`${AlertProjectApiUrl}/unread`, { withCredentials: true });
       return response.data;
     } catch (error) {
-      console.error('🚨 읽지 않은 프로젝트 알림 조회 실패:', error);
+      // console.error('🚨 읽지 않은 프로젝트 알림 조회 실패:', error);
       return [];
     }
   },

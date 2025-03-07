@@ -50,11 +50,13 @@ export const AlertProvider = ({ children }) => {
   }, []);
 
   // 🔹 동적 업데이트: 30초마다 최신 상태를 반영
+  // (알림이 실시간으로 업데이트되지 않는 경우를 대비하여 추가)
+  //TODO : 5분마다 최신 상태를 반영하도록 수정 (배포할때)
   useEffect(() => {
     const interval = setInterval(() => {
       fetchUnReadProjectAlerts();
       fetchUnreadPortfolioAlerts();
-    }, 30000);
+    }, 300000);
     return () => clearInterval(interval);
   }, []);
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Alert, Button, Card, Container, Spinner, Modal, Form } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import portfolioApi from "../../api/portfolioApi";
@@ -7,6 +7,7 @@ import { getMyProjects } from "../../api/projectApi"; // 내가 만든 프로젝
 import alertApi from "../../api/alertApi"; // 프로젝트 초대 API 호출
 import SkillTagComponent from "../../components/skill/SkillTagComponent";
 import SkillTagGuideComponent from "../../components/skill/SkillTagGuideComponent";
+import { AlertContext } from "../../context/AlertContext";
 
 const PortfolioDetail = () => {
   const { portfolioId } = useParams(); // URL에서 portfolioId 가져오기
@@ -25,11 +26,11 @@ const PortfolioDetail = () => {
     skills: "",
     github_url: "",
   };
-
+  const { refreshAlerts } = useContext(AlertContext);
   const [portfolio, setPortfolio] = useState(portfolioInit);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [portfolioAlert , setPortfolioAlert] = useState(null);
   // 초대 모달 관련 상태
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [myProjects, setMyProjects] = useState([]); // 내가 만든 프로젝트 목록
@@ -54,7 +55,7 @@ const PortfolioDetail = () => {
         if (!data || !data.id) {
           throw new Error("데이터가 존재하지 않습니다.");
         }
-        console.log("📌 포트폴리오 데이터:", data);
+        //console.log("📌 포트폴리오 데이터:", data);
         setPortfolio(data);
       } catch (error) {
         console.error("❌ 포트폴리오 조회 실패:", error);
@@ -98,6 +99,15 @@ const PortfolioDetail = () => {
       setInviting(true);
       await alertApi.inviteToProject(selectedProjectId, portfolio.userId);
       alert("초대가 성공적으로 전송되었습니다.");
+      setTimeout(async () => {
+				await refreshAlerts();
+				// 선택적으로 전체 알림을 다시 가져와 local 상태 업데이트도 가능
+				const alerts = await alertApi.getPortfolioAlerts();
+				const matchingAlert = alerts.find(
+				  (alert) => Number(alert.portfolio.id) === Number(portfolioId)
+				);
+				setPortfolioAlert(matchingAlert);
+			  }, 500); // 500ms 딜레이
       setShowInviteModal(false);
       setSelectedProjectId("");
     } catch (error) {

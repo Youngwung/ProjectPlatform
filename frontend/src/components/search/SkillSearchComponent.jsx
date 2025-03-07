@@ -25,25 +25,25 @@ export default function SkillSearchComponent({ setSelectedSkill, querySkills }) 
 	const [skills, setSkills] = useState(initSkillData);
 	useEffect(() => {
 		getSkillList().then((data) => {
-			console.log(data);
+			//console.log(data);
 			setSkillCategories(data);
-			console.log(skillCategories);
+			//console.log(skillCategories);
 			// 처음 표시할 스킬 설정
 			setSkills(data[0].skills);
-			console.log(data[0].skills);
+			//console.log(data[0].skills);
 		});
 	}, []);
 
 	const handleSkillClick = (value) => {
 		// 부모컴포넌트에 선택한 스킬 전달
-		console.log(value);
+		//console.log(value);
 		setSelectedSkill(value);
 	};
 
 	const handleSkillCategoryClick = (id) => {
 		// value = categoryId
 		setActiveItem(id - 1);
-		console.log(id);
+		//console.log(id);
 		setSkills(skillCategories[id - 1].skills);
 	};
 
@@ -61,7 +61,7 @@ export default function SkillSearchComponent({ setSelectedSkill, querySkills }) 
 			.then((data) => {
 				setSkillResult(data);
 			})
-			.catch((error) => console.log(error));
+			.catch((error) => console.error(error));
 	}, []);
 	// 검색 결과를 표시할 지 카테고리의 스킬리스트를 표시할 지 정하는 변수 선언
 	const [isSearch, setIsSearch] = useState(false);
@@ -70,11 +70,11 @@ export default function SkillSearchComponent({ setSelectedSkill, querySkills }) 
 		if (value.trim() === "") {
 			// value가 빈 문자열인 경우 API 호출하지 않음
 			setIsSearch(false);
-			console.log("기술 검색창 빈 문자열");
+			//console.log("기술 검색창 빈 문자열");
 			return;
 		}
 		// 검색 결과 표시
-		console.log("기술 검색창 문자열 있음");
+		//console.log("기술 검색창 문자열 있음");
 		setIsSearch(true);
 		searchResult(value);
 	};
@@ -84,7 +84,7 @@ export default function SkillSearchComponent({ setSelectedSkill, querySkills }) 
 	// 선택된 스킬 하이라이팅을 위한 변수 선언
 	const [selectedSkills, setSelectedSkills] = useState(querySkills);
 	useEffect(() => {
-		console.log(querySkills)
+		//console.log(querySkills)
 		setSelectedSkills(querySkills)
 	}, [querySkills])
 	

@@ -50,7 +50,7 @@ const portfolioApi = {
 	createProject: async (projectData) => {
 		try {
 			const response = await axiosInstance.post("/create", projectData);
-			console.log(response.data);
+			//console.log(response.data);
 			return response.data;
 		} catch (error) {
 			console.error("❌ 새 프로젝트 생성 실패:", error);

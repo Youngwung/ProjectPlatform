@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Badge, Button, Card, Col, Container, Row } from "react-bootstrap";
 import { getOne } from "../../api/projectApi";
 import useCustomMove from "../../hooks/useCustomMove";
@@ -7,9 +7,9 @@ import BookmarkProjectBtn from "../bookmark/BookmarkProjectBtn";
 import SkillTagComponent from "../skill/SkillTagComponent";
 import SkillTagGuideComponent from "../skill/SkillTagGuideComponent";
 import alertApi from "../../api/alertApi";
+import { AlertContext } from "../../context/AlertContext";
 
 // 조회 기능을 구현하기 위한 컴포넌트
-
 // 기본값 설정
 const initState = {
 	id: 0,
@@ -38,6 +38,7 @@ const getStatusVariant = (status) => {
 	}
 };
 export default function ReadComponent({ projectId }) {
+	const { refreshAlerts } = useContext(AlertContext);
 	const [project, setProject] = useState(initState);
 	const [projectAlert, setProjectAlert] = useState(null);
 	
@@ -76,11 +77,15 @@ export default function ReadComponent({ projectId }) {
 			await alertApi.applyProject(projectId);
 			alert("프로젝트 참가 신청이 완료되었습니다.");
 			// 신청 후 다시 알림 목록을 갱신하여 버튼이 뱃지로 대체되도록 함
-			const alerts = await alertApi.getProjectAlerts();
-			const matchingAlert = alerts.find(
-				(alert) => Number(alert.project.id) === Number(projectId)
-			);
-			setProjectAlert(matchingAlert);
+			setTimeout(async () => {
+				await refreshAlerts();
+				// 선택적으로 전체 알림을 다시 가져와 local 상태 업데이트도 가능
+				const alerts = await alertApi.getProjectAlerts();
+				const matchingAlert = alerts.find(
+				  (alert) => Number(alert.project.id) === Number(projectId)
+				);
+				setProjectAlert(matchingAlert);
+			  }, 500); // 500ms 딜레이
 		} catch (error) {
 			console.error("참가 신청 처리 중 오류 발생:", error);
 			alert("참가 신청에 실패했습니다. 다시 시도해주세요.");

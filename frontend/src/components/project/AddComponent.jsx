@@ -45,8 +45,8 @@ export default function AddComponent() {
 
 	const handleConfirm = () => {
 		postAdd(project).then((result) => {
-			console.log(result);
-			console.log(project);
+			// console.log(result);
+			// console.log(project);
 			// 기존 인풋 입력값 초기화
 			setProject({ ...initState });
 			moveToList();

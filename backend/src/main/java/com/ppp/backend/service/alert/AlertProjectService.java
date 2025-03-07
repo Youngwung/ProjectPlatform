@@ -89,7 +89,7 @@ public class AlertProjectService {
                     log.warn("❌ [getProjectAlertById] 프로젝트 알림 ID {} 찾을 수 없음", alertId);
                     return new EntityNotFoundException("해당 프로젝트 알림을 찾을 수 없습니다. ID: " + alertId);
                 });
-
+        markProjectAlertAsRead(alertId);
         AlertProjectDto alertProjectDto = convertToDto(alertProject, userId);
         log.info("✅ [getProjectAlertById] 조회 성공 - 알림 ID: {}", alertProjectDto.getId());
         return alertProjectDto;
@@ -245,13 +245,13 @@ public class AlertProjectService {
         User invitee = userRepository.findById(inviteeId)
                 .orElseThrow(() -> new EntityNotFoundException("초대받는 사용자를 찾을 수 없습니다. ID: " + inviteeId));
 
-        // 초대받는 사용자 알림 생성 (프로젝트 소유자 → 초대받는 사용자)
+        // ✅ 초대받는 사용자 알림 생성 (프로젝트 소유자 → 초대받는 사용자)
         String contentForInvitee = project.getUser().getName() + " 님이 프로젝트 [" + project.getTitle() + "]에 초대했습니다.";
         AlertProject alertForInvitee = AlertProject.builder()
                 .project(project)
-                .senderId(project.getUser())
-                .receiverId(invitee)
-                .alertOwnerId(project.getUser())
+                .senderId(project.getUser()) // 보낸 사람: 프로젝트 소유자
+                .receiverId(invitee)    // 받는 사람: 초대받은 사용자
+                .alertOwnerId(invitee)
                 .status(AlertProject.Status.신청)
                 .type(AlertProject.Type.초대알림)
                 .content(contentForInvitee)
@@ -261,12 +261,12 @@ public class AlertProjectService {
         alertProjectRepository.save(alertForInvitee);
         log.info("✅ [inviteToProject] 초대받는 사용자 알림 생성 완료, alert ID: {}", alertForInvitee.getId());
 
-        // 초대 전송 확인 알림 생성 (프로젝트 소유자 → 본인)
+        // ✅ 초대 전송 확인 알림 생성 (프로젝트 소유자 → 본인)
         String contentForInviter = "프로젝트 [" + project.getTitle() + "] 초대가 " + invitee.getName() + " 님에게 전송되었습니다.";
         AlertProject alertForInviter = AlertProject.builder()
                 .project(project)
                 .senderId(project.getUser())
-                .receiverId(project.getUser())
+                .receiverId(invitee)
                 .alertOwnerId(project.getUser())
                 .status(AlertProject.Status.신청)
                 .type(AlertProject.Type.초대알림)
@@ -283,7 +283,7 @@ public class AlertProjectService {
      * 기존 알림을 업데이트하고, 프로젝트 소유자와 초대받은 사용자에게 새 응답 알림을 생성합니다.
      *
      * @param projectId 초대에 해당하는 프로젝트의 고유 ID
-     * @param inviteId  응답할 초대 알림의 고유 ID
+     * @param inviteId  응답할 초대 알림의 고유 ID (alert)
      * @param accepted  초대 수락 여부 (true: 수락, false: 거절)
      * @param request   HTTP 요청 객체로, JWT 쿠키에서 초대 응답자의 사용자 ID를 추출합니다.
      * @throws EntityNotFoundException 해당 초대 알림이 존재하지 않을 경우 예외 발생
@@ -305,13 +305,27 @@ public class AlertProjectService {
         }
         User projectOwner = inviteAlert.getProject().getUser();
 
-        // 기존 알림 업데이트: 상태, 읽음 처리, 단계 변경 (1 -> 2)
+        // 기존 초대받은 사용자 알림 업데이트: 상태, 읽음 처리, 단계 변경 (1 -> 2)
         AlertProject.Status newStatus = accepted ? AlertProject.Status.초대수락 : AlertProject.Status.초대거절;
         inviteAlert.setStatus(newStatus);
-        inviteAlert.markAsRead();
+//        inviteAlert.markAsRead();
         inviteAlert.setStep(2);
         alertProjectRepository.save(inviteAlert);
-        log.info("✅ [handleInviteResponse] 기존 알림 업데이트 완료: {} / step: {}", newStatus, inviteAlert.getStep());
+        log.info("✅ [handleInviteResponse] 기존 초대 알림 업데이트 완료: {} / step: {}", newStatus, inviteAlert.getStep());
+
+        // 프로젝트 소유자에게 전달된 초대 전송 확인 알림 업데이트 (step 1 -> 2)
+        Optional<AlertProject> ownerAlertOpt = alertProjectRepository.findByProjectAndReceiverIdAndTypeAndStep(
+                inviteAlert.getProject(), projectOwner, AlertProject.Type.초대알림, 1);
+        if (ownerAlertOpt.isPresent()) {
+            AlertProject ownerAlert = ownerAlertOpt.get();
+            ownerAlert.setStatus(newStatus);
+//            ownerAlert.markAsRead();
+            ownerAlert.setStep(2);
+            alertProjectRepository.save(ownerAlert);
+            log.info("✅ [handleInviteResponse] 프로젝트 소유자 알림 업데이트 완료, alert ID: {}", ownerAlert.getId());
+        } else {
+            log.warn("🚨 [handleInviteResponse] 프로젝트 소유자 알림을 찾을 수 없습니다. (step 1)");
+        }
 
         // 새 응답 알림 생성 (프로젝트 소유자 대상, step 3)
         String contentForOwner = accepted
@@ -332,12 +346,12 @@ public class AlertProjectService {
         log.info("✅ [handleInviteResponse] 새로운 알림(프로젝트 소유자 대상) 생성 완료, alert ID: {}", responseAlertForOwner.getId());
 
         // 새 응답 알림 생성 (초대받은 사용자 대상, step 3)
-        String contentForInvitee = "프로젝트 [" + inviteAlert.getProject().getTitle() + "] 초대를 " + (accepted ? "수락" : "거절") + "하였습니다.";
+        String contentForInvitee = "["+inviteAlert.getReceiverId().getName()+"]님이 프로젝트 [" + inviteAlert.getProject().getTitle() + "] 초대를 " + (accepted ? "수락" : "거절") + "하였습니다.";
         AlertProject responseAlertForInvitee = AlertProject.builder()
                 .project(inviteAlert.getProject())
-                .senderId(projectOwner)
-                .receiverId(inviteAlert.getReceiverId())
-                .alertOwnerId(projectOwner)
+                .senderId(inviteAlert.getReceiverId())
+                .receiverId(projectOwner)
+                .alertOwnerId(inviteAlert.getReceiverId())
                 .status(newStatus)
                 .type(AlertProject.Type.초대알림)
                 .content(contentForInvitee)

@@ -8,21 +8,20 @@ const alertApi = {
   getPortfolioAlerts: async () => {
     try {
       const response = await axios.get(`${AlertPortfolioApiUrl}/list`, { withCredentials: true });
-      console.log(response.data);
+      //console.log(response.data);
       return response.data;
     } catch (error) {
       console.error('🚨 포트폴리오 알림 조회 실패:', error);
       return [];
     }
   },
-
   /** 🔹 유저의 읽지 않은 포트폴리오 알림 조회 */
   getUnreadPortfolioAlerts: async () => {
     try {
       const response = await axios.get(`${AlertPortfolioApiUrl}/unread`, { withCredentials: true });
       return response.data;
     } catch (error) {
-      console.error('🚨 읽지 않은 포트폴리오 알림 조회 실패:', error);
+      //console.error('🚨 읽지 않은 포트폴리오 알림 조회 실패:', error);
       return [];
     }
   },
@@ -49,7 +48,7 @@ const alertApi = {
   getProjectAlerts: async () => {
     try {
       const response = await axios.get(`${AlertProjectApiUrl}/list`, { withCredentials: true });
-      console.log(response.data);
+      //console.log(response.data);
       return response.data;
     } catch (error) {
       console.error('🚨 프로젝트 알림 조회 실패:', error);
@@ -63,7 +62,7 @@ const alertApi = {
       const response = await axios.get(`${AlertProjectApiUrl}/unread`, { withCredentials: true });
       return response.data;
     } catch (error) {
-      console.error('🚨 읽지 않은 프로젝트 알림 조회 실패:', error);
+      // console.error('🚨 읽지 않은 프로젝트 알림 조회 실패:', error);
       return [];
     }
   },
@@ -100,7 +99,7 @@ const alertApi = {
     const apiUrl = isProject ? AlertProjectApiUrl : AlertPortfolioApiUrl;
     try {
       await axios.put(`${apiUrl}/all/read`, null, { withCredentials: true });
-      console.log(`🟢${apiUrl}에서 모든 알림 읽음 처리 완료`);
+      //console.log(`🟢${apiUrl}에서 모든 알림 읽음 처리 완료`);
     } catch (error) {
       console.error("🚨 모든 알림 읽음 처리 실패:", error);
     }
@@ -110,7 +109,7 @@ const alertApi = {
     const apiUrl = isProject ? AlertProjectApiUrl : AlertPortfolioApiUrl;
     try {
       const response = await axios.get(`${apiUrl}/${alertId}`, { withCredentials: true });
-      console.log(`🟢 알림(${alertId}) 조회 결과:`, response.data);
+      //console.log(`🟢 알림(${alertId}) 조회 결과:`, response.data);
       return response.data;
     } catch (error) {
       console.error(`🚨 알림(${alertId}) 조회 실패:`, error);
@@ -122,7 +121,7 @@ const alertApi = {
   applyProject: async (projectId) => {
     try {
       await axios.post(`${AlertProjectApiUrl}/${projectId}/apply`, null, { withCredentials: true });
-      console.log("🟢 프로젝트 참가 신청 완료");
+      //console.log("🟢 프로젝트 참가 신청 완료");
     } catch (error) {
       console.error("🚨 프로젝트 참가 신청 실패:", error);
     }
@@ -132,7 +131,7 @@ const alertApi = {
   inviteToProject: async (projectId, inviteeId) => {
     try {
       await axios.post(`${AlertProjectApiUrl}/${projectId}/invite/${inviteeId}`, null, { withCredentials: true });
-      console.log("🟢 프로젝트 초대 전송 완료");
+      //console.log("🟢 프로젝트 초대 전송 완료");
     } catch (error) {
       console.error("🚨 프로젝트 초대 실패:", error);
     }
@@ -142,7 +141,7 @@ const alertApi = {
   acceptInvite: async (projectId, inviteId) => {
     try {
       await axios.post(`${AlertProjectApiUrl}/${projectId}/invite/${inviteId}/accept`, null, { withCredentials: true });
-      console.log("🟢 초대 수락 완료");
+      //console.log("🟢 초대 수락 완료");
     } catch (error) {
       console.error("🚨 초대 수락 실패:", error);
     }
@@ -152,7 +151,7 @@ const alertApi = {
   rejectInvite: async (projectId, inviteId) => {
     try {
       await axios.post(`${AlertProjectApiUrl}/${projectId}/invite/${inviteId}/reject`, null, { withCredentials: true });
-      console.log("🟢 초대 거절 완료");
+      //console.log("🟢 초대 거절 완료");
     } catch (error) {
       console.error("🚨 초대 거절 실패:", error);
     }
@@ -162,7 +161,7 @@ const alertApi = {
   acceptApplication: async (projectId, applicantId) => {
     try {
       await axios.post(`${AlertProjectApiUrl}/${projectId}/application/${applicantId}/accept`, null, { withCredentials: true });
-      console.log("🟢 참가 신청 수락 완료");
+      //console.log("🟢 참가 신청 수락 완료");
     } catch (error) {
       console.error("🚨 참가 신청 수락 실패:", error);
     }
@@ -172,7 +171,7 @@ const alertApi = {
   rejectApplication: async (projectId, applicantId) => {
     try {
       await axios.post(`${AlertProjectApiUrl}/${projectId}/application/${applicantId}/reject`, null, { withCredentials: true });
-      console.log("🟢 참가 신청 거절 완료");
+      //console.log("🟢 참가 신청 거절 완료");
     } catch (error) {
       console.error("🚨 참가 신청 거절 실패:", error);
     }

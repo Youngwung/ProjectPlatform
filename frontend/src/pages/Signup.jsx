@@ -9,6 +9,8 @@ import {
 	Form,
 	InputGroup,
 	Row,
+	OverlayTrigger,
+	Tooltip,
 } from "react-bootstrap";
 import { useSearchParams } from "react-router-dom";
 import authApi from "../api/authApi";
@@ -18,7 +20,7 @@ const Signup = () => {
 	const [queryParams] = useSearchParams();
 	const [errorMsg, setErrorMsg] = useState("");
 	const [isPasswordValid, setIsPasswordValid] = useState(true);
-
+	const [isConfirmedEmail, setIsConfirmedEmail] = useState(false)
 	// 입력값을 useState로 관리
 	const [formData, setFormData] = useState({
 		name: "",
@@ -35,8 +37,8 @@ const Signup = () => {
 		const tempToken = queryParams.get("token");
 		if (tempToken) {
 			const decoded = jwtDecode(tempToken);
-			console.log(decoded);
-			console.log(decoded.sub);
+			//console.log(decoded);
+			//console.log(decoded.sub);
 			
 			
 			setFormData((prevData) => ({
@@ -45,9 +47,9 @@ const Signup = () => {
 				name: decoded.name,
 				providerName: decoded.providerName, // 소셜 로그인 제공자 정보 저장
 			}));
-			console.log(formData.email);
-			console.log(formData.email === "");
-			console.log(formData.email !== "");
+			//console.log(formData.email);
+			//console.log(formData.email === "");
+			//console.log(formData.email !== "");
 		}
 	}, [queryParams]);
 
@@ -76,18 +78,27 @@ const Signup = () => {
 		}
 		try {
 			const response = await authApi.checkEmail(email);
-
-			if (response) {
+			//console.log("response", response);
+			//true 중복, false 중복되지 않음
+			const ischeckEmail = response.exists;
+			//console.log("ischeckEmail", response.exists);
+			if (ischeckEmail) { // 중복된 이메일일 경우
 				alert("❌ 중복된 이메일입니다. 다른 이메일을 입력해주세요.");
+				setIsConfirmedEmail(false);
+				return; // 🚀 중복이면 함수 종료
+			}
+	
+			// ✅ 사용 가능한 이메일일 경우에만 confirm 창 띄우기
+			const confirmUse = window.confirm("✅ 사용 가능한 이메일입니다. 이 이메일을 사용하시겠습니까?");
+			if (confirmUse) {
+				alert("✔ 이메일이 확정되었습니다.");
+				setIsConfirmedEmail(true);
 			} else {
-				const confirmUse = window.confirm("✅ 사용 가능한 이메일입니다. 이 이메일을 사용하시겠습니까?");
-				if (confirmUse) {
-					alert("✔ 이메일이 확정되었습니다.");
-				} else {
-					alert("이메일 입력을 변경할 수 있습니다.");
-				}
+				alert("이메일 입력을 변경할 수 있습니다.");
+				setIsConfirmedEmail(false);
 			}
 		} catch (error) {
+			console.error("Error during email check:", error);
 			alert("⚠ 이메일 중복 확인 중 오류가 발생했습니다. 다시 시도해주세요.");
 		}
 	};
@@ -98,14 +109,40 @@ const Signup = () => {
 		e.preventDefault();
 		const { email, password, confirmPassword, name, phoneNumber, experience, providerName } = formData;
 
-		// 소셜 로그인이 아닐 경우 비밀번호 검사
+		// 🚨 입력값이 비어 있는 경우 return 처리
+		if (!email) {
+			alert("이메일을 입력해주세요.");
+			return;
+		}
+		if (!isConfirmedEmail) {
+			alert("이메일 중복 확인을 완료해주세요.");
+			return;
+		}
+		if (!name) {
+			alert("이름을 입력해주세요.");
+			return;
+		}
+		if (!phoneNumber) {
+			alert("전화번호를 입력해주세요.");
+			return;
+		}
+
+		// 소셜 로그인일경우 비밀번호 검사
 		if (providerName === "local") {
+			if (!password) {
+				alert("비밀번호를 입력해주세요.");
+				return;
+			}
 			if (!validatePassword(password)) {
-				setErrorMsg("비밀번호는 최소 8자 이상, 숫자, 문자, 특수문자를 포함해야 합니다.");
+				alert("비밀번호는 최소 8자 이상, 숫자, 문자, 특수문자를 포함해야 합니다.");
+				return;
+			}
+			if (!confirmPassword) {
+				alert("비밀번호 확인을 입력해주세요.");
 				return;
 			}
 			if (password !== confirmPassword) {
-				setErrorMsg("비밀번호가 일치하지 않습니다.");
+				alert("비밀번호가 일치하지 않습니다.");
 				return;
 			}
 		}
@@ -117,7 +154,7 @@ const Signup = () => {
 				name,
 				phoneNumber,
 				experience,
-				providerName, // "local" 또는 "kakao", "naver", "google" 값 전달
+				providerName,
 			});
 			alert("회원가입이 완료되었습니다.");
 			window.location.href = "/login";
@@ -214,9 +251,25 @@ const Signup = () => {
 									/>
 								</Form.Group>
 
-								<Button className="w-100 mt-3" variant="primary" type="submit">
-									회원가입
-								</Button>
+								<OverlayTrigger
+									placement="top"
+									overlay={!isConfirmedEmail ?
+										<Tooltip>중복 확인을 해주세요</Tooltip>
+										:<></>}
+								>
+									<span className="d-inline-block w-100">
+										<Button
+											className="w-100 mt-3"
+											variant="primary"
+											type="submit"
+											disabled={!isConfirmedEmail}
+											style={!isConfirmedEmail ? { pointerEvents: "none" } : {}}
+										>
+											회원가입
+										</Button>
+									</span>
+								</OverlayTrigger>
+
 							</Form>
 						</Card.Body>
 					</Card>

@@ -1,27 +1,75 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Badge, Button, Spinner, Row, Col } from "react-bootstrap";
 import { HiOutlineMailOpen, HiOutlineMail } from "react-icons/hi";
 import alertApi from "../../api/alertApi";
+import { AlertContext } from "../../context/AlertContext";
 
 const AlertDetail = ({ isProject }) => {
   const { alertId } = useParams();
   const navigate = useNavigate();
   const [alert, setAlert] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  // 별도의 상태 변수(actionUI)를 이용하여 버튼/뱃지를 동적으로 관리
+  const [actionUI, setActionUI] = useState(null);
+  const { refreshAlerts } = useContext(AlertContext);
   // 백엔드에서 AlertDetail 정보를 받아옴 (senderUserDto, receiverUserDto, alertOwnerUserDto 포함)
   useEffect(() => {
     const fetchAlertDetail = async () => {
       if (!alertId) return;
       setLoading(true);
       const data = await alertApi.getOneAlert(alertId, isProject);
-      console.log("알림 상세 정보:", data);
+      //console.log("알림 상세 정보:", data);
       setAlert(data);
       setLoading(false);
     };
     fetchAlertDetail();
   }, [alertId, isProject]);
+
+  useEffect(() => {
+    if (!alert) return;
+
+    if (alert.step === 1) {
+      if (alert.type === "참가알림" && isProject && alert.myProject) {
+        // 신청 알림이고 내가 소유한 프로젝트인 경우
+        setActionUI(
+          <div className="text-center mt-4">
+            <Button variant="success" className="px-4" onClick={handleAccept}>
+              신청 수락
+            </Button>
+            <Button variant="danger" className="ms-3 px-4" onClick={handleReject}>
+              신청 거절
+            </Button>
+          </div>
+        );
+      } else if (alert.type === "초대알림" && isProject && !alert.myProject) {
+        // 초대 알림이고 내가 소유하지 않은 경우
+        setActionUI(
+          <div className="text-center mt-4">
+            <Button variant="success" className="px-4" onClick={handleAccept}>
+              초대 수락
+            </Button>
+            <Button variant="danger" className="ms-3 px-4" onClick={handleReject}>
+              초대 거절
+            </Button>
+          </div>
+        );
+      } else {
+        setActionUI(null);
+      }
+    } else if (alert.step === 2) {
+      // 응답 후 업데이트된 기존 알림(step 2): 버튼 대신 상태 Badge 표시
+      setActionUI(
+        <div className="text-center mt-4">
+          <Badge bg="info" className="px-3 py-2">
+            {alert.status}
+          </Badge>
+        </div>
+      );
+    } else {
+      setActionUI(null);
+    }
+  }, [alert, isProject]);
 
   const handleMarkAsRead = async () => {
     if (!alert || alert.isRead) return;
@@ -34,10 +82,20 @@ const AlertDetail = ({ isProject }) => {
     if (!alert || !alert.project) return;
     if (alert.type === "참가알림") {
       await alertApi.acceptApplication(alert.project.id, alert.senderUserDto.id);
-      console.log("신청 수락 처리 완료");
+      //console.log("신청 수락 처리 완료");
+      setTimeout(async () => {
+        await refreshAlerts();
+        const updatedAlert = await alertApi.getOneAlert(alert.id, isProject);
+        setAlert(updatedAlert);
+      }, 500);
     } else if (alert.type === "초대알림") {
-      await alertApi.acceptInvite(alert.project.id, alert.receiverUserDto.id);
-      console.log("초대 수락 처리 완료");
+      await alertApi.acceptInvite(alert.project.id, alert.id);
+      // console.log("초대 수락 처리 완료");
+      setTimeout(async () => {
+        await refreshAlerts();
+        const updatedAlert = await alertApi.getOneAlert(alert.id, isProject);
+        setAlert(updatedAlert);
+      }, 500);
     }
   };
 
@@ -45,10 +103,10 @@ const AlertDetail = ({ isProject }) => {
     if (!alert || !alert.project) return;
     if (alert.type === "참가알림") {
       await alertApi.rejectApplication(alert.project.id, alert.senderUserDto.id);
-      console.log("신청 거절 처리 완료");
+      // console.log("신청 거절 처리 완료");
     } else if (alert.type === "초대알림") {
-      await alertApi.rejectInvite(alert.project.id, alert.receiverUserDto.id);
-      console.log("초대 거절 처리 완료");
+      await alertApi.rejectInvite(alert.project.id, alert.id);
+      // console.log("초대 거절 처리 완료");
     }
   };
 
@@ -158,39 +216,9 @@ const AlertDetail = ({ isProject }) => {
               )}
             </>
           )}
-          
-          { 
-            // 원본 알림(step === 1)이고 내가 소유한 프로젝트/포트폴리오인 경우에만 버튼 표시
-            alert.step === 1 && alert.myProject ? (
-              isProject && alert.type === "참가알림" ? (
-                <div className="text-center mt-4">
-                  <Button variant="success" className="px-4" onClick={handleAccept}>
-                    신청 수락
-                  </Button>
-                  <Button variant="danger" className="ms-3 px-4" onClick={handleReject}>
-                    신청 거절
-                  </Button>
-                </div>
-              ) : !isProject && alert.type === "초대알림" ? (
-                <div className="text-center mt-4">
-                  <Button variant="success" className="px-4" onClick={handleAccept}>
-                    초대 수락
-                  </Button>
-                  <Button variant="danger" className="ms-3 px-4" onClick={handleReject}>
-                    초대 거절
-                  </Button>
-                </div>
-              ) : null
-            ) : alert.step === 2 ? (
-              // 응답 후 업데이트된 기존 알림(step 2): 버튼 대신 상태를 Badge로 표시
-              <div className="text-center mt-4">
-                <Badge bg="info" className="px-3 py-2">
-                  {alert.status}
-                </Badge>
-              </div>
-            ) : null
-          }
 
+          {/* actionUI를 통해 alert.step에 따라 동적으로 버튼/뱃지 영역 렌더링 */}
+          {actionUI}
 
           {/* 내비게이션 버튼: 중복되지 않게 한 번만 표시 */}
           <div className="text-center mt-4">

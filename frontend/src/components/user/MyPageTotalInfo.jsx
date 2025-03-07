@@ -31,7 +31,7 @@ const MyPageTotalInfo = () => {
   const handleBookmarkProjectList = async () => {
     try {
       const data = await getUserBookmarkProjectList(); // API 호출
-      console.log("✅ 북마크된 프로젝트 리스트:", data);
+      //console.log("✅ 북마크된 프로젝트 리스트:", data);
 
       // 📌 `projectTitle`을 기준으로 목록 업데이트
       const formattedProjects = data.map((item) => ({
@@ -50,7 +50,7 @@ const MyPageTotalInfo = () => {
   const handleBookmarkPortfolioList = async () =>{
     try {
       const data = await getUserBookmarkPortfolioList();
-      console.log("✅ 북마크된 포폴 리스트:", data);
+      //console.log("✅ 북마크된 포폴 리스트:", data);
       const formattedPortfolios = data.map((item) => ({
         id: item.id,
         portfolioId: item.portfolioId,
@@ -96,7 +96,7 @@ const MyPageTotalInfo = () => {
 const handleProjectAlerts = async () => {
   try {
     const data = await alertApi.getUnreadProjectAlerts();
-    console.log("✅ 프로젝트 알림 리스트:", data);
+    //console.log("✅ 프로젝트 알림 리스트:", data);
 
     // 🔥 'content' 필드만 표시하도록 변경
     const formattedAlerts = data.slice(0, 10).map(alert => ({
@@ -117,7 +117,7 @@ const handleProjectAlerts = async () => {
 const handlePortfolioAlerts = async () => {
   try {
     const data = await alertApi.getUnreadPortfolioAlerts();
-    console.log("✅ 포트폴리오 알림 리스트:", data);
+    //console.log("✅ 포트폴리오 알림 리스트:", data);
 
     // 🔥 'content' 필드만 표시하도록 변경
     const formattedAlerts = data.slice(0, 10).map(alert => ({
@@ -136,9 +136,9 @@ const handlePortfolioAlerts = async () => {
 
   useEffect(() => {
     // ✅ 유저 정보 가져오기
-    authApi.getAuthenticatedUser(1)
+    authApi.getAuthenticatedUser()
       .then((data) => {
-        console.log("✅ 부모 컴포넌트에서 받은 user 값:", data);
+        //console.log("✅ 부모 컴포넌트에서 받은 user 값:", data);
         setUser(data);
       })
       .catch(() => setAlertMessage("유저 정보를 불러오는데 실패했습니다."));
@@ -221,3 +221,6 @@ const handlePortfolioAlerts = async () => {
 };
 
 export default MyPageTotalInfo;
+
+
+//TODO UserContext 사용해서 user 정보 가져오기 유저의 정보를 그래서 중복된 로직과 코드를 줄이기

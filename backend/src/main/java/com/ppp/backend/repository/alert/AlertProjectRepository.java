@@ -3,6 +3,8 @@ package com.ppp.backend.repository.alert;
 import java.util.List;
 import java.util.Optional;
 
+import com.ppp.backend.domain.Project;
+import com.ppp.backend.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -57,6 +59,7 @@ public interface AlertProjectRepository extends JpaRepository<AlertProject, Long
     @Modifying
     @Query("DELETE FROM AlertProject a WHERE a.senderId.id = :userId OR a.receiverId.id = :userId OR a.alertOwnerId.id = :userId")
     void deleteByUserId(@Param("userId") Long userId);
+    Optional<AlertProject> findByProjectAndReceiverIdAndTypeAndStep(Project project, User receiver, AlertProject.Type type, Integer step);
 
 
 }

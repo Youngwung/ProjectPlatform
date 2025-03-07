@@ -30,7 +30,7 @@ export default function ModifyComponent({ projectId }) {
 	useEffect(() => {
 		const fetchData = async () => {
 			const data = await getOne(projectId);
-			console.log(data);
+			//console.log(data);
 			setProject(data);
 		}
 			fetchData();
@@ -42,7 +42,7 @@ export default function ModifyComponent({ projectId }) {
 			...project,
 			[name]: type === "checkbox" ? checked : value,
 		});
-		console.log(e.target.value);
+		//console.log(e.target.value);
 	};
 
 	// 모달 및 등록 요청 관련 기능 구현
@@ -56,7 +56,7 @@ export default function ModifyComponent({ projectId }) {
 	// 수정 버튼 클릭 시
 	const handleClickModify = (e) => {
 		e.preventDefault();
-		console.log(project);
+		//console.log(project);
 		setResult("Modified");
 		setShowModal(true);
 	};
@@ -64,7 +64,7 @@ export default function ModifyComponent({ projectId }) {
 	// 삭제 버튼 클릭 시
 	const handleClickDelete = (e) => {
 		e.preventDefault();
-		console.log(project);
+		//console.log(project);
 		setResult("Deleted");
 		setShowModal(true);
 	};
@@ -72,7 +72,7 @@ export default function ModifyComponent({ projectId }) {
 	// 수정 모달 "확인" 클릭 시
 	const handleModifyConfirm = () => {
 		putOne(project).then((data) => {
-			console.log("modify result: " + data.RESULT); // {RESULT: SUCCESS}
+			//console.log("modify result: " + data.RESULT); // {RESULT: SUCCESS}
 			moveToRead(project.id);
 		});
 	};
@@ -80,7 +80,7 @@ export default function ModifyComponent({ projectId }) {
 	// 삭제 모달 "확인" 클릭 시
 	const handleDeleteConfirm = (e) => {
 		deleteOne(projectId).then((data) => {
-			console.log("delete result: " + data.RESULT); // {RESULT: SUCCESS}
+			//console.log("delete result: " + data.RESULT); // {RESULT: SUCCESS}
 			moveToList();
 		});
 	};

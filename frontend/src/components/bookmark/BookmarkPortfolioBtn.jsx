@@ -18,14 +18,14 @@ export default function BookmarkPortfolioBtn({ portfolioId }) {
     const checkAuth = async () => {
       try {
         const rs = await authApi.getAuthenticatedUser(); // 🔥 사용자 정보 가져오기
-        console.log(rs);
-				if (rs === null) {
-					setIsAuthenticated(false);
-				} else {
-					setIsAuthenticated(true);
-				}
+        //console.log(rs);
+		if (rs === null) {
+			setIsAuthenticated(false);
+		} else {
+			setIsAuthenticated(true);
+		}
       } catch (error) {
-				console.log(error)
+		console.error(error)
       }
     };
     checkAuth();
@@ -37,11 +37,11 @@ export default function BookmarkPortfolioBtn({ portfolioId }) {
 				try {
 					const response = checkBookmarkPortfolio(portfolioId);
 					response.then((result) => {
-						console.log(result);
+						//console.log(result);
 						setBookmarkId(result || null);
 					});
 				} catch (error) {
-					console.log(error);
+					console.error(error);
 				}
 			}
 		checkBookmarkStatus();

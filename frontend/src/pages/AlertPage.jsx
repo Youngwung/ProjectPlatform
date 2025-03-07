@@ -9,9 +9,9 @@ const AlertPage = () => {
 
     // 초기 데이터 로드 및 상태 관리
     useEffect(() => {
-        console.log("🔔 AlertPage loaded");
+        // console.log("🔔 AlertPage loaded");
         return () => {
-            console.log("🔕 AlertPage unmounted");
+            // console.log("🔕 AlertPage unmounted");
         };
     }, []);
 

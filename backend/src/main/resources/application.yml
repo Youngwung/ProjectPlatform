@@ -108,8 +108,8 @@ spring:
     defer-datasource-initialization: true
   datasource:
     url: jdbc:mysql://localhost:3308/ppproject?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
-    username: ppproject
-    password: ppproject
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       auto-commit: true
@@ -156,5 +156,5 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
 jwt:
-  secret: c2RmajNKTEtKZHMzMktKSjIxMzMxMjEzMjEzMjMyMTJhc2Rsa2pmOTA4c2RmTEtKQVNGSjMwOUFTREZMS0o=
+  secret: ${JWT_SECRET}
 

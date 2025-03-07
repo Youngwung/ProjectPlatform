@@ -61,5 +61,7 @@ public interface AlertProjectRepository extends JpaRepository<AlertProject, Long
     void deleteByUserId(@Param("userId") Long userId);
     Optional<AlertProject> findByProjectAndReceiverIdAndTypeAndStep(Project project, User receiver, AlertProject.Type type, Integer step);
 
+    void deleteByProjectId(Long projectId);
+
 
 }

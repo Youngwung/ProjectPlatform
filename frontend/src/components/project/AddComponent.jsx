@@ -9,7 +9,7 @@ export default function AddComponent() {
 	// 기본값 설정
 	const initState = {
 		id: null,
-		userId: 0,
+		userName: "",
 		title: "",
 		skills: "",
 		description: "",

@@ -22,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 public class ProjectDTO extends BaseSkillDto{
 	private Long id;
 
-	private Long userId;
+	private String userName;
 
 	private String title;
 
@@ -34,6 +34,8 @@ public class ProjectDTO extends BaseSkillDto{
 	private String status;
 
 	private boolean isPublic;
+
+	private String email;
 
 	@ToString.Exclude
 	private LocalDateTime createdAt;

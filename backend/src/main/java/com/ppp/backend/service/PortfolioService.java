@@ -46,7 +46,7 @@ public class PortfolioService extends AbstractSkillService<UserSkill, PortfolioD
                 Page<Portfolio> result = portfolioRepository.searchString(PageRequestDTO.builder().build());
                 List<PortfolioDto> dtoList = result.get().map((portfolio) -> {
                         PortfolioDto dto = convertToDto(portfolio);
-                        String skillString = getSkill(portfolio.getId());
+                        String skillString = getSkill(portfolio.getUser().getId());
                         dto.setSkills(skillString);
                         return dto;
                 }).collect(Collectors.toList());
@@ -62,7 +62,7 @@ public class PortfolioService extends AbstractSkillService<UserSkill, PortfolioD
                 return portfolioRepository.findByTitleContainingIgnoreCase(searchTerm).stream()
                                 .map((entity) -> {
                                         PortfolioDto dto = convertToDto(entity);
-                                        dto.setSkills(getSkill(entity.getId()));
+                                        dto.setSkills(getSkill(entity.getUser().getId()));
                                         return dto;
                                 })
                                 .collect(Collectors.toList());
@@ -73,7 +73,7 @@ public class PortfolioService extends AbstractSkillService<UserSkill, PortfolioD
                 return portfolioRepository.findById(id)
                                 .map((entity) -> {
                                         PortfolioDto dto = convertToDto(entity);
-                                        dto.setSkills(getSkill(entity.getId()));
+                                        dto.setSkills(getSkill(entity.getUser().getId()));
                                         return dto;
                                 })
                                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 프로젝트를 찾을 수 없습니다."));
@@ -81,13 +81,12 @@ public class PortfolioService extends AbstractSkillService<UserSkill, PortfolioD
 
         // **4. 새 프로젝트 생성**
         public PortfolioDto createPortfolio(PortfolioDto portfolioDto, Long userId) {
-
-                portfolioDto.setUserId(userId);
-
-                Portfolio project = convertToEntity(portfolioDto);
-                Portfolio savedProject = portfolioRepository.save(project);
-                log.info("save pppp{}", savedProject);
-                return convertToDto(savedProject);
+                User user = userRepository.findById(userId).orElse(null);
+                portfolioDto.setUserName(user.getName());
+                Portfolio portfolio = convertToEntity(portfolioDto);
+                Portfolio savedPortfolio = portfolioRepository.save(portfolio);
+                log.info("save pppp{}", savedPortfolio);
+                return convertToDto(savedPortfolio);
         }
 
         // **5. 기존 프로젝트 수정**
@@ -115,7 +114,7 @@ public class PortfolioService extends AbstractSkillService<UserSkill, PortfolioD
                 // ! Portfolio List => PortfolioDTO List
                 List<PortfolioDto> dtoList = result.get().map(portfolio -> {
                         PortfolioDto dto = convertToDto(portfolio);
-                        String skillString = getSkill(portfolio.getId());
+                        String skillString = getSkill(portfolio.getUser().getId());
                         dto.setSkills(skillString);
 
                         return dto;
@@ -132,7 +131,7 @@ public class PortfolioService extends AbstractSkillService<UserSkill, PortfolioD
         private PortfolioDto convertToDto(Portfolio project) {
                 return PortfolioDto.builder()
                                 .id(project.getId())
-                                .userId(project.getUser().getId())
+                                .userName(project.getUser().getName())
                                 .title(project.getTitle())
                                 .description(project.getDescription())
                                 .createdAt(project.getCreatedAt())
@@ -142,7 +141,8 @@ public class PortfolioService extends AbstractSkillService<UserSkill, PortfolioD
 
         // **DTO -> Entity 변환**
         private Portfolio convertToEntity(PortfolioDto dto) {
-                User user = userRepository.findById(dto.getUserId())
+                log.info("email = {}", dto.getEmail());
+                User user = userRepository.findByEmail(dto.getEmail())
                                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 유저를 찾을 수 없습니다."));
 
                 return Portfolio.builder()
@@ -170,6 +170,12 @@ public class PortfolioService extends AbstractSkillService<UserSkill, PortfolioD
                 return portfolios.stream()
                         .map(this::convertToDto)
                         .collect(Collectors.toList());
+        }
+
+        public boolean checkPortfolioWriter(Long userId, Long portfolioId) {
+                log.info("portfolioId = {}, userId = {}", portfolioId, userId);
+                Long writer = portfolioRepository.findById(portfolioId).orElseThrow().getUser().getId();
+                return userId == writer;
         }
 
 }

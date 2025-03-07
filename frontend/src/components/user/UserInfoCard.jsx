@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button, ListGroup, Badge, Spinner } from "react-bootstrap";
-import { FaUserEdit, FaLock } from "react-icons/fa";
+import { Badge, Button, Card, ListGroup, Spinner } from "react-bootstrap";
+import { FaLock, FaUserEdit } from "react-icons/fa";
 import authApi from "../../api/authApi";
+import SkillTagComponent from "../skill/SkillTagComponent";
 import EditInfoModal from "./EditInfoModal";
 import PasswordModal from "./PasswordModal";
 
@@ -107,15 +108,7 @@ const UserInfoCard = () => {
               </ListGroup.Item>
               <ListGroup.Item>
                 <strong>기술 스택:</strong>{" "}
-                {user.techStack && user.techStack.length > 0 ? (
-                  user.techStack.map((tech, index) => (
-                    <Badge key={index} bg="primary" className="me-1">
-                      {tech}
-                    </Badge>
-                  ))
-                ) : (
-                  "등록된 기술 스택 없음"
-                )}
+                <SkillTagComponent skills={user.skills} />
               </ListGroup.Item>
               <ListGroup.Item>
               <strong>사용자 링크:</strong>{" "}

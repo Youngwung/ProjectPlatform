@@ -1,9 +1,9 @@
 package com.ppp.backend.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,8 +19,11 @@ import com.ppp.backend.dto.ProjectDTO;
 import com.ppp.backend.service.ProjectService;
 import com.ppp.backend.util.AuthUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+
 
 /**
  * ProjectController는 프로젝트 관련 API를 제공함.
@@ -100,9 +103,10 @@ public class ProjectController {
 			log.error("❌ 쿠키에서 userId를 가져오지 못했음");
 			return Map.of("projectId", -1L);
 		}
-		dto.setUserId(userId);
+		String email = authUtil.extractEmailFromCookie(request);
+		dto.setEmail(email);
 		log.info("register() dto = {}", dto);
-		Long projectId = projectService.register(dto);
+		Long projectId = projectService.register(dto, userId);
 		return Map.of("projectId", projectId);
 	}
 
@@ -127,7 +131,6 @@ public class ProjectController {
 			log.error("❌ 쿠키에서 userId를 가져오지 못했음");
 			return Map.of("projectId", "FAIL");
 		}
-		dto.setUserId(userId);
 		log.info("modify() dto = {}", dto);
 		dto.setId(projectId);
 		projectService.modify(dto);
@@ -163,4 +166,20 @@ public class ProjectController {
 		log.info("✅ [GET] /api/project/my - 내 프로젝트 조회 요청");
 		return projectService.getMyProjects(request);
 	}
+
+	@GetMapping("/main")
+	public List<ProjectDTO> getListForMain() {
+		PageRequestDTO pageDto = PageRequestDTO.builder().page(1).size(8).sortOption("popularity").query("").querySkills(new ArrayList<String>()).build();
+		List<ProjectDTO> result = projectService.getSearchResult(pageDto).getDtoList();
+		return result;
+	}
+
+	@GetMapping("/checkWriter/{projectId}")
+	public boolean checkWriter(HttpServletRequest request, @PathVariable(name = "projectId") Long projectId) {
+		Long userId = authUtil.extractUserIdFromCookie(request);
+		
+		return projectService.checkWriter(userId, projectId);
+	}
+	
+	
 }

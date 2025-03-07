@@ -1,5 +1,6 @@
 package com.ppp.backend.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+
 @RestController
 @RequestMapping("/api/portfolio")
 @RequiredArgsConstructor
@@ -42,6 +44,7 @@ public class PortfolioApiController {
         log.info("프로젝트 전체조회 요청: {}", projectList);
         return ResponseEntity.ok(projectList);
     }
+
     // **2. 특정 사용자 포폴 조회(GET)**
     @GetMapping("/my")
     public ResponseEntity<List<PortfolioDto>> getMyPortfolios(HttpServletRequest request) {
@@ -75,12 +78,14 @@ public class PortfolioApiController {
         }
 
         Long userId = userDetails.getUserId();
+        String email = userDetails.getUsername();
+        portfolioDto.setEmail(email);
         // ✅ JWT에서 `userId` 추출하여 자동 설정
         log.info("userDetails: {}", userDetails);
         String userName = userDetails.getUsername();
         log.info("userName유저 이름: {}", userName);
 
-        PortfolioDto createdProject = portfolioService.createPortfolio(portfolioDto,userId);
+        PortfolioDto createdProject = portfolioService.createPortfolio(portfolioDto, userId);
         return ResponseEntity.ok(createdProject);
     }
 
@@ -88,8 +93,7 @@ public class PortfolioApiController {
     @PutMapping("/{id}")
     public ResponseEntity<PortfolioDto> updatePortfolio(
             @PathVariable(name = "id") Long id,
-            @RequestBody PortfolioDto PortfolioDto
-    ) {
+            @RequestBody PortfolioDto PortfolioDto) {
         log.info("포폴 수정 요청: ID={}, Data={}", id, PortfolioDto);
         PortfolioDto updatedProject = portfolioService.updatePortfolio(id, PortfolioDto);
         return ResponseEntity.ok(updatedProject);
@@ -108,5 +112,21 @@ public class PortfolioApiController {
         log.info("Request = {}", pageRequestDTO);
         return portfolioService.getSearchResult(pageRequestDTO);
     }
+
+    @GetMapping("/main")
+    public List<PortfolioDto> getListForMain() {
+        PageRequestDTO pageDto = PageRequestDTO.builder().page(1).size(8).sortOption("popularity").query("")
+                .querySkills(new ArrayList<String>()).build();
+        List<PortfolioDto> result = portfolioService.getSearchResult(pageDto).getDtoList();
+        return result;
+    }
+
+    @GetMapping("/checkPortfolioWriter/{portfolioId}")
+    public boolean checkPortfolioWriter(HttpServletRequest request, @PathVariable(name = "portfolioId") Long portfolioId) {
+        Long userId = authUtil.extractUserIdFromCookie(request);
+
+        return portfolioService.checkPortfolioWriter(userId, portfolioId);
+    }
     
+
 }

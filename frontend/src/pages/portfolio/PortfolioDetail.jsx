@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Alert, Button, Card, Container, Spinner, Modal, Form } from "react-bootstrap";
+import { Alert, Button, Card, Container, Form, Modal, Spinner } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import portfolioApi from "../../api/portfolioApi";
-import BookmarkPortfolioBtn from "../../components/bookmark/BookmarkPortfolioBtn";
-import { getMyProjects } from "../../api/projectApi"; // 내가 만든 프로젝트 목록을 가져올 API
 import alertApi from "../../api/alertApi"; // 프로젝트 초대 API 호출
+import portfolioApi from "../../api/portfolioApi";
+import { getMyProjects } from "../../api/projectApi"; // 내가 만든 프로젝트 목록을 가져올 API
+import BookmarkPortfolioBtn from "../../components/bookmark/BookmarkPortfolioBtn";
 import SkillTagComponent from "../../components/skill/SkillTagComponent";
 import SkillTagGuideComponent from "../../components/skill/SkillTagGuideComponent";
 import { AlertContext } from "../../context/AlertContext";
@@ -18,7 +18,7 @@ const PortfolioDetail = () => {
     id: null,
     title: "",
     description: "",
-    userId: null,
+    userName: "",
     links: "",
     createdAt: "",
     updatedAt: "",
@@ -37,8 +37,8 @@ const PortfolioDetail = () => {
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [inviting, setInviting] = useState(false);
 
-  // 현재 로그인한 사용자 ID (임시로 localStorage 사용)
-  const currentUserId = Number(localStorage.getItem("currentUserId"));
+  // 작성자인 지 확인하는 api 호출 결과를 저장할 변수 선언
+  const [isWriter, setIsWriter] = useState(false);
 
   useEffect(() => {
     if (!portfolioId) {
@@ -65,7 +65,17 @@ const PortfolioDetail = () => {
       }
     };
 
+    const checkPortfolioWriter = async () => {
+      try {
+        const data = await portfolioApi.checkPortfolioWriter(portfolioId);
+        setIsWriter(data);
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
     fetchPortfolio();
+    checkPortfolioWriter();
   }, [portfolioId]);
 
   // 내 프로젝트 목록 가져오기
@@ -81,10 +91,10 @@ const PortfolioDetail = () => {
 
   // 초대 버튼 클릭 시 모달 열기 (자신의 포트폴리오는 초대 불가)
   const handleOpenInviteModal = () => {
-    if (portfolio.userId === currentUserId) {
-      alert("자신의 포트폴리오는 초대할 수 없습니다.");
-      return;
-    }
+    // if (portfolio.userId === currentUserId) {
+    //   alert("자신의 포트폴리오는 초대할 수 없습니다.");
+    //   return;
+    // }
     setShowInviteModal(true);
     fetchMyProjects();
   };
@@ -135,6 +145,7 @@ const PortfolioDetail = () => {
       setLoading(false);
     }
   };
+  
 
   if (loading) {
     return (
@@ -179,20 +190,26 @@ const PortfolioDetail = () => {
           )}
           <Button
             variant="primary"
+            hidden={!isWriter}
             onClick={() =>
               navigate(`/portfolio/modify/${portfolioId}`, { state: { portfolio } })
             }
           >
             수정
           </Button>
-          <Button variant="danger" className="ms-2" onClick={handleDelete}>
+          <Button 
+            variant="danger" 
+            className="ms-2" 
+            onClick={handleDelete}
+            hidden={!isWriter}
+          >
             삭제
           </Button>
-          {portfolio.userId !== currentUserId && (
+          {/* {portfolio.userId !== currentUserId && ( */}
             <Button variant="success" className="ms-2" onClick={handleOpenInviteModal}>
               초대하기
             </Button>
-          )}
+          {/* )} */}
         </Card.Body>
       </Card>
       <Link to="/portfolio/list">

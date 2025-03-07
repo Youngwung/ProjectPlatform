@@ -149,10 +149,9 @@ CREATE TABLE `alert_project` (
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE project_members (
-	id bigint NOT NULL AUTO_INCREMENT,
 	project_id bigint NOT NULL,
 	user_id bigint NOT NULL,
-	PRIMARY KEY (`id`)
+	PRIMARY KEY (`project_id`)
 );
 
 CREATE TABLE project_applications (

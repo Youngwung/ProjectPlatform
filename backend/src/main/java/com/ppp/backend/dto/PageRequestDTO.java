@@ -23,6 +23,11 @@ public class PageRequestDTO {
 
 	private List<String> querySkills;
 
-	private String type;
+	@Builder.Default
+	private String type = "all";
+
+	@Builder.Default
+	// 관련도순: relevance, 인기순: popularity
+	private String sortOption = "relevance";
 
 }

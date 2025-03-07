@@ -12,11 +12,12 @@ import {
 	OverlayTrigger,
 	Tooltip,
 } from "react-bootstrap";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import authApi from "../api/authApi";
 import userApi from "../api/userApi";
 
 const Signup = () => {
+	const navigate = useNavigate();
 	const [queryParams] = useSearchParams();
 	const [errorMsg, setErrorMsg] = useState("");
 	const [isPasswordValid, setIsPasswordValid] = useState(true);
@@ -157,7 +158,7 @@ const Signup = () => {
 				providerName,
 			});
 			alert("회원가입이 완료되었습니다.");
-			window.location.href = "/login";
+			navigate("/login");
 		} catch (error) {
 			alert("회원가입 중 오류가 발생했습니다.");
 		}

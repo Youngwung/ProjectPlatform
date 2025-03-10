@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { FcGoogle } from "react-icons/fc";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import AuthApi from "../api/authApi";
 
 const Login = () => {
-	const navigate = useNavigate();
+	
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
@@ -29,10 +29,10 @@ const Login = () => {
 					// console.log("로그인아이디:" + email + "로그인비번" + password);
 					if (redirectUrl) {
 						// 리다이렉트 url이 존재하는 경우 해당 url로 이동
-						navigate({pathname: redirectUrl})
+						window.location.href = `${redirectUrl}`
 					} else {
 						// 아닌 경우 홈페이지로 이동
-						navigate({pathname: "/"})
+						window.location.href = '/';
 					}
 				} else {
 					//401 에러일때
@@ -48,7 +48,7 @@ const Login = () => {
 
 	// 소셜 로그인 구현을 위한 코드
 	const handleLogin = (provider) => {
-		const oauth2URL = `http://localhost:8080/oauth2/authorization/${provider}`;
+		const oauth2URL = `${process.env.REACT_APP_API_URL}/oauth2/authorization/${provider}`;
 		//console.log(oauth2URL);
 
 		window.location.href = oauth2URL;

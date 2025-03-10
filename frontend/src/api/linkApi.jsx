@@ -1,8 +1,7 @@
 import axios from "axios";
 
-export const API_URL = "http://localhost:8080";
-const linkPrefix = `${API_URL}/api/link`;
-const linkTypePrefix = `${API_URL}/api/linkType`;
+const linkPrefix = `${process.env.REACT_APP_API_URL}/api/link`;
+const linkTypePrefix = `${process.env.REACT_APP_API_URL}/api/linkType`;
 
 const linkApi = {
   getAllLinks: async () => {

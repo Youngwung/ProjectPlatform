@@ -1,8 +1,7 @@
 import axios from "axios";
 
 // API 기본 URL 설정
-export const API_URL = "http://localhost:8080";
-const prefix = `${API_URL}/api/portfolio`;
+const prefix = `${process.env.REACT_APP_API_URL}/api/portfolio`;
 // Axios 인스턴스 생성 (쿠키 포함)
 const axiosInstance = axios.create({
 	baseURL: prefix,

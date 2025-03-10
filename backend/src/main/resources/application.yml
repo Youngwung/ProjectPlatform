@@ -33,7 +33,7 @@ spring:
     defer-datasource-initialization: true
   datasource:
     # DB URL은 docker 환경에 맞게 지정
-    url: jdbc:mysql://mysql-container:3306/ppproject?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    url: ${DB_URL_DOCKER}
     # username과 password를 .env 파일에서 주입받습니다.
     username: ${DB_USERNAME}       # 예: ppproject
     password: ${DB_PASSWORD}       # 예: ppproject
@@ -60,7 +60,7 @@ spring:
             client-secret: ${NAVER_CLIENT_SECRET}
             client-name: Naver
             authorization-grant-type: authorization_code
-            redirect-uri: "http://localhost:8080/login/oauth2/code/{registrationId}"
+            redirect-uri: ${SERVER_URL}/login/oauth2/code/{registrationId}
             scope:
               - name
               - email
@@ -69,7 +69,7 @@ spring:
             client-secret: ${KAKAO_CLIENT_SECRET}
             client-name: Kakao
             authorization-grant-type: authorization_code
-            redirect-uri: "http://localhost:8080/login/oauth2/code/{registrationId}"
+            redirect-uri: ${SERVER_URL}/login/oauth2/code/{registrationId}
             scope:
               - nickname
         provider:
@@ -116,7 +116,7 @@ spring:
     defer-datasource-initialization: true
   datasource:
     # local 환경에 맞는 DB URL 설정
-    url: jdbc:mysql://localhost:3308/ppproject?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    url: ${DB_URL_LOCAL}
     # local 프로파일에서도 DB 사용자 정보는 환경 변수로 관리합니다.
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
@@ -142,7 +142,7 @@ spring:
             client-secret: ${NAVER_CLIENT_SECRET}
             client-name: Naver
             authorization-grant-type: authorization_code
-            redirect-uri: "http://localhost:8080/login/oauth2/code/naver"
+            redirect-uri: ${SERVER_URL}/login/oauth2/code/naver
             scope:
               - email
               - name
@@ -151,7 +151,7 @@ spring:
             client-secret: ${KAKAO_CLIENT_SECRET}
             client-name: Kakao
             authorization-grant-type: authorization_code
-            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            redirect-uri: ${SERVER_URL}/login/oauth2/code/kakao
             client-authentication-method: client_secret_post
             scope:
               - profile_nickname

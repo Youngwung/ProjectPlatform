@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const AlertPortfolioApiUrl = 'http://localhost:8080/api/alert/portfolio';
-const AlertProjectApiUrl = 'http://localhost:8080/api/alert/project';
+const AlertPortfolioApiUrl = `${process.env.REACT_APP_API_URL}/api/alert/portfolio`;
+const AlertProjectApiUrl = `${process.env.REACT_APP_API_URL}/api/alert/project`;
 
 const alertApi = {
   /** 🔹 유저의 모든 포트폴리오 알림 조회 */

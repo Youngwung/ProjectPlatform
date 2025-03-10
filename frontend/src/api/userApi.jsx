@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-export const API_URL = 'http://localhost:8080';
-const prefix = `${API_URL}/api/user`;
+const prefix = `${process.env.REACT_APP_API_URL}/api/user`;
 
 const userApi = {
     getAllUsers: async () => {

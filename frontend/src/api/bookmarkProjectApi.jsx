@@ -3,10 +3,8 @@
 
 import axios from "axios";
 
-// TODO: .env 파일로 서버 주소 비공개 처리
-export const API_SERVER_HOST = "http://localhost:8080";
-const projectPrefix = `${API_SERVER_HOST}/api/bookmark/project`;
-const portfolioPrefix = `${API_SERVER_HOST}/api/bookmark/portfolio`;
+const projectPrefix = `${process.env.REACT_APP_API_URL}/api/bookmark/project`;
+const portfolioPrefix = `${process.env.REACT_APP_API_URL}/api/bookmark/portfolio`;
 
 const axiosInstance = axios.create({
 	baseURL: portfolioPrefix,

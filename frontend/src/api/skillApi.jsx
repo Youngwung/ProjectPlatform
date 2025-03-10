@@ -1,8 +1,6 @@
 import axios from "axios";
 
-// TODO: .env 파일로 서버 주소 비공개 처리
-export const API_SERVER_HOST = 'http://localhost:8080'
-const prefix = `${API_SERVER_HOST}/api/skill`
+const prefix = `${process.env.REACT_APP_API_URL}/api/skill`
 const axiosInstance = axios.create({
   baseURL: prefix,
   withCredentials: true, // ✅ 쿠키 자동 포함

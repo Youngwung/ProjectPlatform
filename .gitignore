@@ -208,3 +208,4 @@ backend/.vscode/launch.json
 /node_modules
 frontend.code-workspace
 backend/.env
+frontend/.env

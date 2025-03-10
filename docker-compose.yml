@@ -9,9 +9,9 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      #SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3308/ppproject?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: ppproject
-      SPRING_DATASOURCE_PASSWORD: ppproject
+      SPRING_DATASOURCE_URL: ${DOCK_DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${DOCK_DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DOCK_DB_PASSWORD}
     volumes:
       - ./backend:/app
       - ~/.m2:/root/.m2
@@ -42,8 +42,10 @@ services:
     ports:
       - "3308:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: ppproject
+      MYSQL_ROOT_PASSWORD: ${DOCK_DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DOCK_DB_SCHEMA}
+      MYSQL_USER: ${DOCK_DB_USERNAME}
+      MYSQL_PASSWORD: ${DOCK_DB_PASSWORD}
       TZ: Asia/Seoul
     volumes:
       - mysql-data:/var/lib/mysql

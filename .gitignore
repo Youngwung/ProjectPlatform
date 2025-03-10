@@ -209,3 +209,4 @@ backend/.vscode/launch.json
 frontend.code-workspace
 backend/.env
 frontend/.env
+.env

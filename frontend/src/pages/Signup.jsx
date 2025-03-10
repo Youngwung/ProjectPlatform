@@ -22,6 +22,12 @@ const Signup = () => {
 	const [errorMsg, setErrorMsg] = useState("");
 	const [isPasswordValid, setIsPasswordValid] = useState(true);
 	const [isConfirmedEmail, setIsConfirmedEmail] = useState(false)
+	const [tokenData, setTokenData] = useState({
+		email: "",
+		name:""
+	});
+
+
 	// 입력값을 useState로 관리
 	const [formData, setFormData] = useState({
 		name: "",
@@ -41,7 +47,13 @@ const Signup = () => {
 			//console.log(decoded);
 			//console.log(decoded.sub);
 			
-			
+			setTokenData({
+				email: decoded.sub,
+				name: decoded.name,
+			});
+			if (decoded.sub) {
+				setIsConfirmedEmail(true);
+			}
 			setFormData((prevData) => ({
 				...prevData,
 				email: decoded.sub,
@@ -177,9 +189,10 @@ const Signup = () => {
 									<Form.Label>이름</Form.Label>
 									<Form.Control
 										type="text"
+										placeholder="이름을 입력해주세요"
 										value={formData.name}
 										onChange={handleInputChange}
-										readOnly = {formData.providerName !== "local"}
+										readOnly = {tokenData.name !== ""}
 									/>
 								</Form.Group>
 
@@ -191,11 +204,12 @@ const Signup = () => {
 											placeholder="이메일을 입력해주세요"
 											value={formData.email}
 											onChange={handleInputChange}
-											required = {formData.email !== ''}
+											required = {tokenData.email ===""}
+											//TODO : 소셜 로그인 이메일 수정 불가 로컬 수정가능하게
 											// readOnly={!!formData.providerName && formData.providerName !== "local"} // 소셜 로그인 이메일 수정 불가
-											readOnly={formData.email === ''} // 소셜 로그인 이메일 수정 불가
+											readOnly={tokenData.email !==""} // 소셜 로그인 이메일 수정 불가
 										/>
-										<Button variant="secondary" onClick={handleDuplicate} disabled={!!formData.providerName && formData.providerName !== "local"}>
+										<Button variant="secondary" onClick={handleDuplicate} hidden={tokenData.email}>
 											중복확인
 										</Button>
 									</InputGroup>

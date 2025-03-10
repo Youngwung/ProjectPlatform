@@ -107,7 +107,7 @@ const PortfolioDetail = () => {
     }
     try {
       setInviting(true);
-      await alertApi.inviteToProject(selectedProjectId, portfolio.userId);
+      await alertApi.inviteToProject(selectedProjectId, portfolio.userId, portfolioId);
       alert("초대가 성공적으로 전송되었습니다.");
       setTimeout(async () => {
 				await refreshAlerts();

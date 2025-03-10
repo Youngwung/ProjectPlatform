@@ -128,9 +128,9 @@ const alertApi = {
   },
 
   /** 🔹 프로젝트 초대 API */
-  inviteToProject: async (projectId, inviteeId) => {
+  inviteToProject: async (projectId, inviteeId,portfolioId) => {
     try {
-      await axios.post(`${AlertProjectApiUrl}/${projectId}/invite/${inviteeId}`, null, { withCredentials: true });
+      await axios.post(`${AlertProjectApiUrl}/${projectId}/invite/${inviteeId}/${portfolioId}`, null, { withCredentials: true });
       //console.log("🟢 프로젝트 초대 전송 완료");
     } catch (error) {
       console.error("🚨 프로젝트 초대 실패:", error);

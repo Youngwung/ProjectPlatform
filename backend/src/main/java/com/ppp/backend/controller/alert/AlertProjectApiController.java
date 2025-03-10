@@ -101,9 +101,9 @@ public class AlertProjectApiController {
     }
 
     // 🔸 프로젝트 초대 API
-    @PostMapping("/{projectId}/invite/{inviteeId}")
-    public ResponseEntity<Void> inviteToProject(@PathVariable(name="projectId") Long projectId, @PathVariable(name = "inviteeId") Long inviteeId, HttpServletRequest request) {
-        alertProjectService.inviteToProject(projectId, inviteeId, request);
+    @PostMapping("/{projectId}/invite/{inviteeId}/{portfolioId}")
+    public ResponseEntity<Void> inviteToProject(@PathVariable(name="projectId") Long projectId, @PathVariable(name = "inviteeId") Long inviteeId, @PathVariable(name= "portfolioId") Long portfolioId ,HttpServletRequest request) {
+        alertProjectService.inviteToProject(projectId, inviteeId, portfolioId,request);
         return ResponseEntity.ok().build();
     }
 

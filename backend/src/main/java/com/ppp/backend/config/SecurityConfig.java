@@ -73,7 +73,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/project/*").authenticated() // ✅ 프로젝트 삭제(DELETE) 인증 필요
                         .requestMatchers(HttpMethod.PUT, "/api/user/list/*").authenticated() // ✅ 프로젝트 수정(PUT) 인증 필요
                         .requestMatchers(HttpMethod.DELETE, "/api/user/list/*").authenticated() // ✅ 프로젝트 삭제(DELETE) 인증
-                                                                                                // 필요
                         .anyRequest().permitAll() // ✅ 나머지 모든 요청은 허용
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // ✅ 세션을

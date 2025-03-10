@@ -7,7 +7,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ppp.backend.domain.Portfolio;
+import com.ppp.backend.domain.PortfolioInvitation;
 import com.ppp.backend.domain.Project;
+import com.ppp.backend.domain.ProjectApplication;
 import com.ppp.backend.domain.User;
 import com.ppp.backend.domain.alert.AlertProject;
 import com.ppp.backend.dto.LinkDto;
@@ -15,6 +18,8 @@ import com.ppp.backend.dto.ProjectDTO;
 import com.ppp.backend.dto.UserDto;
 import com.ppp.backend.dto.alert.AlertProjectDto;
 import com.ppp.backend.repository.LinkRepository;
+import com.ppp.backend.repository.PortfolioInvitationRepository;
+import com.ppp.backend.repository.ProjectApplicationRepository;
 import com.ppp.backend.repository.ProjectRepository;
 import com.ppp.backend.repository.ProjectTypeRepository;
 import com.ppp.backend.repository.UserRepository;
@@ -40,6 +45,8 @@ public class AlertProjectService {
     private final LinkRepository linkRepository;
     // private final LinkTypeRepository linkTypeRepository; // 사용하지 않음 (추후 삭제 가능)
     private final AuthUtil authUtil;
+    private final ProjectApplicationRepository projectApplicationRepo;
+    private final PortfolioInvitationRepository portfolioInvitationRepository;
 
     // ==================== 조회 관련 메서드 ====================
     /**
@@ -220,6 +227,20 @@ public class AlertProjectService {
                 .build();
         alertProjectRepository.save(alertForApplicant);
         log.info("✅ [applyProject] 신청자 알림 생성 완료, alert ID: {}", alertForApplicant.getId());
+
+         // 프로젝트에 해당하는 인기도 증가(노출 카운트)
+         ProjectApplication projectApp = projectApplicationRepo.findById(project.getId()).orElse(null);
+
+         if (projectApp == null) {
+                 // 원래 값이 없으면 조회수 1로 생성
+                 projectApp = ProjectApplication.builder().id(project.getId()).counts(1L).build();
+                 projectApplicationRepo.save(projectApp);
+         } else {
+                 // 원래 값이 있으면 조회수 +1
+                 Long counts = projectApp.getCounts() + 1L;
+                 projectApp = ProjectApplication.builder().id(project.getId()).counts(counts).build();
+                 projectApplicationRepo.save(projectApp);
+         }
     }
 
     /**
@@ -232,7 +253,7 @@ public class AlertProjectService {
      * @throws EntityNotFoundException 프로젝트 또는 사용자 정보를 찾을 수 없을 경우 예외 발생
      * @throws IllegalStateException    초대 요청자가 프로젝트 소유자가 아닐 경우 예외 발생
      */
-    public void inviteToProject(Long projectId, Long inviteeId, HttpServletRequest request) {
+    public void inviteToProject(Long projectId, Long inviteeId, Long portfolioId,HttpServletRequest request) {
         Long inviterId = extractUserIdOrThrow(request);
         log.info("✅ [inviteToProject] 초대 요청자 ID: {}, 프로젝트 ID: {}", inviterId, projectId);
 
@@ -276,6 +297,19 @@ public class AlertProjectService {
                 .build();
         alertProjectRepository.save(alertForInviter);
         log.info("✅ [inviteToProject] 초대 전송 확인 알림 생성 완료, alert ID: {}", alertForInviter.getId());
+
+        // 포트폴리오에 해당하는 인기도 증가(노출 카운트)
+        PortfolioInvitation portfolioInv = portfolioInvitationRepository.findById(portfolioId).orElse(null);
+        if(portfolioInv == null){
+            // 원래 값이 없으면 조회수 1로 생성
+            portfolioInv = PortfolioInvitation.builder().id(portfolioId).counts(1L).build();
+            portfolioInvitationRepository.save(portfolioInv);
+        } else {
+            // 원래 값이 있으면 조회수 +1
+            Long counts = portfolioInv.getCounts() + 1L;
+            portfolioInv = PortfolioInvitation.builder().id(portfolioId).counts(counts).build();
+            portfolioInvitationRepository.save(portfolioInv);
+        }
     }
 
     /**

@@ -3,7 +3,7 @@ import { Container, Nav, Navbar, OverlayTrigger, Tooltip } from 'react-bootstrap
 import { FaUser } from "react-icons/fa"; // 🔹 react-icons에서 가져옴
 import { Link, useNavigate } from 'react-router-dom';
 import AuthApi from '../api/authApi';
-
+import AlertBtn from '../components/alert/AlertBtn';
 const Top = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userName, setUsername] = useState('21332112');
@@ -76,7 +76,7 @@ const Top = () => {
                       <FaUser size={20} />
                     </Nav.Link>
                   </OverlayTrigger>
-
+                  <AlertBtn/>
                   {/* 🔹 로그아웃 버튼 */}
                   <Nav.Link onClick={handleLogout} style={{ cursor: 'pointer', marginLeft: '15px' }}>로그아웃</Nav.Link>
                 </>

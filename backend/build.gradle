@@ -24,43 +24,71 @@ repositories {
 }
 
 dependencies {
+	// ✅ Spring Boot 기본 설정
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	// ✅ Lombok
 	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	implementation 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	// Querydsl -------------
-	// dependency-management가 관리해주지 못하는 의존성: 버전번호를 직접 써주어야함.
+	// ✅ QueryDSL (중복 의존성 제거 및 JPA 의존성 명확히 추가)
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 	annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
-	annotationProcessor 'jakarta.annotation:jakarta.annotation-api' // 얘는 의존성관리자가 관리해줌. 버전번호 안써도 됨
-	annotationProcessor 'jakarta.persistence:jakarta.persistence-api' // 얘도 의존성 관리자가 관리해줌.
-	// ----------------------
+
+	// ✅ JPA 관련 의존성 추가 (jakarta.persistence 충돌 방지)
+	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+
+	// ✅ JWT 관련 의존성
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	// OAuth 의존성
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
-}
-
-	// Querydsl 관련 빌드 옵션: java-build path에 추가하는 과정을 자동으로 해줌. -----
-def querydslDir = "$buildDir/generated/querydsl"
+// ✅ QueryDSL 관련 빌드 설정
+def querydslMainDir = "$buildDir/generated/sources/annotationProcessor/java/main"
+def querydslTestDir = "$buildDir/generated/sources/annotationProcessor/java/test"
 
 sourceSets {
-    main.java.srcDirs += [ querydslDir ]
+	main {
+		java {
+			srcDirs += querydslMainDir
+		}
+	}
+	test {
+		java {
+			srcDirs += querydslTestDir
+		}
+	}
 }
 
-// annotationProcessor를 할 때 사용할 폴더를 지정해주는 설정.
-tasks.withType(JavaCompile) {
-    options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
+tasks.withType(JavaCompile).configureEach {
+	if (name.toLowerCase().contains('test')) {
+		options.annotationProcessorGeneratedSourcesDirectory = file(querydslTestDir)
+	} else {
+		options.annotationProcessorGeneratedSourcesDirectory = file(querydslMainDir)
+	}
 }
 
-// clean할 때 아래 설정한 폴더를 지우도록 하는 설정
+// ✅ clean 시 QueryDSL 생성된 파일 삭제
 clean.doLast {
-    file(querydslDir).deleteDir()
+	// 메인용 Q파일 디렉토리 삭제
+	delete file(querydslMainDir)
+	// 테스트용 Q파일 디렉토리 삭제
+	delete file(querydslTestDir)
+	// 혹시 남아 있을 수 있는 src/main/generated 폴더도 삭제
+	delete file("src/main/generated")
 }

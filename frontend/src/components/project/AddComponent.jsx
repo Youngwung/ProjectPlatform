@@ -8,21 +8,22 @@ import ModalComponent from "./ModalComponent";
 export default function AddComponent() {
 	// 기본값 설정
 	const initState = {
-		projectId: 0,
-		userId: 0,
+		id: null,
+		userName: "",
 		title: "",
 		skills: "",
 		description: "",
+		type: "all",
 		maxPeople: 0,
 		status: "모집_중",
-		public: false,
+		public: true,
 	};
-	const [joinProject, setJoinProject] = useState({ ...initState });
+	const [project, setProject] = useState({ ...initState });
 
 	const handleChange = (e) => {
 		const { name, value, type, checked } = e.target;
-		setJoinProject({
-			...joinProject,
+		setProject({
+			...project,
 			[name]: type === "checkbox" ? checked : value,
 		});
 	};
@@ -43,61 +44,83 @@ export default function AddComponent() {
 	};
 
 	const handleConfirm = () => {
-		postAdd(joinProject).then((result) => {
-			console.log(result);
-			console.log(joinProject);
+		postAdd(project).then((result) => {
+			// console.log(result);
+			// console.log(project);
 			// 기존 인풋 입력값 초기화
-			setJoinProject({ ...initState });
+			setProject({ ...initState });
 			moveToList();
 		});
 	};
 
-	// TODO: userId를 가져오는 로직 추가
-	const [userId, setUserId] = useState(0);
-	useEffect(() => {
-		setUserId(localStorage.getItem("userId"));
-		if (userId) {
-			setJoinProject({ ...initState, userId: userId });
-		} else {
-			// 원래는 아무 기능을 하지 않아야 하지만 개발 당시 로그인 기능을 구현하지 않았으므로 강제로 userId = 1을 주입
-			setJoinProject({ ...initState, userId: 1 });
-		}
-	}, [userId]);
+	// 통합 유효성 검사 state 선언
+	const [validation, setValidation] = useState({
+		skill: false,
+	});
 
-	// 스킬 입력 컴포넌트 불러오기 위한 변수
-	const [validSkill, setValidSkill] = useState(false);
-
+	// 스킬 Input 컴포넌트로부터 데이터 불러오기
 	const handleValidationComplete = useCallback(({ isValid, value }) => {
+		setValidation((prev) => ({
+			...prev,
+			skill: isValid,
+		}));
+
 		if (isValid) {
-			// 스킬 유효성 검사 통과
-			setValidSkill(true);
-			// joinProject 업데이트
-			setJoinProject(prev => ({
+			setProject((prev) => ({
 				...prev,
-				skills: value
-			}))
-		} else {
-			// 등록 버튼 비활성화
-			setValidSkill(false);
+				skills: value,
+			}));
 		}
 	}, []);
+
+	// 콤보박스 변수 추적 로직
+	const handleTypeChange = (e) => {
+		const newType = e.target.value;
+
+		setValidation((prev) => ({
+			...prev,
+			skill: newType === "content", // type이 "content"이면 skill 유효성 검사 통과
+		}));
+		setProject({ ...project, type: newType });
+	};
+
+	// 통합 유효성 검사 state 선언
+	useEffect(() => {
+		setOnButton(validation.skill);
+	}, [validation]);
+
 	const [onButton, setOnButton] = useState(false);
 
 	useEffect(() => {
-		setOnButton(validSkill);
-	}, [validSkill]);
+			setOnButton(validation.skill);
+		}, [validation]);
 
 	return (
 		<div>
 			<Form onSubmit={handleSubmit}>
+				<Form.Group controlId="formDescription" className="mb-4">
+					<Form.Label>프로젝트 유형 설정</Form.Label>
+					<Form.Select
+						name="type"
+						aria-label="Default select example"
+						value={project.type}
+						onChange={handleTypeChange}
+					>
+						<option value="all">모두 설정됨 (기본값)</option>
+						<option value="content">주제만 설정됨</option>
+						<option value="skill">사용 기술 스택만 설정됨</option>
+					</Form.Select>
+				</Form.Group>
+
 				<Form.Group controlId="formTitle">
 					<Form.Label>프로젝트 제목</Form.Label>
 					<Form.Control
 						type="text"
 						name="title"
-						value={joinProject.title}
+						value={project.title}
 						onChange={handleChange}
 						placeholder="프로젝트 제목을 입력하세요"
+						required
 					/>
 				</Form.Group>
 
@@ -106,15 +129,19 @@ export default function AddComponent() {
 					<Form.Control
 						as="textarea"
 						name="description"
-						value={joinProject.description}
+						value={project.description}
 						onChange={handleChange}
 						rows={3}
 						placeholder="프로젝트 설명을 입력하세요"
+						required
 					/>
 				</Form.Group>
 
 				{/* 스킬 Input 컴포넌트 불러오기 */}
-				<InputSkillComponent onValidationComplete={handleValidationComplete} />
+				<InputSkillComponent
+					onValidationComplete={handleValidationComplete}
+					disabled={project.type === "content"}
+				/>
 
 				<Row>
 					<Col>
@@ -123,7 +150,7 @@ export default function AddComponent() {
 							<Form.Control
 								type="number"
 								name="maxPeople"
-								value={joinProject.maxPeople}
+								value={project.maxPeople}
 								onChange={handleChange}
 								placeholder="최대 인원을 입력하세요"
 							/>
@@ -135,7 +162,7 @@ export default function AddComponent() {
 							<Form.Control
 								as="select"
 								name="status"
-								value={joinProject.status}
+								value={project.status}
 								onChange={handleChange}
 							>
 								<option value="모집_중">모집 중</option>
@@ -151,7 +178,7 @@ export default function AddComponent() {
 								type="checkbox"
 								name="public"
 								label="공개"
-								checked={joinProject.public}
+								checked={project.public}
 								onChange={handleChange}
 							/>
 						</Form.Group>
@@ -167,7 +194,7 @@ export default function AddComponent() {
 				show={showModal}
 				handleClose={handleModalClose}
 				handleConfirm={handleConfirm}
-				description={`"${joinProject.title}"프로젝트를 등록하시겠습니까?`}
+				description={`"${project.title}"프로젝트를 등록하시겠습니까?`}
 			/>
 		</div>
 	);

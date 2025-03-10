@@ -1,5 +1,7 @@
 package com.ppp.backend.repository;
 
+import static org.assertj.core.api.Assertions.*;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
@@ -23,12 +25,56 @@ public class UserRepositoryTest {
 	@Autowired
 	private ProviderRepository provRepo;
 
+
 	// @Test
 	public void diTest() {
 		Assertions.assertNotNull(userRepo);
 		log.info("userRepo = {} ------------------", userRepo);
 	}
+	// @Test
+	public void testCreateAndFindUser() {
+		Provider prov = provRepo.findById(1L).orElseThrow();
+		User user = User.builder()
+				.password("password123")        // 사용자 비밀번호
+				.name("홍길동")                  // 사용자 이름
+				.email("hong@example.com")       // 사용자 이메일
+				.phoneNumber("010-1234-5678")     // 전화번호
+				.experience("3년")               // 경력 정보
+				.provider(prov)
+				.build();
+		User savedUser = userRepo.save(user);
+		User foundUser = userRepo.findById(savedUser.getId()).orElse(null);
+		assertThat(foundUser).isNotNull();
+		assertThat(foundUser.getName()).isEqualTo("홍길동");
+		assertThat(foundUser.getEmail()).isEqualTo("hong@example.com");
+		assertThat(foundUser.getPhoneNumber()).isEqualTo("010-1234-5678");
+		assertThat(foundUser.getExperience()).isEqualTo("3년");
+	}
+	// @Test
+	public void testUpdateUser() {
+		Provider prov = provRepo.findById(1L).orElseThrow();
+		Long userid = 1L;
 
+		User user = User.builder()
+				.id(userid)
+				.password("password123")
+				.name("홍길동테스트")
+				.email("hong@example11.com")
+				.phoneNumber("010-1234-5678")
+				.experience("4년")
+				.provider(prov)
+				.build();
+		userRepo.save(user);
+		log.info("userRepo = {} ---------------------", userRepo);
+	}
+	//@Test
+	// Todo findproject에  연관된 유저아이디가 있을경우 삭제 에러가남 User 엔티티에 FindProject와의 양방향 연관 관계 추가하기 가 필요할수도?
+	public void testDeleteUser() {
+		Provider prov = provRepo.findById(1L).orElseThrow();
+		Long userid = 1L;
+		User user = userRepo.findById(userid).orElseThrow();
+		userRepo.delete(user);
+	}
 	// @Test
 	public void providerInsertTest() {
 		Provider google = Provider.builder()
@@ -94,6 +140,11 @@ public class UserRepositoryTest {
 				.build();
 		userRepo.save(user);
 		log.info("user = {}", user);
+	}
+
+
+	public void findAll() {
+
 	}
 
 }

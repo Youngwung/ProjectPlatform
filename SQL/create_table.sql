@@ -96,13 +96,72 @@ CREATE TABLE portfolio (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- notice 테이블 생성
-CREATE TABLE alert (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+-- bookmark 테이블 생성
+CREATE TABLE bookmark_project (
+	id BIGINT AUTO_INCREMENT PRIMARY KEY,
+	user_id BIGINT NOT NULL,
     project_id BIGINT,
-    user_id BIGINT NOT NULL,
-    content TEXT,
-    status ENUM('초대','접수', '합격', '불합격') ,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- bookmark 테이블 생성
+CREATE TABLE bookmark_portfolio (
+	id BIGINT AUTO_INCREMENT PRIMARY KEY,
+	user_id BIGINT NOT NULL,
+    portfolio_id BIGINT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE project_type (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    type ENUM('all', 'skill', 'content') DEFAULT 'all',
+    project_id BIGINT NOT NULL
+);
+CREATE TABLE `alert_portfolio` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `portfolio_id` bigint DEFAULT NULL,
+  `user_id` bigint NOT NULL,
+  `content` text,
+  `status` enum('초대','접수','합격','불합격') DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `is_read` tinyint NOT NULL DEFAULT '0',
+  `type` enum('참가알림','초대알림') DEFAULT NULL,
+  PRIMARY KEY (`id`)https://docs.google.com/spreadsheets/d/1pP7Qc_6jqKE1Fs5lKI7elNvJDN61QAjLAXdi7yCLDUg/edit?gid=538927429#gid=538927429
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `alert_project` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `project_id` bigint DEFAULT NULL,
+  `alert_owner_id` bigint NOT NULL,
+  `sender_id` bigint NOT NULL,
+  `receiver_id` bigint NOT NULL,
+  `content` text,
+  `status` enum('신청','검토중','합격','불합격','초대수락','초대거절') DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `is_read` tinyint NOT NULL DEFAULT '0',
+  `type` enum('참가알림','초대알림') DEFAULT NULL,
+  `step` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE project_members (
+	project_id bigint NOT NULL,
+	user_id bigint NOT NULL,
+	PRIMARY KEY (`project_id`)
+);
+
+CREATE TABLE project_applications (
+	project_id bigint NOT NULL,
+	counts bigint NOT NULL,
+	PRIMARY KEY (`project_id`)
+);
+
+CREATE TABLE portfolio_invitations (
+	portfolio_id bigint NOT NULL,
+	counts bigint NOT NULL,
+	PRIMARY KEY (`portfolio_id`)
 );

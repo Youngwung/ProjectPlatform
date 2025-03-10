@@ -1,5 +1,8 @@
 package com.ppp.backend.service;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -8,37 +11,38 @@ import org.springframework.test.context.ActiveProfiles;
 import com.ppp.backend.dto.PageRequestDTO;
 import com.ppp.backend.dto.PageResponseDTO;
 import com.ppp.backend.dto.ProjectDTO;
-import com.ppp.backend.repository.SkillLevelRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
-// @SpringBootTest
+@SpringBootTest
 @Slf4j
 @ActiveProfiles("local")
 public class ProjectServiceTest {
 	@Autowired
 	private ProjectService projectService;
-	@Autowired
-	private SkillLevelRepository skillLevelRepo;
 
 	// @Test
-	// @Transactional
+	@Transactional
 	public void getTest() {
-		Long jPNo = 36L;
+		Long jPNo = 46L;
 		ProjectDTO projectDTO = projectService.get(jPNo);
 		System.out.println(projectDTO);
 	}
 
 	// @Test
+	@Transactional
 	public void registerTest() {
 		ProjectDTO dto =ProjectDTO.builder()
 		.title("registerSkillTest")
 		.description("testDescription")
-		.userId(1L)
-		.skills("#React:고급, #Java:중급, #Python:초급")
+		.userName("test")
+		.skills("#React:고급, #Java:중급")
 		.status("진행_중")
+		.type("all")
+		.maxPeople(6)
 		.build();
-		Long id = projectService.register(dto);
+		Long id = projectService.register(dto, 1L);
 		log.info("id = {}", id);
 	}
 
@@ -46,11 +50,15 @@ public class ProjectServiceTest {
 	public void modifyTest() {
 		String skills = "#React:고급, #Java:초급";
 		ProjectDTO dto =ProjectDTO.builder()
-		.id(38L)
+		.id(46L)
 		.title("modifySkillTest3")
 		.description("testSkillDescription")
 		.skills(skills)
-		.userId(1L)
+		.type("all")
+		.userName("test")
+		.isPublic(false)
+		.maxPeople(4)
+		.status("모집_중")
 		.build();
 		projectService.modify(dto);
 	}
@@ -66,9 +74,9 @@ public class ProjectServiceTest {
 			ProjectDTO dto =ProjectDTO.builder()
 			.title("title: " + i)
 			.description("testDescription" + i)
-			.userId(1L)
+			.userName("test")
 			.build();
-			Long id = projectService.register(dto);
+			Long id = projectService.register(dto, 1L);
 			log.info("id = {}", id);
 		}
 	}
@@ -79,6 +87,17 @@ public class ProjectServiceTest {
 		PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(1).build();
 		PageResponseDTO<ProjectDTO> result = projectService.getList(pageRequestDTO);
 		System.out.println(result);
+	}
+
+	@Test
+	public void getSearchResultTest() {
+		List<String> skills = Arrays.asList("java", "react", "python");
+		PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
+			.query("e")
+			.querySkills(skills)
+		.build();
+		PageResponseDTO<ProjectDTO> searchResult = projectService.getSearchResult(pageRequestDTO);
+		log.info("searchResult-----------{}", searchResult);
 	}
 
 }

@@ -3,10 +3,10 @@ import { useParams } from 'react-router-dom';
 import ModifyComponent from '../../components/project/ModifyComponent';
 
 export default function ModifyPage() {
-	const {jpNo} = useParams();
+	const {projectId} = useParams();
 	return (
 		<div>
-			<ModifyComponent jpNo = {jpNo}/>
+			<ModifyComponent projectId = {projectId}/>
 		</div>
 	)
 }

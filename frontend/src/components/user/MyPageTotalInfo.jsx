@@ -1,0 +1,226 @@
+import React, { useState, useEffect } from "react";
+import { Container, Row, Col, Alert } from "react-bootstrap";
+import authApi from "../../api/authApi";
+import { deleteBookmarkProjectOne,
+         getUserBookmarkProjectList,
+         deleteBookmarkPortfolioOne,
+         getUserBookmarkPortfolioList
+        } from "../../api/bookmarkProjectApi";
+import alertApi from "../../api/alertApi";
+import UserInfoCard from "./UserInfoCard";
+import DashboardCard from "./DashboardCard";
+import ExperienceCard from "./ExperienceCard";
+import AlertCard from "./AlertCard";
+import MyProjectPortfolioCard from "./MyProjectPortfolioCard";
+
+const MyPageTotalInfo = () => {
+  // 사용자 정보 상태
+  const [user, setUser] = useState(null);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertVariant, setAlertVariant] = useState("success");
+
+  // 프로젝트 & 포트폴리오 북마크
+  const [projectBookmarkList, setProjectBookmarkList] = useState([]);
+  const [portfolioBookmarkList, setPortfoiloBookmarkList] = useState([]);
+
+  // 프로젝트 & 포트폴리오 알림
+  const [projectAlerts, setProjectAlerts] = useState([]);
+  const [portfolioAlerts, setPortfolioAlerts] = useState([]);
+
+  // ✅ 북마크 프로젝트 목록 가져오는 함수
+  const handleBookmarkProjectList = async () => {
+    try {
+      const data = await getUserBookmarkProjectList(); // API 호출
+      //console.log("✅ 북마크된 프로젝트 리스트:", data);
+
+      // 📌 `projectTitle`을 기준으로 목록 업데이트
+      const formattedProjects = data.map((item) => ({
+        id: item.id,
+        projectId : item.projectId,
+        title: item.projectTitle, // 프로젝트 제목으로 매핑
+      }));
+
+      setProjectBookmarkList(formattedProjects); // 상태 업데이트
+    } catch (error) {
+      console.error("❌ 북마크된 프로젝트 목록을 가져오는 데 실패했습니다:", error);
+      setAlertMessage("북마크된 프로젝트를 불러오는데 실패했습니다.");
+      setAlertVariant("danger");
+    }
+  };
+  const handleBookmarkPortfolioList = async () =>{
+    try {
+      const data = await getUserBookmarkPortfolioList();
+      //console.log("✅ 북마크된 포폴 리스트:", data);
+      const formattedPortfolios = data.map((item) => ({
+        id: item.id,
+        portfolioId: item.portfolioId,
+        title: item.portfolioTitle, // 프로젝트 제목으로 매핑
+      }));
+      setPortfoiloBookmarkList(formattedPortfolios)
+    } catch (error) {
+      console.error("❌ 북마크된 포폴 목록을 가져오는 데 실패했습니다:", error);
+      setAlertMessage("북마크된 포폴을 불러오는데 실패했습니다.");
+      setAlertVariant("danger");
+    }
+
+  }
+  const handleDeleteBookmarkProject = async (id) => {
+    try {
+      await deleteBookmarkProjectOne(id); // 서버에서 삭제 요청
+      setProjectBookmarkList((prevList) =>
+        prevList.filter((project) => project.id !== id) // UI에서 즉시 반영
+      );
+      setAlertMessage("북마크가 삭제되었습니다.");
+      setAlertVariant("success");
+    } catch (error) {
+      console.error("❌ 북마크 삭제 실패:", error);
+      setAlertMessage("북마크 삭제에 실패했습니다.");
+      setAlertVariant("danger");
+    }
+  };
+  const handleDeleteBookmarkPortfolio = async (id) => {
+    try {
+      await deleteBookmarkPortfolioOne(id); // 서버에서 삭제 요청
+      setPortfoiloBookmarkList((prevList) =>
+        prevList.filter((portfolio) => portfolio.id !== id) // UI에서 즉시 반영
+      );
+      setAlertMessage("북마크가 삭제되었습니다.");
+      setAlertVariant("success");
+    } catch (error) {
+      console.error("❌ 북마크 삭제 실패:", error);
+      setAlertMessage("북마크 삭제에 실패했습니다.");
+      setAlertVariant("danger");
+    }
+  };
+  // ✅ 프로젝트 알림 목록 가져오는 함수
+const handleProjectAlerts = async () => {
+  try {
+    const data = await alertApi.getUnreadProjectAlerts();
+    //console.log("✅ 프로젝트 알림 리스트:", data);
+
+    // 🔥 'content' 필드만 표시하도록 변경
+    const formattedAlerts = data.slice(0, 10).map(alert => ({
+      id: alert.id,
+      content: alert.content, // ✅ 'message' 대신 'content' 사용
+      status: alert.status, // 상태 추가 (예: "초대", "접수", "합격" 등)
+      createdAt: new Date(alert.createdAt).toLocaleString(), // ✅ 날짜 포맷팅
+      isRead: alert.isRead,
+    }));
+
+    setProjectAlerts(formattedAlerts);
+  } catch (error) {
+    console.error("❌ 프로젝트 알림을 가져오는 데 실패:", error);
+  }
+};
+
+// ✅ 포트폴리오 알림 목록 가져오는 함수
+const handlePortfolioAlerts = async () => {
+  try {
+    const data = await alertApi.getUnreadPortfolioAlerts();
+    //console.log("✅ 포트폴리오 알림 리스트:", data);
+
+    // 🔥 'content' 필드만 표시하도록 변경
+    const formattedAlerts = data.slice(0, 10).map(alert => ({
+      id: alert.id,
+      content: alert.content, // ✅ 'message' 대신 'content' 사용
+      status: alert.status, // 상태 추가
+      createdAt: new Date(alert.createdAt).toLocaleString(), // ✅ 날짜 포맷팅
+      isRead: alert.isRead,
+    }));
+
+    setPortfolioAlerts(formattedAlerts);
+  } catch (error) {
+    console.error("❌ 포트폴리오 알림을 가져오는 데 실패:", error);
+  }
+};
+
+  useEffect(() => {
+    // ✅ 유저 정보 가져오기
+    authApi.getAuthenticatedUser()
+      .then((data) => {
+        //console.log("✅ 부모 컴포넌트에서 받은 user 값:", data);
+        setUser(data);
+      })
+      .catch(() => setAlertMessage("유저 정보를 불러오는데 실패했습니다."));
+
+    // ✅ 북마크 프로젝트 목록 가져오기
+    handleBookmarkProjectList();
+    handleBookmarkPortfolioList();
+
+    // ✅ 알림 목록 가져오기
+    handleProjectAlerts();
+    handlePortfolioAlerts();
+  }, []);
+
+  return (
+    <Container>
+      <h1>유저 정보</h1>
+      {alertMessage && (
+        <Alert variant={alertVariant} dismissible onClose={() => setAlertMessage("")}>
+          {alertMessage}
+        </Alert>
+      )}
+
+      {/* 유저 정보 & 대시보드 */}
+      <Row className="mb-4">
+        <Col md={6}>{user && <UserInfoCard user={user} />}</Col>
+        <Col md={6}>
+          <DashboardCard
+            bookmarkProjectList={projectBookmarkList} // ✅ 데이터 전달 (수정된 projectList)
+            onDeleteBookmarkProjectList={handleDeleteBookmarkProject}
+            bookmarkPortfolioList={portfolioBookmarkList}
+            onDeleteBookmarkPortfolioList={handleDeleteBookmarkPortfolio}
+          />
+        </Col>
+      </Row>
+
+      {/* 경력 정보 */}
+      <Row className="mb-4">
+        <Col md={12}>
+          {user && (
+            <ExperienceCard
+              experience={user.experience}
+              onSaveExperience={(newExperience) => {
+                setUser((prevUser) => ({
+                  ...prevUser,
+                  experience: newExperience,
+                }));
+
+                authApi.updateUserExperience({ experience: newExperience })
+                  .then(() => {
+                    setAlertMessage("경력이 성공적으로 업데이트되었습니다.");
+                    setAlertVariant("success");
+                  })
+                  .catch((error) => {
+                    console.error("❌ 경력 업데이트 실패:", error);
+                    setAlertMessage("경력 업데이트에 실패했습니다.");
+                    setAlertVariant("danger");
+                  });
+              }}
+            />
+          )}
+        </Col>
+      </Row>
+
+      {/* 알림 정보 */}
+      <Row>
+        <Col md={12}>
+          <AlertCard
+            projectAlerts={projectAlerts}
+            portfolioAlerts={portfolioAlerts}
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col md={12}>
+          <MyProjectPortfolioCard/>
+        </Col>
+      </Row>
+    </Container>
+  );
+};
+
+export default MyPageTotalInfo;
+
+
+//TODO UserContext 사용해서 user 정보 가져오기 유저의 정보를 그래서 중복된 로직과 코드를 줄이기

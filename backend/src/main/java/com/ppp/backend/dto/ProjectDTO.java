@@ -2,20 +2,27 @@ package com.ppp.backend.dto;
 
 import java.time.LocalDateTime;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import com.ppp.backend.dto.skill.BaseSkillDto;
 
-@Data
-@Builder
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+
+@Getter
+@Setter
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectDTO {
+public class ProjectDTO extends BaseSkillDto{
 	private Long id;
 
-	private Long userId;
+	private String userName;
 
 	private String title;
 
@@ -28,12 +35,14 @@ public class ProjectDTO {
 
 	private boolean isPublic;
 
+	private String email;
+
 	@ToString.Exclude
 	private LocalDateTime createdAt;
 
 	@ToString.Exclude
 	private LocalDateTime updatedAt;
 
-	// 클라이언트에서 전달받은 정규 표현식 문자열을 저장하는 컬럼.
-	private String skills;
+	// 프로젝트 타입을 받아오기 위한 필드
+	private String type;
 }

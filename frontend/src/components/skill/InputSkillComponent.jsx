@@ -8,7 +8,11 @@ import {
 	validateSkillsString,
 } from "./SkillTagUtil";
 
-export default function InputSkillComponent({ onValidationComplete, skills }) {
+export default function InputSkillComponent({
+	onValidationComplete,
+	skills,
+	disabled,
+}) {
 	const [skillsInput, setSkillsInput] = useState("");
 	const [isValidating, setIsValidating] = useState(false);
 	const [validationError, setValidationError] = useState("");
@@ -24,28 +28,27 @@ export default function InputSkillComponent({ onValidationComplete, skills }) {
 		// 입력창이 변경될 때 마다 부모 컴포넌트에 알림
 		onValidationComplete({
 			isValid: false,
-			value:newValue
-		})
-		
+			value: newValue,
+		});
 	};
 
-	// 통합 검증 처리
-	const handleValidation = async (event) => {
-		const input = event.target.value;
+	// 통합 검증 처리 함수
+	const validateSkills = async (input) => {
 		setSkillsInput(input);
+		//console.log(input);
 		// 검사 중인 경우 로딩창을 표시하기 위한 변수 초기화
 		setIsValidating(true);
 		// 에러메세지 초기화
 		setValidationError("");
 		try {
 			// 입력창이 비어있는 지 검사
-			if (!skillsInput.trim()) {
+			if (!input.trim()) {
 				setValidationError("입력값이 없습니다.");
 				return;
 			}
 
 			// 정규식 검사
-			if (!validateSkillsString(skillsInput)) {
+			if (!validateSkillsString(input)) {
 				setValidationError(
 					"형식이 올바르지 않습니다. 예: #React:중급, #Spring:고급"
 				);
@@ -54,34 +57,41 @@ export default function InputSkillComponent({ onValidationComplete, skills }) {
 			}
 
 			// 중복 검사
-			if (getDuplicatedString(skillsInput).length !== 0) {
-				setValidationError(`${getDuplicatedString(skillsInput)}: 중복된 기술이 있습니다`);
+			if (getDuplicatedString(input).length !== 0) {
+				setValidationError(
+					`${getDuplicatedString(input)}: 중복된 기술이 있습니다`
+				);
 				setIsValid(false);
 				return;
 			}
 
 			// DB 단어 검사
-			const result = await getProjectValid({ skills: skillsInput });
-			console.log(result.isValid)
+			const result = await getProjectValid({ skills: input });
+			//console.log(result.isValid);
 			if (!result.isValid) {
-        setValidationError(`${result.wrongString}: 등록되지 않은 기술이 포함되어 있습니다`);
-        setIsValid(false);
-        return;
-      }
+				setValidationError(
+					`${result.wrongString}: 등록되지 않은 기술이 포함되어 있습니다`
+				);
+				setIsValid(false);
+				return;
+			}
 
-      // 모든 검사 통과
-      setIsValid(true);
+			// 모든 검사 통과
+			setIsValid(true);
 			// 에러 메세지 초기화
-      setValidationError("");
-
+			setValidationError("");
 		} catch (error) {
 			setValidationError(error.message);
-			console.log(error);
+			//console.log(error);
 			setIsValid(false);
 		} finally {
 			// 검증 과정 종료
 			setIsValidating(false);
 		}
+	};
+	const handleValidation = async (event) => {
+		const input = event.target.value;
+		await validateSkills(input);
 	};
 
 	// 검증 결과가 변경될 때마다 부모 컴포넌트에 알림
@@ -95,11 +105,24 @@ export default function InputSkillComponent({ onValidationComplete, skills }) {
 
 	// 처음 컴포넌트를 마운트 할 때 기존 스킬 데이터를 불러오기 위한 훅
 	useEffect(() => {
-		if (skills){
-			setSkillsInput(skills)
+		if (skills) {
+			setSkillsInput(skills);
+			validateSkills(skills);
 		}
-	}, [skills])
-	
+	}, [skills]);
+
+	// 비활성화 변수 재렌더링 하기 위한 훅
+	const [isHidden, setIsHidden] = useState(false);
+	useEffect(() => {
+		setIsHidden(disabled);
+		if (disabled) {
+			// 스킬 유효성 검사 무시
+			setIsValid(true);
+			// 스킬 입력값 초기화
+			setSkillsInput("");
+		}
+		//console.log(disabled);
+	}, [disabled]);
 
 	return (
 		<Form.Group className="mb-3">
@@ -111,22 +134,29 @@ export default function InputSkillComponent({ onValidationComplete, skills }) {
 				onChange={handleInputChange}
 				onBlur={handleValidation}
 				placeholder="#기술:숙련도, #기술:숙련도"
+				disabled={disabled}
 			/>
 
 			{/* 검사 중일 때 표시할 로딩 창 */}
 			{isValidating && (
 				<div className="absolute right-2 top-2">
-					<div className="animate-spin h-5 w-5 border-2 border-blue-500 rounded-full border-t-transparent">검증 중...</div>
+					<div className="animate-spin h-5 w-5 border-2 border-blue-500 rounded-full border-t-transparent">
+						검증 중...
+					</div>
 				</div>
 			)}
 
 			{/* 에러메세지가 존재할 경우 */}
 			{validationError && (
-				<Alert className="my-2" variant="danger">{validationError}</Alert>
+				<Alert className={`my-2 ${isHidden ? "hidden" : ""}`} variant="danger">
+					{validationError}
+				</Alert>
 			)}
 
 			{/* 파싱된 스킬 표시 */}
-			<div className="d-flex flex-wrap gap-2 mt-2">
+			<div
+				className={`d-flex flex-wrap gap-2 mt-2 ${isHidden ? "hidden" : ""}`}
+			>
 				<span className="my-2">태그 미리보기:</span>
 				{parseSkills(skillsInput).map((skill, index) => (
 					<span

@@ -10,11 +10,11 @@ export default function SkillTagComponent({ skills }) {
 	const skillArray = parseSkills(skills);
 
 	return (
-		<div className="font-extrabold">
+		<div className="flex flex-wrap gap-1 font-extrabold">
 			{skillArray.map((skill, index) => (
 				<span
 					key={index}
-					className={`skill-tag p-1 px-2 mx-1 rounded 
+					className={`skill-tag p-1 px-2 rounded inline-block
 						${getTailwindClassByLevel(skill.level)}`}
 				>
 					<code>{skill.language}</code>

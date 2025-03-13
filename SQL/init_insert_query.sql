@@ -108,4 +108,9 @@ INSERT INTO skill (name, skill_category_id) VALUES ('Backbone.js', 19);
 INSERT INTO skill (name, skill_category_id) VALUES ('Preact', 19);
 INSERT INTO skill (name, skill_category_id) VALUES ('Nuxt.js', 19);
 
+INSERT INTO provider (id, name, description) VALUES (1, 'google', '구글 프로바이더');
+INSERT INTO provider (id, name, description) VALUES (2, 'naver', '네이버 프로바이더');
+INSERT INTO provider (id, name, description) VALUES (3, 'kakao', '카카오 프로바이더');
+INSERT INTO provider (id, name, description) VALUES (4, 'local', '로컬 회원가입');
+
 commit;
